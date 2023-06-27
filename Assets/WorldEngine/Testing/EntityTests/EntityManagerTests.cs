@@ -20,9 +20,9 @@ public class EntityManagerTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
-        we.characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/World Engine/Entity/Character/Prefabs/UserAvatar.prefab");
-        we.voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/World Engine/Entity/Voxel/Prefabs/Voxel.prefab");
-        we.inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/World Engine/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab");
+        we.characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Character/Prefabs/UserAvatar.prefab");
+        we.voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Voxel/Prefabs/Voxel.prefab");
+        we.inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab");
         yield return null;
         WorldEngine.LoadWorld("test");
 

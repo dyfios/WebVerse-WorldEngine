@@ -167,6 +167,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Get the visibility state of the entity.
+        /// </summary>
+        /// <returns>The visibility state of the entity.</returns>
+        public virtual bool GetVisibility()
+        {
+            return gameObject.activeSelf;
+        }
+
+        /// <summary>
         /// Delete the entity.
         /// </summary>
         /// <returns>Whether or not the setting was successful.</returns>
@@ -191,6 +200,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 synchronizer.SetHighlight(this, highlight);
             }
+            return false;
+        }
+
+        /// <summary>
+        /// Get the highlight state of the entity.
+        /// </summary>
+        /// <returns>The highlight state of the entity.</returns>
+        public virtual bool GetHighlight()
+        {
             return false;
         }
 

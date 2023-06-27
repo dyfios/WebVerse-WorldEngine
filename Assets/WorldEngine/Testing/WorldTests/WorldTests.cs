@@ -18,13 +18,13 @@ public class WorldTests
         // Initialize.
         World.WorldInfo worldInfo = new World.WorldInfo()
         {
-            characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/World Engine/Entity/Character/Prefabs/UserAvatar.prefab"),
+            characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Character/Prefabs/UserAvatar.prefab"),
             highlightMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit")),
-            inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/World Engine/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab"),
+            inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab"),
             maxEntryLength = 128,
             maxKeyLength = 16,
             maxStorageEntries = 16,
-            voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/World Engine/Entity/Voxel/Prefabs/Voxel.prefab")
+            voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Voxel/Prefabs/Voxel.prefab")
         };
         world.Initialize(worldInfo);
         Assert.IsNotNull(world.entityManager);

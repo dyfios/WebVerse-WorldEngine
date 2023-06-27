@@ -35,12 +35,16 @@ public class EntityTests
         // Set Visibility.
         be.SetVisibility(true);
         Assert.IsTrue(be.gameObject.activeSelf);
+        Assert.IsTrue(be.GetVisibility());
         be.SetVisibility(false);
         Assert.IsFalse(be.gameObject.activeSelf);
+        Assert.IsFalse(be.GetVisibility());
 
         // Set Highlight.
         be.SetHighlight(true);
+        Assert.IsFalse(be.GetHighlight());
         be.SetHighlight(false);
+        Assert.IsFalse(be.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject();
@@ -210,12 +214,16 @@ public class EntityTests
         // Set Visibility.
         uie.SetVisibility(true);
         Assert.IsTrue(uie.gameObject.activeSelf);
+        Assert.IsFalse(uie.GetHighlight());
         uie.SetVisibility(false);
         Assert.IsFalse(uie.gameObject.activeSelf);
+        Assert.IsFalse(uie.GetHighlight());
 
         // Set Highlight.
         uie.SetHighlight(true);
+        Assert.IsFalse(uie.GetHighlight());
         uie.SetHighlight(false);
+        Assert.IsFalse(uie.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject("parentGO");
@@ -393,8 +401,10 @@ public class EntityTests
         // Set Visibility.
         uie.SetVisibility(true);
         Assert.IsTrue(uie.gameObject.activeSelf);
+        Assert.IsTrue(uie.GetVisibility());
         uie.SetVisibility(false);
         Assert.IsFalse(uie.gameObject.activeSelf);
+        Assert.IsFalse(uie.GetVisibility());
 
         // Set Highlight.
         uie.SetHighlight(true);
@@ -573,12 +583,16 @@ public class EntityTests
         // Set Visibility.
         ce.SetVisibility(true);
         Assert.IsTrue(ce.gameObject.activeSelf);
+        Assert.IsTrue(ce.GetVisibility());
         ce.SetVisibility(false);
         Assert.IsFalse(ce.gameObject.activeSelf);
+        Assert.IsFalse(ce.GetVisibility());
 
         // Set Highlight.
         ce.SetHighlight(true);
+        Assert.IsFalse(ce.GetHighlight());
         ce.SetHighlight(false);
+        Assert.IsFalse(ce.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject();
@@ -772,12 +786,16 @@ public class EntityTests
         // Set Visibility.
         be.SetVisibility(true);
         Assert.IsTrue(be.gameObject.activeSelf);
+        Assert.IsTrue(be.GetVisibility());
         be.SetVisibility(false);
         Assert.IsFalse(be.gameObject.activeSelf);
+        Assert.IsFalse(be.GetVisibility());
 
         // Set Highlight.
         be.SetHighlight(true);
+        Assert.IsFalse(be.GetHighlight());
         be.SetHighlight(false);
+        Assert.IsFalse(be.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject("parentGO");
@@ -959,7 +977,7 @@ public class EntityTests
         GameObject WEGO = new GameObject("WEGO");
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
         yield return null;
-        we.inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/World Engine/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab");
+        we.inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab");
         WorldEngine.LoadWorld("test");
 
         // Set up Entity.
@@ -984,12 +1002,16 @@ public class EntityTests
         // Set Visibility.
         ie.SetVisibility(true);
         Assert.IsTrue(ie.gameObject.activeSelf);
+        Assert.IsTrue(ie.GetVisibility());
         ie.SetVisibility(false);
         Assert.IsFalse(ie.gameObject.activeSelf);
+        Assert.IsFalse(ie.GetVisibility());
 
         // Set Highlight.
         ie.SetHighlight(true);
+        Assert.IsFalse(ie.GetHighlight());
         ie.SetHighlight(false);
+        Assert.IsFalse(ie.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject("parentGO");
@@ -1191,12 +1213,16 @@ public class EntityTests
         // Set Visibility.
         te.SetVisibility(true);
         Assert.IsTrue(te.gameObject.activeSelf);
+        Assert.IsTrue(te.GetVisibility());
         te.SetVisibility(false);
         Assert.IsFalse(te.gameObject.activeSelf);
+        Assert.IsFalse(te.GetVisibility());
 
         // Set Highlight.
         te.SetHighlight(true);
+        Assert.IsFalse(te.GetHighlight());
         te.SetHighlight(false);
+        Assert.IsFalse(te.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject("parentGO");
@@ -1387,7 +1413,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
-        we.characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/World Engine/Entity/Character/Prefabs/UserAvatar.prefab");
+        we.characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Character/Prefabs/UserAvatar.prefab");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -1406,12 +1432,16 @@ public class EntityTests
         // Set Visibility.
         ce.SetVisibility(true);
         Assert.IsTrue(ce.gameObject.activeSelf);
+        Assert.IsTrue(ce.GetVisibility());
         ce.SetVisibility(false);
         Assert.IsFalse(ce.gameObject.activeSelf);
+        Assert.IsFalse(ce.GetVisibility());
 
         // Set Highlight.
         ce.SetHighlight(true);
+        Assert.IsFalse(ce.GetHighlight());
         ce.SetHighlight(false);
+        Assert.IsFalse(ce.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject();
@@ -1582,12 +1612,16 @@ public class EntityTests
         // Set Visibility.
         le.SetVisibility(true);
         Assert.IsTrue(le.gameObject.activeSelf);
+        Assert.IsTrue(le.GetVisibility());
         le.SetVisibility(false);
         Assert.IsFalse(le.gameObject.activeSelf);
+        Assert.IsFalse(le.GetVisibility());
 
         // Set Highlight.
         le.SetHighlight(true);
+        Assert.IsFalse(le.GetHighlight());
         le.SetHighlight(false);
+        Assert.IsFalse(le.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject();
@@ -1789,12 +1823,16 @@ public class EntityTests
         // Set Visibility.
         me.SetVisibility(true);
         Assert.IsTrue(me.gameObject.activeSelf);
+        Assert.IsTrue(me.GetVisibility());
         me.SetVisibility(false);
         Assert.IsFalse(me.gameObject.activeSelf);
+        Assert.IsFalse(me.GetVisibility());
 
         // Set Highlight.
         me.SetHighlight(true);
+        Assert.IsFalse(me.GetHighlight());
         me.SetHighlight(false);
+        Assert.IsFalse(me.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject();
@@ -1974,12 +2012,16 @@ public class EntityTests
         // Set Visibility.
         te.SetVisibility(true);
         Assert.IsTrue(te.terrain.drawHeightmap);
+        Assert.IsTrue(te.GetVisibility());
         te.SetVisibility(false);
         Assert.IsFalse(te.terrain.drawHeightmap);
+        Assert.IsFalse(te.GetVisibility());
 
         // Set Highlight.
         te.SetHighlight(true);
+        Assert.IsTrue(te.GetHighlight());
         te.SetHighlight(false);
+        Assert.IsFalse(te.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject();
@@ -2133,7 +2175,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
-        we.voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/World Engine/Entity/Voxel/Prefabs/Voxel.prefab");
+        we.voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Voxel/Prefabs/Voxel.prefab");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -2151,12 +2193,16 @@ public class EntityTests
         // Set Visibility.
         ve.SetVisibility(true);
         Assert.IsTrue(ve.gameObject.activeSelf);
+        Assert.IsTrue(ve.GetVisibility());
         ve.SetVisibility(false);
         Assert.IsFalse(ve.gameObject.activeSelf);
+        Assert.IsFalse(ve.GetVisibility());
 
         // Set Highlight.
         ve.SetHighlight(true);
+        Assert.IsFalse(ve.GetHighlight());
         ve.SetHighlight(false);
+        Assert.IsFalse(ve.GetHighlight());
 
         // Set Parent/Get Parent.
         GameObject parentGO = new GameObject();

@@ -120,6 +120,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Get the highlight state of the entity.
+        /// </summary>
+        /// <returns>The highlight state of the entity.</returns>
+        public override bool GetHighlight()
+        {
+            return highlightCube.activeSelf;
+        }
+
+        /// <summary>
         /// Set the interaction state for the entity.
         /// </summary>
         /// <param name="stateToSet">Interaction state to set.</param>
@@ -195,6 +204,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             terrain.drawHeightmap = visible;
 
             return true;
+        }
+
+        /// <summary>
+        /// Get the visibility state of the entity.
+        /// </summary>
+        /// <returns>The visibility state of the entity.</returns>
+        public override bool GetVisibility()
+        {
+            return terrain.drawHeightmap;
         }
 
         /// <summary>
