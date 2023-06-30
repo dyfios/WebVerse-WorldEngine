@@ -109,6 +109,25 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Load a mesh entity.
+        /// </summary>
+        /// <param name="parentEntity">Parent entity to give the mesh entity.</param>
+        /// <param name="meshPrefab">Prefab to load mesh entity from.</param>
+        /// <param name="position">Position to apply to the mesh entity.</param>
+        /// <param name="rotation">Rotation to apply to the mesh entity.</param>
+        /// <param name="id">ID to apply to the mesh entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>The ID of the new mesh entity.</returns>
+        public Guid LoadMeshEntity(BaseEntity parentEntity, GameObject meshPrefab,
+            Vector3 position, Quaternion rotation, Guid? id = null, Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadMeshEntity(meshPrefab, entityID, parentEntity,
+                position, rotation, onLoaded));
+            return entityID;
+        }
+
+        /// <summary>
         /// Load a terrain entity.
         /// </summary>
         /// <param name="length">Length of the terrain.</param>
@@ -342,6 +361,36 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             GameObject lightEntityObject = new GameObject("LightEntity-" + id.ToString());
             LightEntity entity = lightEntityObject.AddComponent<LightEntity>();
+            entities.Add(id, entity);
+            entity.SetParent(parent);
+            entity.SetPosition(position, true);
+            entity.SetRotation(rotation, true);
+            entity.Initialize(id);
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
+        /// <summary>
+        /// Loads a mesh entity.
+        /// </summary>
+        /// <param name="meshPrefab">Prefab to load the mesh entity from.</param>
+        /// <param name="id">ID of the mesh entity.</param>
+        /// <param name="parent">Parent of the mesh entity.</param>
+        /// <param name="position">Position of the mesh entity.</param>
+        /// <param name="rotation">Rotation of the mesh entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>Coroutine, completes after invocation of the OnLoaded action.</returns>
+        private System.Collections.IEnumerator LoadMeshEntity(GameObject meshPrefab, Guid id, BaseEntity parent,
+            Vector3 position, Quaternion rotation, Action onLoaded)
+        {
+            GameObject meshGO = Instantiate(meshPrefab);
+            meshGO.name = "MeshEntity-" + id.ToString();
+            MeshEntity entity = meshGO.AddComponent<MeshEntity>();
             entities.Add(id, entity);
             entity.SetParent(parent);
             entity.SetPosition(position, true);
