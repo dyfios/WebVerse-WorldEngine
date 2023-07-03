@@ -183,18 +183,18 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="parentEntity">Parent entity to give the text entity.</param>
         /// <param name="positionPercent">Position to apply to the text entity
         /// as a percentage of the canvas.</param>
-        /// <param name="scale">Scale/size to apply to the text entity.</param>
+        /// <param name="sizePercent">Size to apply to the text entity
+        /// as a percentage of the canvas.</param>
         /// <param name="id">ID to apply to the text entity.</param>
-        /// <param name="isSize">Whether or not the scale value is for a size.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>The ID of the new text entity.</returns>
         public Guid LoadTextEntity(string text, int fontSize, CanvasEntity parentEntity,
-            Vector3 positionPercent, Vector3 scale, Guid? id = null,
-            bool isSize = false, Action onLoaded = null)
+            Vector2 positionPercent, Vector2 sizePercent, Guid? id = null,
+            Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadTextEntity(text, fontSize, entityID,
-                parentEntity, positionPercent, onLoaded));
+                parentEntity, positionPercent, sizePercent, onLoaded));
             return entityID;
         }
 
@@ -204,19 +204,20 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="parentEntity">Parent entity to give the button entity.</param>
         /// <param name="positionPercent">Position to apply to the button entity
         /// as a percentage of the canvas.</param>
-        /// <param name="scale">Scale/size to apply to the button entity.</param>
+        /// <param name="sizePercent">Size to apply to the button entity
+        /// as a percentage of the canvas.</param>
         /// <param name="onClick">Action to perform on click of the button.</param>
         /// <param name="id">ID to apply to the button entity.</param>
         /// <param name="isSize">Whether or not the scale value is for a size.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>The ID of the new button entity.</returns>
         public Guid LoadButtonEntity(CanvasEntity parentEntity,
-            Vector3 positionPercent, Vector3 scale, Action onClick, Guid? id = null,
-            bool isSize = false, Action onLoaded = null)
+            Vector2 positionPercent, Vector2 sizePercent, Action onClick, Guid? id = null,
+            Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadButtonEntity(entityID,
-                parentEntity, positionPercent, onClick, onLoaded));
+                parentEntity, positionPercent, sizePercent, onClick, onLoaded));
             return entityID;
         }
 
@@ -226,18 +227,19 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="parentEntity">Parent entity to give the input entity.</param>
         /// <param name="positionPercent">Position to apply to the input entity
         /// as a percentage of the canvas.</param>
-        /// <param name="scale">Scale/size to apply to the input entity.</param>
+        /// <param name="sizePercent">Size to apply to the input entity
+        /// as a percentage of the canvas.</param>
         /// <param name="id">ID to apply to the input entity.</param>
         /// <param name="isSize">Whether or not the scale value is for a size.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>The ID of the new input entity.</returns>
         public Guid LoadInputEntity(CanvasEntity parentEntity,
-            Vector3 positionPercent, Vector3 scale, Guid? id = null,
-            bool isSize = false, Action onLoaded = null)
+            Vector2 positionPercent, Vector2 sizePercent, Guid? id = null,
+            Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadInputEntity(entityID,
-                parentEntity, positionPercent, onLoaded));
+                parentEntity, positionPercent, sizePercent, onLoaded));
             return entityID;
         }
 
@@ -253,7 +255,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>The ID of the new voxel entity.</returns>
         public Guid LoadVoxelEntity(BaseEntity parentEntity,
             Vector3 position, Quaternion rotation, Vector3 scale, Guid? id = null,
-            Action<string> onLoaded = null)
+            Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadVoxelEntity(entityID,
@@ -485,16 +487,18 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="id">ID of the text entity.</param>
         /// <param name="parent">Parent of the text entity.</param>
         /// <param name="positionPercent">Position of the text entity as a percentage of the canvas.</param>
+        /// <param name="sizePercent">Size of the text entity as a percentage of the canvas.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
         private System.Collections.IEnumerator LoadTextEntity(string text, int fontSize,
-            Guid id, CanvasEntity parent, Vector3 positionPercent, Action onLoaded)
+            Guid id, CanvasEntity parent, Vector2 positionPercent, Vector2 sizePercent, Action onLoaded)
         {
             GameObject textEntityObject = new GameObject("TextEntity-" + id.ToString());
             TextEntity entity = textEntityObject.AddComponent<TextEntity>();
             entities.Add(id, entity);
             entity.Initialize(id, parent);
             entity.SetPositionPercent(positionPercent, true);
+            entity.SetSizePercent(sizePercent, true);
             entity.SetText(text);
             entity.SetFontSize(fontSize);
 
@@ -512,16 +516,18 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="id">ID of the button entity.</param>
         /// <param name="parent">Parent of the button entity.</param>
         /// <param name="positionPercent">Position of the button entity as a percentage of the canvas.</param>
+        /// <param name="sizePercent">Size of the button entity as a percentage of the canvas.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
         private System.Collections.IEnumerator LoadButtonEntity(Guid id, CanvasEntity parent,
-            Vector3 positionPercent, Action onClick, Action onLoaded)
+            Vector2 positionPercent, Vector2 sizePercent, Action onClick, Action onLoaded)
         {
             GameObject buttonEntityObject = new GameObject("ButtonEntity-" + id.ToString());
             ButtonEntity entity = buttonEntityObject.AddComponent<ButtonEntity>();
             entities.Add(id, entity);
             entity.Initialize(id, parent);
             entity.SetPositionPercent(positionPercent, true);
+            entity.SetSizePercent(sizePercent, true);
 
             if (onLoaded != null)
             {
@@ -539,10 +545,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="id">ID of the input entity.</param>
         /// <param name="parent">Parent of the input entity.</param>
         /// <param name="positionPercent">Position of the input entity as a percentage of the canvas.</param>
+        /// <param name="sizePercent">Size of the input entity as a percentage of the canvas.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
         private System.Collections.IEnumerator LoadInputEntity(Guid id, CanvasEntity parent,
-            Vector3 positionPercent, Action onLoaded)
+            Vector2 positionPercent, Vector2 sizePercent, Action onLoaded)
         {
             GameObject inputEntityObject = Instantiate(inputEntityPrefab);
             inputEntityObject.name = "InputEntity-" + id.ToString();
@@ -550,6 +557,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             entities.Add(id, entity);
             entity.Initialize(id, parent);
             entity.SetPositionPercent(positionPercent, true);
+            entity.SetSizePercent(sizePercent, true);
 
             if (onLoaded != null)
             {
@@ -570,7 +578,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
         private System.Collections.IEnumerator LoadVoxelEntity(Guid id, BaseEntity parent,
-            Vector3 position, Quaternion rotation, Vector3 scale, Action<string> onLoaded)
+            Vector3 position, Quaternion rotation, Vector3 scale, Action onLoaded)
         {
             GameObject voxelEntityObject = new GameObject("VoxelEntity-" + id.ToString());
             VoxelEntity entity = voxelEntityObject.AddComponent<VoxelEntity>();
@@ -584,7 +592,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             if (onLoaded != null)
             {
                 yield return new WaitForSeconds(0.01f);
-                onLoaded.Invoke(id.ToString());
+                onLoaded.Invoke();
             }
 
             yield return null;
