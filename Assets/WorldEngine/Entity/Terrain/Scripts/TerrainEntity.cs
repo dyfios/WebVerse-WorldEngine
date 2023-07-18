@@ -4,6 +4,8 @@ using System;
 using UnityEngine;
 using FiveSQD.WebVerse.WorldEngine.Materials;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
+using FiveSQD.WebVerse.WorldEngine.Entity.Terrain;
+using System.Collections.Generic;
 
 namespace FiveSQD.WebVerse.WorldEngine.Entity
 {
@@ -15,7 +17,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <summary>
         /// Terrain object for the terrain entity.
         /// </summary>
-        public Terrain terrain;
+        public UnityEngine.Terrain terrain;
 
         /// <summary>
         /// Terrain collider for the terrain entity.
@@ -26,6 +28,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Highlight cube for the terrain entity.
         /// </summary>
         private GameObject highlightCube;
+
+        /// <summary>
+        /// Heights values. Stored since the rendered terrain is interpolated.
+        /// </summary>
+        private float[,] heights;
 
         /// <summary>
         /// Create a terrain entity.
@@ -42,20 +49,22 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             GameObject terrainGO = new GameObject("TerrainEntity-" + id.ToString());
             TerrainEntity terrainEntity = terrainGO.AddComponent<TerrainEntity>();
             TerrainData terrainData = new TerrainData();
-            for (int i = 0; i < heights.GetLength(0); i++)
+            /*for (int i = 0; i < heights.GetLength(0); i++)
             {
                 for (int j = 0; j < heights.GetLength(1); j++)
                 {
                     heights[i, j] = heights[i, j] / height;
                 }
-            }
-            terrainData.heightmapResolution = GetTerrainSize(Math.Max(length, width));
-            terrainData.SetHeights(0, 0, heights);
-            terrainData.size = new Vector3(length, height, width);
-            GameObject terrainObject = Terrain.CreateTerrainGameObject(terrainData);
+            }*/
+            //terrainData.heightmapResolution = GetTerrainSize(Math.Max(length, width));
+            //terrainData.SetHeights(0, 0, heights);
+            //terrainData.size = new Vector3(length, height, width);
+            GameObject terrainObject = UnityEngine.Terrain.CreateTerrainGameObject(terrainData);
             terrainObject.transform.SetParent(terrainGO.transform);
-            terrainEntity.terrain = terrainObject.GetComponent<Terrain>();
+            terrainEntity.terrain = terrainObject.GetComponent<UnityEngine.Terrain>();
             terrainEntity.terrainCollider = terrainObject.GetComponent<TerrainCollider>();
+            terrainEntity.Initialize(id);
+            terrainEntity.SetHeights(length, width, height, heights);
             return terrainEntity;
         }
 
@@ -216,6 +225,339 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Set the heights of the terrain.
+        /// </summary>
+        /// <param name="newLength">New length in meters of the terrain.</param>
+        /// <param name="newWidth">New width in meters of the terrain.</param>
+        /// <param name="newHeight">New height in meters of the terrain.</param>
+        /// <param name="newHeights">New array of heights for the terrain. Array will be distributed across the terrain.
+        /// For example, a terrain that is 8 meters long and has a newHeights array of 16 elements will have one data point
+        /// for every half meter, Length and width of array cannot exceed 4097 units.</param>
+        public void SetHeights(float newLength, float newWidth, float newHeight, float[,] newHeights)
+        {
+            // ------- Input Validation -------
+            if (newLength < 1 || newWidth < 1 || newHeight < 1)
+            {
+                LogSystem.LogWarning("[TerrainEntity->SetHeights] New length, width, and height must be greater than 0.");
+                return;
+            }
+
+            if (newHeights == null)
+            {
+                LogSystem.LogWarning("[TerrainEntity->SetHeights] Invalid new heights array.");
+                return;
+            }
+
+            int newTerrainArrayLength = newHeights.GetLength(0);
+            int newTerrainArrayWidth = newHeights.GetLength(1);
+
+            if (newTerrainArrayLength > 4097 || newTerrainArrayWidth > 4097 ||
+                newTerrainArrayLength < 1 || newTerrainArrayWidth < 1)
+            {
+                LogSystem.LogWarning("[TerrainEntity->SetHeights] Terrain cannot contain less than 1 or more than 4097 elements in any direction.");
+                return;
+            }
+
+            // ------- Size New Terrain Object -------
+            int newTerrainDataSize = GetTerrainSize(Math.Max(newLength, newWidth));
+
+            // ------- Fit New Terrain Data to New Terrain Object -------
+            float[,] newFittedHeights = new float[newTerrainDataSize, newTerrainDataSize];
+            float xCapacityToDataRatio = (float) newTerrainArrayLength / newTerrainDataSize;
+            float yCapacityToDataRatio = (float) newTerrainArrayWidth / newTerrainDataSize;
+            for (int i = 0; i < newTerrainDataSize; i++)
+            {
+                // Index of the lower x element in the data array to use.
+                int lowerXIdx = (int) (i * xCapacityToDataRatio);
+
+                // Index of the upper x element in the data array to use.
+                int upperXIdx = Math.Min((int) (i * xCapacityToDataRatio + 1), newTerrainArrayLength - 1);
+
+                // Percentage between the lower and upper x elements to interpolate.
+                float xInterpolationPercentage = lowerXIdx == upperXIdx ? 0 : (i - lowerXIdx / xCapacityToDataRatio) * xCapacityToDataRatio;
+
+                // Run for each y element.
+                for (int j = 0; j < newTerrainDataSize; j++)
+                {
+                    // Index of the lower y element in the data array to use.
+                    int lowerYIdx = (int) (j * yCapacityToDataRatio);
+
+                    // Index of the upper y element in the data array to use.
+                    int upperYIdx = Math.Min((int) (j * yCapacityToDataRatio + 1), newTerrainArrayWidth - 1);
+
+                    // Percentage between the lower and upper y elements to interpolate.
+                    float yInterpolationPercentage = lowerYIdx == upperYIdx ? 0 : (j - lowerYIdx / yCapacityToDataRatio) * yCapacityToDataRatio;
+
+                    // Get value between two elements on x axis.
+                    float xInterpolation = newHeights[lowerXIdx, lowerYIdx]
+                        + xInterpolationPercentage * (newHeights[upperXIdx, lowerYIdx] - newHeights[lowerXIdx, lowerYIdx]);
+
+                    // Get value between two elements on y axis.
+                    float yInterpolation = newHeights[lowerXIdx, lowerYIdx]
+                        + yInterpolationPercentage * (newHeights[lowerXIdx, upperYIdx] - newHeights[lowerXIdx, lowerYIdx]);
+
+                    // Average two axes to get single height value.
+                    float newHeightValue = xInterpolation + yInterpolation / 2;
+
+                    // Assign height value.
+                    newFittedHeights[i, j] = newHeightValue / newHeight;
+                }
+            }
+
+            // ------- Set Up Terrain -------
+            terrain.terrainData.heightmapResolution = newTerrainDataSize;
+            terrain.terrainData.SetHeights(0, 0, newFittedHeights);
+            terrain.terrainData.size = new Vector3(newLength, newHeight, newWidth);
+            heights = newHeights;
+        }
+
+        /// <summary>
+        /// Get a 2d array of heights for the terrain.
+        /// </summary>
+        /// <returns>A 2d array of heights for the terrain.</returns>
+        public float[,] GetHeights()
+        {
+            /*float[,] rawHeights = terrain.terrainData.GetHeights(
+                0, 0, terrain.terrainData.heightmapResolution, terrain.terrainData.heightmapResolution);
+
+            int len = rawHeights.GetLength(0);
+            int width = rawHeights.GetLength(1);
+            float[,] processedHeights = new float[len, width];
+            for (int i = 0; i < len; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    processedHeights[i, j] = rawHeights[i, j] * terrain.terrainData.size.y;
+                }
+            }*/
+
+            return heights;
+        }
+
+        /// <summary>
+        /// Set the height at a given x, y index.
+        /// </summary>
+        /// <param name="xIndex">X index to set height at.</param>
+        /// <param name="yIndex">Y index to set height at.</param>
+        /// <param name="height">Height to set.</param>
+        public void SetHeight(int xIndex, int yIndex, float height)
+        {
+            if (heights.GetLength(0) <= xIndex || heights.GetLength(1) <= yIndex)
+            {
+                LogSystem.LogWarning("[TerrainEntity->SetHeight] Invalid index.");
+                return;
+            }
+
+            float[,] heightsToSet = new float[,] { { height / terrain.terrainData.size.y } };
+            terrain.terrainData.SetHeights(xIndex, yIndex, heightsToSet);
+            heights[xIndex, yIndex] = height;
+        }
+
+        /// <summary>
+        /// Get the height at a given x, y index.
+        /// </summary>
+        /// <param name="xIndex">X index to get height at.</param>
+        /// <param name="yIndex">Y index to get height at.</param>
+        /// <returns>Height at given index.</returns>
+        public float GetHeight(int xIndex, int yIndex)
+        {
+            //return terrain.terrainData.GetHeight(xIndex, yIndex) * terrain.terrainData.size.y;
+
+            if (heights.GetLength(0) <= xIndex || heights.GetLength(1) <= yIndex)
+            {
+                LogSystem.LogWarning("[TerrainEntity->GetHeight] Invalid index.");
+                return 0;
+            }
+
+            return heights[xIndex, yIndex];
+        }
+
+        /// <summary>
+        /// Add a layer to the terrain entity.
+        /// </summary>
+        /// <param name="layer">Layer to add to the terrain entity.</param>
+        /// <returns>Index of the new layer, or -1 if failed.</returns>
+        public int AddLayer(TerrainEntityLayer layer)
+        {
+            if (layer.metallic < 0 || layer.metallic > 1)
+            {
+                LogSystem.LogWarning("[TerrainEntity->AddLayer] Invalid metallic value. Must be between 0 and 1.");
+                return -1;
+            }
+
+            if (layer.smoothness < 0 || layer.smoothness > 1)
+            {
+                LogSystem.LogWarning("[TerrainEntity->AddLayer] Invalid smoothness value. Must be between 0 and 1.");
+                return -1;
+            }
+
+            TerrainLayer[] oldLayers = terrain.terrainData.terrainLayers;
+            List<TerrainLayer> newLayers = new List<TerrainLayer>();
+            if (oldLayers != null)
+            {
+                foreach (TerrainLayer oldLayer in oldLayers)
+                {
+                    newLayers.Add(oldLayer);
+                }
+            }
+
+            TerrainLayer newLayer = new TerrainLayer();
+            newLayer.diffuseTexture = layer.diffuse;
+            newLayer.normalMapTexture = layer.normal;
+            newLayer.maskMapTexture = layer.mask;
+            newLayer.specular = layer.specular;
+            newLayer.metallic = layer.metallic;
+            newLayer.smoothness = layer.smoothness;
+            newLayers.Add(newLayer);
+
+            terrain.terrainData.terrainLayers = newLayers.ToArray();
+            return newLayers.Count - 1;
+        }
+
+        /// <summary>
+        /// Remove a layer from the terrain entity.
+        /// </summary>
+        /// <param name="index">Index of the layer to remove.</param>
+        /// <returns>Whether or not the removal was successful.</returns>
+        public bool RemoveLayer(int index)
+        {
+            if (index < 0)
+            {
+                LogSystem.LogWarning("[TerrainEntity->RemoveLayer] Index must be greater than 0.");
+                return false;
+            }
+
+            TerrainLayer[] oldLayers = terrain.terrainData.terrainLayers;
+            List<TerrainLayer> newLayers = new List<TerrainLayer>();
+            if (oldLayers != null)
+            {
+                foreach (TerrainLayer oldLayer in oldLayers)
+                {
+                    newLayers.Add(oldLayer);
+                }
+            }
+
+            if (index >= newLayers.Count)
+            {
+                LogSystem.LogWarning("[TerrainEntity->RemoveLayer] Invalid index "
+                    + index + ". Only " + newLayers.Count + " layers.");
+                return false;
+            }
+
+            newLayers.RemoveAt(index);
+            terrain.terrainData.terrainLayers = newLayers.ToArray();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Get the layer at a given index.
+        /// </summary>
+        /// <param name="index">Index of the layer to get.</param>
+        /// <returns>The layer at a given index, or null if none.</returns>
+        public TerrainEntityLayer? GetLayer(int index)
+        {
+            if (index < 0)
+            {
+                LogSystem.LogWarning("[TerrainEntity->GetLayer] Index must be greater than 0.");
+                return null;
+            }
+
+            if (terrain.terrainData.terrainLayers == null)
+            {
+                LogSystem.LogWarning("[TerrainEntity->GetLayer] No layers.");
+                return null;
+            }
+
+            if (index >= terrain.terrainData.terrainLayers.Length)
+            {
+                LogSystem.LogWarning("[TerrainEntity->GetLayer] Invalid index "
+                    + index + ". Only " + terrain.terrainData.terrainLayers.Length + " layers.");
+                return null;
+            }
+
+            TerrainLayer layerOfInterest = terrain.terrainData.terrainLayers[index];
+            return new TerrainEntityLayer
+            {
+                diffuse = layerOfInterest.diffuseTexture,
+                normal = layerOfInterest.normalMapTexture,
+                mask = layerOfInterest.maskMapTexture,
+                specular = layerOfInterest.specular,
+                metallic = layerOfInterest.metallic,
+                smoothness = layerOfInterest.smoothness
+            };
+        }
+
+        /// <summary>
+        /// Set the mask for a particular layer.
+        /// </summary>
+        /// <param name="layer">Layer index.</param>
+        /// <param name="mask">Mask (a 2d array of values between 0 and 1 corresponding to the
+        /// intensity of the given layer to set).</param>
+        /// <returns>Whether or not the setting was successful.</returns>
+        public bool SetLayerMask(int layer, float[,] mask)
+        {
+            if (layer < 0)
+            {
+                LogSystem.LogWarning("[TerrainEntity->SetLayerMask] Index must be greater than 0.");
+                return false;
+            }
+
+            if (terrain.terrainData.terrainLayers == null)
+            {
+                LogSystem.LogWarning("[TerrainEntity->SetLayerMask] No layers.");
+                return false;
+            }
+
+            if (layer >= terrain.terrainData.terrainLayers.Length)
+            {
+                LogSystem.LogWarning("[TerrainEntity->SetLayerMask] Invalid index "
+                    + layer + ". Only " + terrain.terrainData.terrainLayers.Length + " layers.");
+                return false;
+            }
+
+            float[,,] map = terrain.terrainData.GetAlphamaps(0, 0, mask.GetLength(0), mask.GetLength(1));
+            for (int i = 0; i < mask.GetLength(0); i++)
+            {
+                for (int j = 0; j < mask.GetLength(1); j++)
+                {
+                    map[i, j, layer] = mask[i, j];
+                }
+            }
+
+            terrain.terrainData.SetAlphamaps(0, 0, map);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Get a layer mask.
+        /// </summary>
+        /// <param name="layer">Layer index.</param>
+        /// <returns>A layer mask (a 2d array of values between 0 and 1 corresponding to the
+        /// intensity of the given layer).</returns>
+        public float[,] GetLayerMask(int layer)
+        {
+            if (layer < 0)
+            {
+                LogSystem.LogWarning("[TerrainEntity->GetLayerMask] Index must be greater than 0.");
+                return null;
+            }
+
+            float[,] mask = new float[terrain.terrainData.alphamapWidth, terrain.terrainData.alphamapHeight];
+            float[,,] map = terrain.terrainData.GetAlphamaps(0, 0, mask.GetLength(0), mask.GetLength(1));
+            for (int i = 0; i < mask.GetLength(0); i++)
+            {
+                for (int j = 0; j < mask.GetLength(1); j++)
+                {
+                    mask[i, j] = map[i, j, layer];
+                }
+            }
+
+            return mask;
+        }
+
+        /// <summary>
         /// Initialize this entity. This should only be called once.
         /// </summary>
         /// <param name="idToSet">ID to apply to the entity.</param>
@@ -366,56 +708,6 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             highlightCube.transform.localRotation = Quaternion.identity;
             highlightCube.transform.localScale = Vector3.one;
             highlightCube.SetActive(false);
-        }
-
-        /// <summary>
-        /// Resize the heightmap for the terrain.
-        /// </summary>
-        /// <param name="newResolution">New resolution to apply to the terrain.</param>
-        private void ResizeHeightmap(int newResolution)
-        {
-            RenderTexture oldRT = RenderTexture.active;
-
-            RenderTexture oldHeightmap = RenderTexture.GetTemporary(terrain.terrainData.heightmapTexture.descriptor);
-            Graphics.Blit(terrain.terrainData.heightmapTexture, oldHeightmap);
-
-            // TODO: Can this be optimized if there is no hole?
-            //RenderTexture oldHoles = RenderTexture.GetTemporary(terrain.terrainData.holesRenderTexture.descriptor);
-            //Graphics.Blit(terrain.terrainData.holesRenderTexture, oldHoles);
-
-            int dWidth = terrain.terrainData.heightmapResolution;
-            int sWidth = newResolution;
-
-            Vector3 oldSize = terrain.terrainData.size;
-            terrain.terrainData.heightmapResolution = newResolution;
-            terrain.terrainData.size = oldSize;
-
-            oldHeightmap.filterMode = FilterMode.Bilinear;
-
-            // Make sure textures are offset correctly when resampling
-            // tsuv = (suv * swidth - 0.5) / (swidth - 1)
-            // duv = (tsuv(dwidth - 1) + 0.5) / dwidth
-            // duv = (((suv * swidth - 0.5) / (swidth - 1)) * (dwidth - 1) + 0.5) / dwidth
-            // k = (dwidth - 1) / (swidth - 1) / dwidth
-            // duv = suv * (swidth * k)     + 0.5 / dwidth - 0.5 * k
-
-            float k = (dWidth - 1.0f) / (sWidth - 1.0f) / dWidth;
-            float scaleX = (sWidth * k);
-            float offsetX = (float)(0.5 / dWidth - 0.5 * k);
-            Vector2 scale = new Vector2(scaleX, scaleX);
-            Vector2 offset = new Vector2(offsetX, offsetX);
-
-            Graphics.Blit(oldHeightmap, terrain.terrainData.heightmapTexture, scale, offset);
-            RenderTexture.ReleaseTemporary(oldHeightmap);
-
-            //oldHoles.filterMode = FilterMode.Point;
-            //Graphics.Blit(oldHoles, (RenderTexture) terrain.terrainData.holesRenderTexture);
-            //RenderTexture.ReleaseTemporary(oldHoles);
-
-            RenderTexture.active = oldRT;
-
-            terrain.terrainData.DirtyHeightmapRegion(new RectInt(0, 0, terrain.terrainData.heightmapTexture.width, terrain.terrainData.heightmapTexture.height), TerrainHeightmapSyncControl.HeightAndLod);
-            //terrain.terrainData.DirtyTextureRegion(TerrainData.HolesTextureName, new RectInt(0, 0, terrain.terrainData.holesRenderTexture.width, terrain.terrainData.holesRenderTexture.height), false);
         }
 
         /// <summary>

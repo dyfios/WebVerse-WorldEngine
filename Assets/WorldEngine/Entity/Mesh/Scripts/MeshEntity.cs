@@ -511,7 +511,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     break;
             }
 
+#if USE_EBS
             EBSPartCollectionManager.StartPlacing(this);
+#endif
             
             gameObject.SetActive(true);
             interactionState = InteractionState.Placing;

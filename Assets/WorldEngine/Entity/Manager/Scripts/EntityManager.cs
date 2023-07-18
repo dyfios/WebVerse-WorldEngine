@@ -430,7 +430,6 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             entity.SetParent(parent);
             entity.SetPosition(position, true);
             entity.SetRotation(rotation, true);
-            entity.Initialize(id);
 
             if (onLoaded != null)
             {

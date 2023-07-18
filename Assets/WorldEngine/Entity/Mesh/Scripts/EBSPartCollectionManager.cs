@@ -2,12 +2,14 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+#if USE_EBS
 using EasyBuildSystem.Features.Runtime.Bases;
 using EasyBuildSystem.Features.Runtime.Buildings.Part;
 using EasyBuildSystem.Features.Runtime.Buildings.Manager;
 using EasyBuildSystem.Features.Runtime.Buildings.Placer;
 using EasyBuildSystem.Features.Runtime.Buildings.Socket;
 using EasyBuildSystem.Features.Runtime.Buildings.Part.Conditions;
+#endif
 
 namespace FiveSQD.WebVerse.WorldEngine.Entity.Placement
 {
@@ -16,6 +18,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity.Placement
     /// </summary>
     public class EBSPartCollectionManager : MonoBehaviour
     {
+#if USE_EBS
         void Start()
         {
             InitializePieceCollection();
@@ -234,5 +237,6 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity.Placement
 
             return returnVal;
         }
+#endif
     }
 }
