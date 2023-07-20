@@ -28,6 +28,28 @@ namespace FiveSQD.WebVerse.WorldEngine.Synchronization
         }
 
         /// <summary>
+        /// Method to add a synchronized entity.
+        /// </summary>
+        /// <param name="entityToSynchronize">The entity to synchronize.</param>
+        /// <param name="deleteWithClient">Whether or not to delete the entity when the client leaves.</param>
+        /// <param name="filePath">Path to a file containing the entity.</param>
+        /// <returns><see cref="StatusCode"/>StatusCode</returns>
+        public virtual StatusCode AddSynchronizedEntity(BaseEntity entityToSynchronize, bool deleteWithClient, string filePath = null)
+        {
+            return StatusCode.UNSUPPORTED;
+        }
+
+        /// <summary>
+        /// Method to remove a synchronized entity.
+        /// </summary>
+        /// <param name="entityToUnSynchronize">The entity to remove.</param>
+        /// <returns><see cref="StatusCode"/>StatusCode</returns>
+        public virtual StatusCode RemoveSynchronizedEntity(BaseEntity entityToUnSynchronize)
+        {
+            return StatusCode.UNSUPPORTED;
+        }
+
+        /// <summary>
         /// Method to delete a synchronized entity.
         /// </summary>
         /// <param name="entityToDelete">The entity to delete.</param>
@@ -155,6 +177,17 @@ namespace FiveSQD.WebVerse.WorldEngine.Synchronization
         /// <param name="entityToSet">The entity to make a screen canvas.</param>
         /// <returns><see cref="StatusCode">StatusCode</returns>
         public virtual StatusCode MakeScreenCanvas(CanvasEntity entityToSet)
+        {
+            return StatusCode.UNSUPPORTED;
+        }
+
+        /// <summary>
+        /// Method to send a text message.
+        /// </summary>
+        /// <param name="topic">Topic for the message.</param>
+        /// <param name="message">Message to send.</param>
+        /// <returns><see cref="StatusCode">StatusCode</returns>
+        public virtual StatusCode SendMessage(string topic, string message)
         {
             return StatusCode.UNSUPPORTED;
         }
