@@ -56,6 +56,11 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             /// </summary>
             [Range(0, int.MaxValue)]
             public int maxKeyLength;
+
+            /// <summary>
+            /// Name/URI for the world's site.
+            /// </summary>
+            public string siteName;
         }
 
         /// <summary>
@@ -82,6 +87,11 @@ namespace FiveSQD.WebVerse.WorldEngine.World
         /// The material manager for the world.
         /// </summary>
         public MaterialManager materialManager { get; private set; }
+
+        /// <summary>
+        /// Name/URI for the world's site.
+        /// </summary>
+        public string siteName { get; private set; }
 
         /// <summary>
         /// The GameObject for the mesh manager.
@@ -166,6 +176,8 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             materialManagerGO.transform.parent = transform;
             materialManager = materialManagerGO.AddComponent<MaterialManager>();
             materialManager.Initialize(worldInfo.highlightMaterial);
+
+            siteName = worldInfo.siteName;
         }
 
         /// <summary>
