@@ -24,6 +24,7 @@ public class WorldTests
             maxEntryLength = 128,
             maxKeyLength = 16,
             maxStorageEntries = 16,
+            skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat"),
             voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Voxel/Prefabs/Voxel.prefab")
         };
         world.Initialize(worldInfo);

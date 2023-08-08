@@ -5,6 +5,7 @@ using FiveSQD.WebVerse.WorldEngine.Entity;
 using FiveSQD.WebVerse.WorldEngine.Materials;
 using FiveSQD.WebVerse.WorldEngine.WorldStorage;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
+using FiveSQD.WebVerse.WorldEngine.Environment;
 using UnityEngine;
 
 namespace FiveSQD.WebVerse.WorldEngine.World
@@ -23,6 +24,11 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             /// Entity highlight material.
             /// </summary>
             public Material highlightMaterial;
+
+            /// <summary>
+            /// Environment sky material.
+            /// </summary>
+            public Material skyMaterial;
 
             /// <summary>
             /// Input entity prefab.
@@ -89,6 +95,11 @@ namespace FiveSQD.WebVerse.WorldEngine.World
         public MaterialManager materialManager { get; private set; }
 
         /// <summary>
+        /// The environment manager for the world.
+        /// </summary>
+        public EnvironmentManager environmentManager { get; private set; }
+
+        /// <summary>
         /// Name/URI for the world's site.
         /// </summary>
         public string siteName { get; private set; }
@@ -117,6 +128,11 @@ namespace FiveSQD.WebVerse.WorldEngine.World
         /// The GameObject for the material manager.
         /// </summary>
         private GameObject materialManagerGO;
+
+        /// <summary>
+        /// The GameObject for the environment manager.
+        /// </summary>
+        private GameObject environmentManagerGO;
 
         /// <summary>
         /// Initialize the World.
@@ -177,6 +193,17 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             materialManager = materialManagerGO.AddComponent<MaterialManager>();
             materialManager.Initialize(worldInfo.highlightMaterial);
 
+            if (environmentManager != null)
+            {
+                LogSystem.LogError("[World->Initialize] Environment manager already initialized.");
+                return;
+            }
+            environmentManagerGO = new GameObject("EnvironmentManager");
+            environmentManagerGO.transform.parent = transform;
+            environmentManager = environmentManagerGO.AddComponent<EnvironmentManager>();
+            environmentManager.skyMaterial = worldInfo.skyMaterial;
+            environmentManager.Initialize();
+
             siteName = worldInfo.siteName;
         }
 
@@ -233,6 +260,16 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             {
                 materialManager.Terminate();
                 Destroy(materialManagerGO);
+            }
+
+            if (environmentManager == null)
+            {
+                LogSystem.LogError("[World->Unload] No environment manager.");
+            }
+            else
+            {
+                environmentManager.Terminate();
+                Destroy(environmentManagerGO);
             }
         }
     }

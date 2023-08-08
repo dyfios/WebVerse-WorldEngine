@@ -16,6 +16,12 @@ namespace FiveSQD.WebVerse.WorldEngine
         public Material highlightMaterial;
 
         /// <summary>
+        /// Material to use for the environment sky.
+        /// </summary>
+        [Tooltip("Material to use for the environment sky.")]
+        public Material skyMaterial;
+
+        /// <summary>
         /// Prefab for an input entity.
         /// </summary>
         [Tooltip("Prefab for an input entity.")]
@@ -75,6 +81,7 @@ namespace FiveSQD.WebVerse.WorldEngine
             World.World.WorldInfo wInfo = new World.World.WorldInfo()
             {
                 highlightMaterial = instance.highlightMaterial,
+                skyMaterial = instance.skyMaterial,
                 inputEntityPrefab = instance.inputEntityPrefab,
                 characterControllerPrefab = instance.characterControllerPrefab,
                 voxelPrefab = instance.voxelPrefab,

@@ -17,7 +17,8 @@ public class EntityTests
     {
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
-        WEGO.AddComponent<WorldEngine>();
+        WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -196,7 +197,8 @@ public class EntityTests
     {
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
-        WEGO.AddComponent<WorldEngine>();
+        WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -375,7 +377,8 @@ public class EntityTests
     {
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
-        WEGO.AddComponent<WorldEngine>();
+        WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -565,7 +568,8 @@ public class EntityTests
     {
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
-        WEGO.AddComponent<WorldEngine>();
+        WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -760,7 +764,8 @@ public class EntityTests
 
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject("WEGO");
-        WEGO.AddComponent<WorldEngine>();
+        WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -978,6 +983,7 @@ public class EntityTests
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
         yield return null;
         we.inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         WorldEngine.LoadWorld("test");
 
         // Set up Entity.
@@ -1188,6 +1194,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject("WEGO");
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -1414,6 +1421,7 @@ public class EntityTests
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
         we.characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Character/Prefabs/UserAvatar.prefab");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -1595,6 +1603,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -1806,6 +1815,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -1987,6 +1997,7 @@ public class EntityTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
@@ -2207,6 +2218,7 @@ public class EntityTests
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
         we.voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Voxel/Prefabs/Voxel.prefab");
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 

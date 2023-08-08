@@ -5,6 +5,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using FiveSQD.WebVerse.WorldEngine;
+using UnityEditor;
 
 public class CameraTests
 {
@@ -20,6 +21,7 @@ public class CameraTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 

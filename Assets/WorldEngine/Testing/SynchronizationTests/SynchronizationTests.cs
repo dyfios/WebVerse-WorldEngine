@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using FiveSQD.WebVerse.WorldEngine;
 using FiveSQD.WebVerse.WorldEngine.Synchronization;
+using UnityEditor;
 
 public class SynchronizationTests
 {
@@ -21,6 +22,7 @@ public class SynchronizationTests
         // Initialize World Engine and Load World.
         GameObject WEGO = new GameObject();
         WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
         yield return null;
         WorldEngine.LoadWorld("test");
 
