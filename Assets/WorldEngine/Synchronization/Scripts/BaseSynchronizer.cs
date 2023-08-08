@@ -33,8 +33,10 @@ namespace FiveSQD.WebVerse.WorldEngine.Synchronization
         /// <param name="entityToSynchronize">The entity to synchronize.</param>
         /// <param name="deleteWithClient">Whether or not to delete the entity when the client leaves.</param>
         /// <param name="filePath">Path to a file containing the entity.</param>
+        /// <param name="resources">Paths to additonal file resources for the entity.</param>
         /// <returns><see cref="StatusCode"/>StatusCode</returns>
-        public virtual StatusCode AddSynchronizedEntity(BaseEntity entityToSynchronize, bool deleteWithClient, string filePath = null)
+        public virtual StatusCode AddSynchronizedEntity(BaseEntity entityToSynchronize, bool deleteWithClient,
+            string filePath = null, string[] resources = null)
         {
             return StatusCode.UNSUPPORTED;
         }
