@@ -326,7 +326,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             Vector3 position, Quaternion rotation, Vector3 scale, bool isSize, Action onLoaded)
         {
             GameObject emptyEntityObject = new GameObject("EmptyEntity-" + id.ToString());
-            BaseEntity entity = emptyEntityObject.AddComponent<BaseEntity>();
+            ContainerEntity entity = emptyEntityObject.AddComponent<ContainerEntity>();
             entities.Add(id, entity);
             entity.SetParent(parent);
             entity.SetPosition(position, true);

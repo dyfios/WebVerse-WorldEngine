@@ -754,6 +754,172 @@ public class EntityTests
     }
 
     [UnityTest]
+    public IEnumerator EntityTests_ContainerEntity()
+    {
+        // Initialize World Engine and Load World.
+        GameObject WEGO = new GameObject();
+        WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
+        yield return null;
+        WorldEngine.LoadWorld("test");
+
+        // Set up Entity.
+        GameObject go = new GameObject();
+        ContainerEntity be = go.AddComponent<ContainerEntity>();
+
+        // Initialize Entity with ID and ensure it cannot be changed.
+        Guid entityID = Guid.NewGuid();
+        be.Initialize(entityID);
+        Assert.AreEqual(entityID, be.id);
+        Assert.Throws<InvalidOperationException>(() => be.id = Guid.NewGuid());
+        Assert.AreEqual(entityID, be.id);
+
+        // Set Visibility.
+        be.SetVisibility(true);
+        Assert.IsTrue(be.gameObject.activeSelf);
+        Assert.IsTrue(be.GetVisibility());
+        be.SetVisibility(false);
+        Assert.IsFalse(be.gameObject.activeSelf);
+        Assert.IsFalse(be.GetVisibility());
+
+        // Set Highlight.
+        be.SetHighlight(true);
+        Assert.IsFalse(be.GetHighlight());
+        be.SetHighlight(false);
+        Assert.IsFalse(be.GetHighlight());
+
+        // Set Parent/Get Parent.
+        GameObject parentGO = new GameObject();
+        BaseEntity parentBE = parentGO.AddComponent<BaseEntity>();
+        parentBE.Initialize(Guid.NewGuid());
+        be.SetParent(parentBE);
+        Assert.AreEqual(be.GetParent(), parentBE);
+        be.SetParent(null);
+        Assert.IsNull(be.GetParent());
+
+        // Get Children.
+        GameObject childGO1 = new GameObject();
+        GameObject childGO2 = new GameObject();
+        BaseEntity childBE1 = childGO1.AddComponent<BaseEntity>();
+        BaseEntity childBE2 = childGO2.AddComponent<BaseEntity>();
+        childBE1.Initialize(Guid.NewGuid());
+        childBE2.Initialize(Guid.NewGuid());
+        childBE1.SetParent(be);
+        BaseEntity[] children = be.GetChildren();
+        Assert.IsFalse(children == null);
+        Assert.IsTrue(children.Length == 1);
+        Assert.AreEqual(children[0], childBE1);
+        childBE2.SetParent(be);
+        children = be.GetChildren();
+        Assert.IsFalse(children == null);
+        Assert.IsTrue(children.Length == 2);
+        Assert.IsTrue(children[0] == childBE1 || children[1] == childBE1);
+        Assert.IsTrue(children[0] == childBE2 || children[1] == childBE2);
+        childBE1.SetParent(null);
+        childBE2.SetParent(null);
+        children = be.GetChildren();
+        Assert.IsFalse(children == null);
+        Assert.IsTrue(children.Length == 0);
+
+        // Set Position/Get Position.
+        be.SetParent(parentBE);
+        parentBE.SetPosition(new Vector3(1, 2, 3), false, false);
+        Vector3 posToSet = new Vector3(1, 2, 3);
+        be.SetPosition(posToSet, false, false);
+        Assert.AreEqual(posToSet, be.GetPosition(false));
+        Assert.AreNotEqual(posToSet, be.GetPosition(true));
+        be.SetPosition(posToSet, true, false);
+        Assert.AreEqual(posToSet, be.GetPosition(true));
+        Assert.AreNotEqual(posToSet, be.GetPosition(false));
+
+        // Set Rotation/Get Rotation.
+        be.SetParent(parentBE);
+        parentBE.SetRotation(new Quaternion(0.1f, 0.2f, 0.3f, 1), false, false);
+        Quaternion rotToSet = new Quaternion(0.1f, 0.2f, 0.3f, 1);
+        be.SetRotation(rotToSet, false, false);
+        yield return null;
+        Quaternion measured = be.GetRotation(false);
+        measured = new Quaternion((float) Math.Round(measured.x, 1), (float) Math.Round(measured.y, 1),
+            (float) Math.Round(measured.z, 1), (float) Math.Round(measured.w, 0));
+        Assert.AreEqual(rotToSet, measured);
+        measured = be.GetRotation(true);
+        measured = new Quaternion((float) Math.Round(measured.x, 1), (float) Math.Round(measured.y, 1),
+            (float) Math.Round(measured.z, 1), (float) Math.Round(measured.w, 0));
+        Assert.AreNotEqual(rotToSet, measured);
+        be.SetRotation(rotToSet, true, false);
+        measured = be.GetRotation(true);
+        measured = new Quaternion((float) Math.Round(measured.x, 1), (float) Math.Round(measured.y, 1),
+            (float) Math.Round(measured.z, 1), (float) Math.Round(measured.w, 0));
+        Assert.AreEqual(rotToSet, measured);
+        measured = be.GetRotation(false);
+        measured = new Quaternion((float) Math.Round(measured.x, 1), (float) Math.Round(measured.y, 1),
+            (float) Math.Round(measured.z, 1), (float) Math.Round(measured.w, 0));
+        Assert.AreNotEqual(rotToSet, measured);
+
+        // Set Euler Rotation/Get Rotation.
+        be.SetParent(parentBE);
+        parentBE.SetEulerRotation(new Vector3(45, 90, 180), false, false);
+        Vector3 eRotToSet = new Vector3(45, 90, 180);
+        be.SetEulerRotation(eRotToSet, false, false);
+        be.SetEulerRotation(eRotToSet, true, false);
+
+        // Set Scale/Get Scale.
+        Vector3 sclToSet = new Vector3(1, 2, 3);
+        be.SetScale(sclToSet, false);
+        Assert.AreEqual(sclToSet, be.GetScale());
+
+        // Set Size/Get Size.
+        Vector3 sizeToSet = new Vector3(1, 2, 3);
+        Assert.Throws<NotImplementedException>(() => be.SetSize(sizeToSet, false));
+
+        // Compare.
+        Assert.IsTrue(be.Compare(be));
+
+        // Set Physical Properties/Get Physical Properties.
+        BaseEntity.EntityPhysicalProperties phyProps = new BaseEntity.EntityPhysicalProperties()
+        {
+            angularDrag = 1,
+            centerOfMass = new Vector3(1, 2, 3),
+            drag = 2,
+            gravitational = true,
+            mass = 42
+        };
+        be.SetPhysicalProperties(phyProps);
+        BaseEntity.EntityPhysicalProperties? setProps = be.GetPhysicalProperties();
+
+        // Set Interaction State/Get Interaction State.
+        BaseEntity.InteractionState interactionState = BaseEntity.InteractionState.Hidden;
+        be.SetInteractionState(interactionState);
+        interactionState = BaseEntity.InteractionState.Static;
+        be.SetInteractionState(interactionState);
+        interactionState = BaseEntity.InteractionState.Placing;
+        be.SetInteractionState(interactionState);
+        interactionState = BaseEntity.InteractionState.Physical;
+        be.SetInteractionState(interactionState);
+
+        // Set Motion/Get Motion.
+        BaseEntity.EntityMotion entityMotion = new BaseEntity.EntityMotion()
+        {
+            angularVelocity = new Vector3(1, 2, 3),
+            stationary = true,
+            velocity = new Vector3(3, 4, 5)
+        };
+        be.SetMotion(entityMotion);
+        BaseEntity.EntityMotion? setMotion = be.GetMotion();
+
+        // Start Synchronizing/Stop Synchronizing.
+        GameObject synchGO = new GameObject();
+        BaseSynchronizer synch = synchGO.AddComponent<BaseSynchronizer>();
+        be.StartSynchronizing(synch);
+        be.StopSynchronizing();
+
+        // Delete Entity.
+        be.Delete();
+        yield return null;
+        Assert.True(be == null);
+    }
+
+    [UnityTest]
     public IEnumerator EntityTests_ButtonEntity()
     {
         // Initialize Camera.
