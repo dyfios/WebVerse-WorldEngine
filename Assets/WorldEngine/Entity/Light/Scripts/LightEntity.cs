@@ -235,9 +235,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     lightObject.useColorTemperature = true;
                     lightObject.color = lightColor;
                     lightObject.colorTemperature = lightTemperature;
-#if !UNITY_WEBGL
-                    lightObject.lightmapBakeType = LightmapBakeType.Realtime;
-#endif
+//#if !UNITY_WEBGL
+//                    lightObject.lightmapBakeType = LightmapBakeType.Realtime;
+//#endif
                     lightObject.intensity = lightIntensity;
                     lightObject.shadows = LightShadows.Soft;
                     break;
