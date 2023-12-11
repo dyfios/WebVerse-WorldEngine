@@ -295,10 +295,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             Vector3 position, Quaternion rotation, Vector3 scale, bool isSize, Action onLoaded,
             float radius = 0.22f, float height = 1.69f, float center = 0.854f)
         {
-            GameObject characterEntityObject = Instantiate(characterControllerPrefab);
+            GameObject characterEntityObject = new GameObject();
             characterEntityObject.name = "CharacterEntity-" + id.ToString();
             CharacterEntity entity = characterEntityObject.AddComponent<CharacterEntity>();
-            entity.entityTag = tag == null ? "" : tag;
             entities.Add(id, entity);
             entity.SetParent(parent);
             entity.SetPosition(position, true);
@@ -315,6 +314,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             entity.radius = radius;
             entity.height = height;
             entity.Initialize(id);
+            entity.entityTag = tag == null ? "" : tag;
 
             if (onLoaded != null)
             {
