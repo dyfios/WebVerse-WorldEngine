@@ -2,6 +2,8 @@
 
 using UnityEngine;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
+using System.Collections.Generic;
+using FiveSQD.WebVerse.WorldEngine.Entity;
 
 namespace FiveSQD.WebVerse.WorldEngine.Camera
 {
@@ -23,6 +25,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         public GameObject defaultCameraParent { get; private set; }
 
         /// <summary>
+        /// Entities that will follow the camera's rotation.
+        /// </summary>
+        private List<BaseEntity> followers;
+
+        /// <summary>
         /// Initialize the camera manager.
         /// </summary>
         /// <param name="cam">Camera to initialize with.</param>
@@ -32,6 +39,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
             base.Initialize();
             this.cam = cam;
             this.defaultCameraParent = defaultCameraParent;
+            followers = new List<BaseEntity>();
         }
 
         /// <summary>
@@ -40,6 +48,58 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         public override void Terminate()
         {
             base.Terminate();
+            followers = null;
+        }
+
+        /// <summary>
+        /// Add a follower.
+        /// </summary>
+        /// <param name="entity">Entity to add.</param>
+        public void AddFollower(BaseEntity entity)
+        {
+            if (entity == null)
+            {
+                LogSystem.LogError("[CameraManager->AddFollower] Invalid entity.");
+                return;
+            }
+
+            if (followers == null)
+            {
+                LogSystem.LogError("[CameraManager->AddFollower] CameraManager not initialized.");
+                return;
+            }
+
+            if (entity is UIEntity)
+            {
+                LogSystem.LogWarning("[CameraManager->AddFollower] UI Entity cannot follow the camera.");
+                return;
+            }
+
+            followers.Add(entity);
+        }
+
+        /// <summary>
+        /// Remove a follower.
+        /// </summary>
+        /// <param name="entity">Entity to remove.</param>
+        public void RemoveFollower(BaseEntity entity)
+        {
+            if (entity == null)
+            {
+                LogSystem.LogError("[CameraManager->AddFollower] Invalid entity.");
+                return;
+            }
+
+            if (followers == null)
+            {
+                LogSystem.LogError("[CameraManager->AddFollower] CameraManager not initialized.");
+                return;
+            }
+
+            if (followers.Contains(entity))
+            {
+                followers.Remove(entity);
+            }
         }
 
         /// <summary>
@@ -116,6 +176,17 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         public void SetScale(Vector3 scale)
         {
             cam.transform.localScale = scale;
+        }
+
+        private void Update()
+        {
+            if (cam != null)
+            {
+                foreach (BaseEntity follower in followers)
+                {
+                    follower.SetRotation(cam.transform.rotation, false);
+                }
+            }
         }
     }
 }

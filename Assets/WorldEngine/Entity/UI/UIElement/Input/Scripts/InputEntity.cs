@@ -74,7 +74,10 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             GraphicRaycaster graphicRaycaster = gameObject.AddComponent<GraphicRaycaster>();
 
-            SetParent(parentCanvas);
+            if (parentCanvas != null)
+            {
+                SetParent(parentCanvas);
+            }
 
             MakeHidden();
         }

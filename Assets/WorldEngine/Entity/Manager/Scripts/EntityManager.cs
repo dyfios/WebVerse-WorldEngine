@@ -524,8 +524,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             entities.Add(id, entity);
             entity.Initialize(id, parent);
             entity.entityTag = tag;
-            entity.SetPositionPercent(positionPercent, true);
-            entity.SetSizePercent(sizePercent, true);
+            if (parent != null)
+            {
+                entity.SetPositionPercent(positionPercent, true);
+                entity.SetSizePercent(sizePercent, true);
+            }
             entity.SetText(text);
             entity.SetFontSize(fontSize);
 
@@ -555,8 +558,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             entities.Add(id, entity);
             entity.Initialize(id, parent);
             entity.entityTag = tag;
-            entity.SetPositionPercent(positionPercent, true);
-            entity.SetSizePercent(sizePercent, true);
+            if (parent != null)
+            {
+                entity.SetPositionPercent(positionPercent, true);
+                entity.SetSizePercent(sizePercent, true);
+            }
 
             if (onLoaded != null)
             {
@@ -587,8 +593,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             entities.Add(id, entity);
             entity.Initialize(id, parent);
             entity.entityTag = tag;
-            entity.SetPositionPercent(positionPercent, true);
-            entity.SetSizePercent(sizePercent, true);
+            if (parent != null)
+            {
+                entity.SetPositionPercent(positionPercent, true);
+                entity.SetSizePercent(sizePercent, true);
+            }
 
             if (onLoaded != null)
             {

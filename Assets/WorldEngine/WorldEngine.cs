@@ -1,5 +1,6 @@
 // Copyright (c) 2019-2023 Five Squared Interactive. All rights reserved.
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace FiveSQD.WebVerse.WorldEngine
@@ -66,11 +67,16 @@ namespace FiveSQD.WebVerse.WorldEngine
         private GameObject currentWorldGO;
 
         /// <summary>
+        /// The URL query parameters for the current world.
+        /// </summary>
+        private Dictionary<string, string> queryParams;
+
+        /// <summary>
         /// Load a world.
         /// </summary>
         /// <param name="worldName">Name for the world.</param>
         /// <returns>Whether or not the operation was successful.</returns>
-        public static bool LoadWorld(string worldName)
+        public static bool LoadWorld(string worldName, string queryParams = null)
         {
             if (instance.currentWorld != null)
             {
@@ -95,6 +101,12 @@ namespace FiveSQD.WebVerse.WorldEngine
             instance.currentWorld = instance.currentWorldGO.AddComponent<World.World>();
             instance.currentWorld.Initialize(wInfo);
 
+            instance.queryParams = new Dictionary<string, string>();
+            if (queryParams != null)
+            {
+                instance.LoadQueryParams(queryParams);
+            }
+
             return true;
         }
 
@@ -108,6 +120,47 @@ namespace FiveSQD.WebVerse.WorldEngine
                 instance.currentWorld.Unload();
             }
             instance.currentWorld = null;
+        }
+
+        /// <summary>
+        /// Get a URL Query Parameter.
+        /// </summary>
+        /// <param name="key">Key of the Query Parameter.</param>
+        /// <returns>The value of the Query Parameter, or null.</returns>
+        public string GetParam(string key)
+        {
+            if (queryParams.ContainsKey(key))
+            {
+                return queryParams[key];
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Load the URL Query Parameters.
+        /// </summary>
+        /// <param name="rawParams">Raw parameter string.</param>
+        private void LoadQueryParams(string rawParams)
+        {
+            if (queryParams == null)
+            {
+                Utilities.LogSystem.LogError("[WorldEngine->LoadQueryParams] WorldEngine not initialized.");
+                return;
+            }
+
+            string[] kvps = rawParams.Split("&");
+            foreach (string kvp in kvps)
+            {
+                string[] param = kvp.Split("=");
+                if (param.Length != 2)
+                {
+                    Utilities.LogSystem.LogWarning("[WorldEngine->LoadQueryParams] Invalid parameter " + param);
+                    continue;
+                }
+
+                queryParams.Add(param[0], param[1]);
+            }
         }
 
         /// <summary>

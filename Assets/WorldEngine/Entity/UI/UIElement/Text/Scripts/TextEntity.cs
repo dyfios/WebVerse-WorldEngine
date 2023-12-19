@@ -130,7 +130,10 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             rt.anchorMin = rt.anchorMax = Vector2.zero;
             uiElementRectTransform = rt;
 
-            SetParent(parentCanvas);
+            if (parentCanvas != null)
+            {
+                SetParent(parentCanvas);
+            }
 
             MakeHidden();
         }
