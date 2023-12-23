@@ -13,10 +13,20 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
     public class CameraManager : BaseManager
     {
         /// <summary>
+        /// Whether or not the camera is in VR mode.
+        /// </summary>
+        public bool vr;
+
+        /// <summary>
         /// Camera that is being controlled.
         /// </summary>
         [Tooltip("Camera that is being controlled.")]
         public UnityEngine.Camera cam { get; private set; }
+
+        /// <summary>
+        /// Camera offset (for VR mode).
+        /// </summary>
+        public GameObject cameraOffset { get; private set; }
 
         /// <summary>
         /// Default parent for the camera (i.e. when null is provided).
@@ -34,10 +44,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         /// </summary>
         /// <param name="cam">Camera to initialize with.</param>
         /// <param name="defaultCameraParent">Default camera parent to initialize with.</param>
-        public void Initialize(UnityEngine.Camera cam, GameObject defaultCameraParent)
+        public void Initialize(UnityEngine.Camera cam, GameObject cameraOffset, bool vr, GameObject defaultCameraParent)
         {
             base.Initialize();
             this.cam = cam;
+            this.cameraOffset = cameraOffset;
+            this.vr = vr;
             this.defaultCameraParent = defaultCameraParent;
             followers = new List<BaseEntity>();
         }
@@ -110,11 +122,25 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         {
             if (parent == null)
             {
-                cam.transform.SetParent(defaultCameraParent.transform);
+                if (vr)
+                {
+                    cameraOffset.transform.SetParent(defaultCameraParent.transform);
+                }
+                else
+                {
+                    cam.transform.SetParent(defaultCameraParent.transform);
+                }
             }
             else
             {
-                cam.transform.SetParent(parent.transform);
+                if (vr)
+                {
+                    cameraOffset.transform.SetParent(parent.transform);
+                }
+                else
+                {
+                    cam.transform.SetParent(parent.transform);
+                }
             }
         }
 
@@ -127,11 +153,56 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         {
             if (local)
             {
-                cam.transform.localPosition = position;
+                if (vr)
+                {
+                    cameraOffset.transform.localPosition = position;
+                }
+                else
+                {
+                    cam.transform.localPosition = position;
+                }
             }
             else
             {
-                cam.transform.position = position;
+                if (vr)
+                {
+                    cameraOffset.transform.position = position;
+                }
+                else
+                {
+                    cam.transform.position = position;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the position of the camera.
+        /// </summary>
+        /// <param name="local">Whether or not the position is local.</param>
+        /// <returns>The position of the camera.</returns>
+        public Vector3 GetPosition(bool local)
+        {
+            if (local)
+            {
+                if (vr)
+                {
+                    return cameraOffset.transform.localPosition;
+                }
+                else
+                {
+                    return cam.transform.localPosition;
+                }
+            }
+            else
+            {
+                if (vr)
+                {
+                    return cameraOffset.transform.position;
+                }
+                else
+                {
+                    return cam.transform.position;
+                }
             }
         }
 
@@ -144,11 +215,56 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         {
             if (local)
             {
-                cam.transform.localRotation = rotation;
+                if (vr)
+                {
+                    cameraOffset.transform.localRotation = rotation;
+                }
+                else
+                {
+                    cam.transform.localRotation = rotation;
+                }
             }
             else
             {
-                cam.transform.rotation = rotation;
+                if (vr)
+                {
+                    cameraOffset.transform.rotation = rotation;
+                }
+                else
+                {
+                    cam.transform.rotation = rotation;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the rotation of the camera.
+        /// </summary>
+        /// <param name="local">Whether or not the rotation is local.</param>
+        /// <returns>The rotation of the camera.</returns>
+        public Quaternion GetRotation(bool local)
+        {
+            if (local)
+            {
+                if (vr)
+                {
+                    return cameraOffset.transform.localRotation;
+                }
+                else
+                {
+                    return cam.transform.localRotation;
+                }
+            }
+            else
+            {
+                if (vr)
+                {
+                    return cameraOffset.transform.rotation;
+                }
+                else
+                {
+                    return cam.transform.rotation;
+                }
             }
         }
 
@@ -161,11 +277,56 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         {
             if (local)
             {
-                cam.transform.localEulerAngles = rotation;
+                if (vr)
+                {
+                    cameraOffset.transform.localEulerAngles = rotation;
+                }
+                else
+                {
+                    cam.transform.localEulerAngles = rotation;
+                }
             }
             else
             {
-                cam.transform.eulerAngles = rotation;
+                if (vr)
+                {
+                    cameraOffset.transform.eulerAngles = rotation;
+                }
+                else
+                {
+                    cam.transform.eulerAngles = rotation;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the Euler rotation of the camera.
+        /// </summary>
+        /// <param name="local">Whether or not the Euler rotation is local.</param>
+        /// <returns>The Euler rotation of the camera.</returns>
+        public Vector3 GetEulerRotation(bool local)
+        {
+            if (local)
+            {
+                if (vr)
+                {
+                    return cameraOffset.transform.localEulerAngles;
+                }
+                else
+                {
+                    return cam.transform.localEulerAngles;
+                }
+            }
+            else
+            {
+                if (vr)
+                {
+                    return cameraOffset.transform.eulerAngles;
+                }
+                else
+                {
+                    return cam.transform.eulerAngles;
+                }
             }
         }
 
@@ -175,7 +336,30 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         /// <param name="scale">Scale to apply.</param>
         public void SetScale(Vector3 scale)
         {
-            cam.transform.localScale = scale;
+            if (vr)
+            {
+                cameraOffset.transform.localScale = scale;
+            }
+            else
+            {
+                cam.transform.localScale = scale;
+            }
+        }
+
+        /// <summary>
+        /// Get the scale of the camera.
+        /// </summary>
+        /// <returns>The scale of the camera.</returns>
+        public Vector3 GetScale()
+        {
+            if (vr)
+            {
+                return cameraOffset.transform.localScale;
+            }
+            else
+            {
+                return cam.transform.localScale;
+            }
         }
 
         private void Update()
@@ -184,7 +368,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
             {
                 foreach (BaseEntity follower in followers)
                 {
+                    //Vector3 cameraEulerAngles = new Vector3(cam.transform.eulerAngles.x, cam.transform.eulerAngles.y + 90, cam.transform.eulerAngles.z);
                     follower.SetRotation(cam.transform.rotation, false);
+                    Vector3 cameraEulerAngles = new Vector3(cam.transform.localEulerAngles.x, cam.transform.localEulerAngles.y, cam.transform.localEulerAngles.z);
+                    follower.SetEulerRotation(cameraEulerAngles, true, false);
+                    follower.SetPosition(cam.transform.position, false);
                 }
             }
         }
