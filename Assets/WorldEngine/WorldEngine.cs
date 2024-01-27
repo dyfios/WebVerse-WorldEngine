@@ -163,7 +163,7 @@ namespace FiveSQD.WebVerse.WorldEngine
                 return;
             }
 
-            string[] kvps = rawParams.Split("&");
+            string[] kvps = rawParams.Replace("%26", "&").Split("&");
             foreach (string kvp in kvps)
             {
                 string[] param = kvp.Split("=");
