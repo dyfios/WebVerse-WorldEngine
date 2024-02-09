@@ -46,6 +46,16 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             public GameObject voxelPrefab;
 
             /// <summary>
+            /// Camera offset.
+            /// </summary>
+            public GameObject cameraOffset;
+
+            /// <summary>
+            /// Whether or not world is in VR mode.
+            /// </summary>
+            public bool vr;
+
+            /// <summary>
             /// Maximum number of storage entries.
             /// </summary>
             [Range(0, int.MaxValue)]
@@ -181,7 +191,7 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             cameraManagerGO = new GameObject("CameraManager");
             cameraManagerGO.transform.parent = transform;
             cameraManager = cameraManagerGO.AddComponent<CameraManager>();
-            cameraManager.Initialize(UnityEngine.Camera.main, entityManagerGO);
+            cameraManager.Initialize(UnityEngine.Camera.main, worldInfo.cameraOffset, worldInfo.vr, entityManagerGO);
 
             if (materialManager != null)
             {

@@ -41,6 +41,18 @@ namespace FiveSQD.WebVerse.WorldEngine
         public GameObject voxelPrefab;
 
         /// <summary>
+        /// Camera offset.
+        /// </summary>
+        [Tooltip("Camera offset.")]
+        public GameObject cameraOffset;
+
+        /// <summary>
+        /// Whether or not world is in VR mode.
+        /// </summary>
+        [Tooltip("Whether or not world is in VR mode.")]
+        public bool vr;
+
+        /// <summary>
         /// The active world loaded by the world engine.
         /// </summary>
         public static World.World ActiveWorld
@@ -91,6 +103,8 @@ namespace FiveSQD.WebVerse.WorldEngine
                 inputEntityPrefab = instance.inputEntityPrefab,
                 characterControllerPrefab = instance.characterControllerPrefab,
                 voxelPrefab = instance.voxelPrefab,
+                cameraOffset = instance.cameraOffset,
+                vr = instance.vr,
                 maxStorageEntries = 2048,
                 maxEntryLength = 2048,
                 maxKeyLength = 128
@@ -102,7 +116,7 @@ namespace FiveSQD.WebVerse.WorldEngine
             instance.currentWorld.Initialize(wInfo);
 
             instance.queryParams = new Dictionary<string, string>();
-            if (queryParams != null)
+            if (!string.IsNullOrEmpty(queryParams))
             {
                 instance.LoadQueryParams(queryParams);
             }
@@ -149,7 +163,7 @@ namespace FiveSQD.WebVerse.WorldEngine
                 return;
             }
 
-            string[] kvps = rawParams.Split("&");
+            string[] kvps = rawParams.Replace("%26", "&").Split("&");
             foreach (string kvp in kvps)
             {
                 string[] param = kvp.Split("=");
