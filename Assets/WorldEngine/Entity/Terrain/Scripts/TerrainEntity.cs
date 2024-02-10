@@ -714,7 +714,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Get the size of the terrain.
         /// </summary>
         /// <param name="size"></param>
-        /// <returns></returns>
+        /// <returns>The size of the terrain.</returns>
         private static int GetTerrainSize(float size)
         {
             if (size < 1)

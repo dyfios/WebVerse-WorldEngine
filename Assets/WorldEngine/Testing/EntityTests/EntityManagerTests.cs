@@ -52,7 +52,7 @@ public class EntityManagerTests
             }
         }
         id = WorldEngine.ActiveWorld.entityManager.LoadTerrainEntity(256, 256, 256,
-            heights, null, Vector3.zero, Quaternion.identity, Vector3.one);
+            heights, null, Vector3.zero, Quaternion.identity);
         Assert.IsNotNull(id);
         eIDs.Add(id);
 
