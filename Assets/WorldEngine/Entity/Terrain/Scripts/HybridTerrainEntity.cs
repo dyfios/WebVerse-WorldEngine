@@ -5,9 +5,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Jobs;
+#if USE_DIGGER
 using Digger.Modules.Core.Sources;
 using Digger.Modules.Core.Sources.Operations;
 using Digger.Modules.Core.Sources.TerrainInterface;
+#endif
 using FiveSQD.WebVerse.WorldEngine.Entity.Terrain;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
 using FiveSQD.WebVerse.WorldEngine.Materials;
@@ -196,10 +198,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         private VoxelMap voxelValues;
 
+#if USE_DIGGER
         /// <summary>
         /// Digger system.
         /// </summary>
         private DiggerSystem diggerSystem;
+#endif
 
         /// <summary>
         /// Terrain material.
@@ -251,6 +255,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         private bool modifying;
 
+#if USE_DIGGER
         /// <summary>
         /// Basic operation.
         /// </summary>
@@ -265,6 +270,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Modification operation buffer.
         /// </summary>
         private readonly Queue<ModificationParameters> modBuf = new Queue<ModificationParameters>();
+#endif
 
         /// <summary>
         /// Create a hybrid terrain entity.
@@ -301,6 +307,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>Whether or not the operation was successful.</returns>
         public bool Dig(Vector3 position, TerrainEntityBrushType brushType, int layerIndex)
         {
+#if USE_DIGGER
             if (modBuf.Count >= bufferSize)
             {
                 return false;
@@ -333,6 +340,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             });
 
             voxelValues.SetBlock(GetVoxelPosition(position), VoxelOperation.Dig, layerIndex);
+#endif
 
             return true;
         }
@@ -346,6 +354,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>Whether or not the operation was successful.</returns>
         public bool Build(Vector3 position, TerrainEntityBrushType brushType, int layerIndex)
         {
+#if USE_DIGGER
             if (modBuf.Count >= bufferSize)
             {
                 return false;
@@ -378,6 +387,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             });
 
             voxelValues.SetBlock(GetVoxelPosition(position), VoxelOperation.Build, layerIndex);
+#endif
 
             return true;
         }
@@ -974,6 +984,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         private void SetUpDiggerSystem()
         {
+#if USE_DIGGER
             GameObject diggerGO = new GameObject("Digger");
             diggerGO.transform.parent = terrain.transform;
             diggerSystem = diggerGO.AddComponent<DiggerSystem>();
@@ -985,6 +996,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             diggerSystem.Init(Application.isEditor ? LoadType.Minimal : LoadType.Minimal_and_LoadVoxels);
 
             SetUpMaterials(diggerSystem, true);
+#endif
         }
 
         /// <summary>
@@ -1071,6 +1083,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             return true;
         }
 
+#if USE_DIGGER
         /// <summary>
         /// Set up materials.
         /// </summary>
@@ -1335,6 +1348,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             modifying = false;
             callback?.Invoke();
         }
+#endif
 
         /// <summary>
         /// Get a position in voxel coordinates.
@@ -1350,6 +1364,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             return voxelPosition;
         }
 
+#if USE_DIGGER
         private void Update()
         {
             if (!modifying && modBuf.Count > 0)
@@ -1358,5 +1373,6 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 StartCoroutine(ModifyAsync(parameters));
             }
         }
+#endif
     }
 }

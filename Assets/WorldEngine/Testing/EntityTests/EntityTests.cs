@@ -9,6 +9,8 @@ using System;
 using FiveSQD.WebVerse.WorldEngine;
 using FiveSQD.WebVerse.WorldEngine.Synchronization;
 using UnityEditor;
+using FiveSQD.WebVerse.WorldEngine.Entity.Terrain;
+using System.Collections.Generic;
 
 public class EntityTests
 {
@@ -2376,6 +2378,250 @@ public class EntityTests
         yield return null;
         Assert.True(te == null);
     }
+
+#if TEST_HYBRID_TERRAIN
+    [UnityTest]
+    public IEnumerator EntityTests_HybridTerrainEntity()
+    {
+        // Initialize World Engine and Load World.
+        GameObject WEGO = new GameObject();
+        WorldEngine we = WEGO.AddComponent<WorldEngine>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat");
+        yield return null;
+        WorldEngine.LoadWorld("test");
+
+        // Set up Entity.
+        Guid tID = Guid.NewGuid();
+        float[,] heights = { { 0, 1, 2, 3, 4, 5, 6, 7 },
+                             { 0, 1, 2, 3, 4, 5, 6, 7 },
+                             { 0, 1, 2, 3, 4, 5, 6, 7 },
+                             { 0, 1, 2, 3, 4, 5, 6, 7 },
+                             { 0, 1, 2, 3, 4, 5, 6, 7 },
+                             { 0, 1, 2, 3, 4, 5, 6, 7 },
+                             { 0, 1, 2, 3, 4, 5, 6, 7 },
+                             { 0, 1, 2, 3, 4, 5, 6, 7 }};
+        TerrainEntityLayer[] layers = new TerrainEntityLayer[3]
+        {
+            new TerrainEntityLayer()
+            {
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Testing/TestResources/1.png")
+            },
+            new TerrainEntityLayer()
+            {
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Testing/TestResources/2.png")
+            },
+            new TerrainEntityLayer()
+            {
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Testing/TestResources/3.png")
+            }
+        };
+        float[,] layerMask = { { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f }};
+        Dictionary<int, float[,]> layerMasks = new Dictionary<int, float[,]>();
+        layerMasks.Add(0, layerMask);
+        layerMasks.Add(1, layerMask);
+        layerMasks.Add(2, layerMask);
+        HybridTerrainEntity te = HybridTerrainEntity.Create(8, 8, 8, heights, layers, layerMasks, tID);
+
+        // Initialize Entity with ID and ensure it cannot be changed.
+        Assert.AreEqual(tID, te.id);
+        Assert.Throws<InvalidOperationException>(() => te.id = Guid.NewGuid());
+        Assert.AreEqual(tID, te.id);
+
+        // Set Visibility.
+        te.SetVisibility(true);
+        Assert.IsTrue(te.terrain.drawHeightmap);
+        Assert.IsTrue(te.GetVisibility());
+        te.SetVisibility(false);
+        Assert.IsFalse(te.terrain.drawHeightmap);
+        Assert.IsFalse(te.GetVisibility());
+
+        // Set Highlight.
+        te.SetHighlight(true);
+        Assert.IsTrue(te.GetHighlight());
+        te.SetHighlight(false);
+        Assert.IsFalse(te.GetHighlight());
+
+        // Set Parent/Get Parent.
+        GameObject parentGO = new GameObject();
+        BaseEntity parentBE = parentGO.AddComponent<BaseEntity>();
+        parentBE.Initialize(Guid.NewGuid());
+        te.SetParent(parentBE);
+        Assert.AreEqual(te.GetParent(), parentBE);
+        te.SetParent(null);
+        Assert.IsNull(te.GetParent());
+
+        // Get Children.
+        GameObject childGO1 = new GameObject();
+        GameObject childGO2 = new GameObject();
+        BaseEntity childBE1 = childGO1.AddComponent<BaseEntity>();
+        BaseEntity childBE2 = childGO2.AddComponent<BaseEntity>();
+        childBE1.Initialize(Guid.NewGuid());
+        childBE2.Initialize(Guid.NewGuid());
+        childBE1.SetParent(te);
+        BaseEntity[] children = te.GetChildren();
+        Assert.IsFalse(children == null);
+        Assert.IsTrue(children.Length == 1);
+        Assert.AreEqual(children[0], childBE1);
+        childBE2.SetParent(te);
+        children = te.GetChildren();
+        Assert.IsFalse(children == null);
+        Assert.IsTrue(children.Length == 2);
+        Assert.IsTrue(children[0] == childBE1 || children[1] == childBE1);
+        Assert.IsTrue(children[0] == childBE2 || children[1] == childBE2);
+        childBE1.SetParent(null);
+        childBE2.SetParent(null);
+        children = te.GetChildren();
+        Assert.IsFalse(children == null);
+        Assert.IsTrue(children.Length == 0);
+
+        // Set Position/Get Position.
+        te.SetParent(parentBE);
+        parentBE.SetPosition(new Vector3(1, 2, 3), false, false);
+        Vector3 posToSet = new Vector3(1, 2, 3);
+        te.SetPosition(posToSet, false, false);
+        Assert.AreEqual(posToSet, te.GetPosition(false));
+        Assert.AreNotEqual(posToSet, te.GetPosition(true));
+        te.SetPosition(posToSet, true, false);
+        Assert.AreEqual(posToSet, te.GetPosition(true));
+        Assert.AreNotEqual(posToSet, te.GetPosition(false));
+
+        // Set Rotation/Get Rotation.
+        te.SetParent(parentBE);
+        parentBE.SetRotation(new Quaternion(0.1f, 0.2f, 0.3f, 1), false, false);
+        Quaternion rotToSet = new Quaternion(0.1f, 0.2f, 0.3f, 1);
+        te.SetRotation(rotToSet, false, false);
+        yield return null;
+        Quaternion measured = te.GetRotation(false);
+        measured = new Quaternion((float) Math.Round(measured.x, 1), (float) Math.Round(measured.y, 1),
+            (float) Math.Round(measured.z, 1), (float) Math.Round(measured.w, 0));
+        Assert.AreEqual(rotToSet, measured);
+        measured = te.GetRotation(true);
+        measured = new Quaternion((float) Math.Round(measured.x, 1), (float) Math.Round(measured.y, 1),
+            (float) Math.Round(measured.z, 1), (float) Math.Round(measured.w, 0));
+        Assert.AreNotEqual(rotToSet, measured);
+        te.SetRotation(rotToSet, true, false);
+        measured = te.GetRotation(true);
+        measured = new Quaternion((float) Math.Round(measured.x, 1), (float) Math.Round(measured.y, 1),
+            (float) Math.Round(measured.z, 1), (float) Math.Round(measured.w, 0));
+        Assert.AreEqual(rotToSet, measured);
+        measured = te.GetRotation(false);
+        measured = new Quaternion((float) Math.Round(measured.x, 1), (float) Math.Round(measured.y, 1),
+            (float) Math.Round(measured.z, 1), (float) Math.Round(measured.w, 0));
+        Assert.AreNotEqual(rotToSet, measured);
+
+        // Set Euler Rotation/Get Rotation.
+        te.SetParent(parentBE);
+        parentBE.SetEulerRotation(new Vector3(45, 90, 180), false, false);
+        Vector3 eRotToSet = new Vector3(45, 90, 180);
+        te.SetEulerRotation(eRotToSet, false, false);
+        te.SetEulerRotation(eRotToSet, true, false);
+
+        // Set Scale/Get Scale.
+        Vector3 sclToSet = new Vector3(1, 2, 3);
+        te.SetScale(sclToSet, false);
+        Assert.AreEqual(sclToSet, te.GetScale());
+
+        // Set Size/Get Size.
+        Vector3 sizeToSet = new Vector3(1, 2, 3);
+        te.SetSize(sizeToSet, false);
+        Assert.AreEqual(sizeToSet, te.GetSize());
+
+        // Compare.
+        Assert.IsTrue(te.Compare(te));
+
+        // Set Physical Properties/Get Physical Properties.
+        BaseEntity.EntityPhysicalProperties phyProps = new BaseEntity.EntityPhysicalProperties()
+        {
+            angularDrag = 1,
+            centerOfMass = new Vector3(1, 2, 3),
+            drag = 2,
+            gravitational = true,
+            mass = 42
+        };
+        te.SetPhysicalProperties(phyProps);
+        BaseEntity.EntityPhysicalProperties? setProps = te.GetPhysicalProperties();
+        Assert.IsTrue(setProps.HasValue);
+        Assert.AreEqual(float.PositiveInfinity, setProps.Value.angularDrag);
+        Assert.AreEqual(new Vector3(float.NegativeInfinity, float.NegativeInfinity, float.NegativeInfinity), setProps.Value.centerOfMass);
+        Assert.AreEqual(float.PositiveInfinity, setProps.Value.drag);
+        Assert.AreEqual(false, setProps.Value.gravitational);
+        Assert.AreEqual(float.PositiveInfinity, setProps.Value.mass);
+
+        // Set Interaction State/Get Interaction State.
+        BaseEntity.InteractionState interactionState = BaseEntity.InteractionState.Hidden;
+        te.SetInteractionState(interactionState);
+        Assert.AreEqual(interactionState, te.GetInteractionState());
+        interactionState = BaseEntity.InteractionState.Static;
+        te.SetInteractionState(interactionState);
+        Assert.AreEqual(interactionState, te.GetInteractionState());
+        interactionState = BaseEntity.InteractionState.Placing;
+        te.SetInteractionState(interactionState);
+        Assert.AreEqual(BaseEntity.InteractionState.Static, te.GetInteractionState());
+        interactionState = BaseEntity.InteractionState.Physical;
+        te.SetInteractionState(interactionState);
+        Assert.AreEqual(interactionState, te.GetInteractionState());
+
+        // Set Motion/Get Motion.
+        BaseEntity.EntityMotion entityMotion = new BaseEntity.EntityMotion()
+        {
+            angularVelocity = new Vector3(1, 2, 3),
+            stationary = true,
+            velocity = new Vector3(3, 4, 5)
+        };
+        te.SetMotion(entityMotion);
+        BaseEntity.EntityMotion? setMotion = te.GetMotion();
+        Assert.IsTrue(setMotion.HasValue);
+        Assert.AreEqual(Vector3.zero, setMotion.Value.angularVelocity);
+        Assert.AreEqual(true, setMotion.Value.stationary);
+        Assert.AreEqual(Vector3.zero, setMotion.Value.velocity);
+
+        // Build.
+        te.Build(new Vector3(1, 2, 3), TerrainEntityBrushType.roundedCube, 1);
+        yield return new WaitForSeconds(1);
+        te.Build(new Vector3(3, 4, 5), TerrainEntityBrushType.sphere, 2);
+        yield return new WaitForSeconds(1);
+
+        // Dig.
+        te.Dig(new Vector3(3, 2, 1), TerrainEntityBrushType.roundedCube, 0);
+        yield return new WaitForSeconds(1);
+        te.Dig(new Vector3(0, 5, 4), TerrainEntityBrushType.sphere, 1);
+        yield return new WaitForSeconds(1);
+
+        // Get Block at Position.
+        Assert.AreEqual(1, te.GetBlockAtPosition(new Vector3(1, 2, 3)).Item2);
+        Assert.AreEqual(HybridTerrainEntity.VoxelOperation.Build, te.GetBlockAtPosition(new Vector3(1, 2, 3)).Item1);
+        Assert.AreEqual(0, te.GetBlockAtPosition(new Vector3(3, 2, 1)).Item2);
+        Assert.AreEqual(HybridTerrainEntity.VoxelOperation.Dig, te.GetBlockAtPosition(new Vector3(3, 2, 1)).Item1);
+
+        // Get Layer.
+        te.GetLayer(0);
+        te.GetLayer(1);
+        te.GetLayer(2);
+
+        // Get Layer Mask.
+        te.GetLayerMask(0);
+        te.GetLayerMask(1);
+        te.GetLayerMask(2);
+
+        // Start Synchronizing/Stop Synchronizing.
+        GameObject synchGO = new GameObject();
+        BaseSynchronizer synch = synchGO.AddComponent<BaseSynchronizer>();
+        te.StartSynchronizing(synch);
+        te.StopSynchronizing();
+
+        // Delete Entity.
+        te.Delete();
+        yield return null;
+        Assert.True(te == null);
+    }
+#endif
 
     [UnityTest]
     public IEnumerator EntityTests_VoxelEntity()
