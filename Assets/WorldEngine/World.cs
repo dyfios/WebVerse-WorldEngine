@@ -7,6 +7,10 @@ using FiveSQD.WebVerse.WorldEngine.WorldStorage;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
 using FiveSQD.WebVerse.WorldEngine.Environment;
 using UnityEngine;
+#if USE_DIGGER
+using Digger.Modules.Core.Sources;
+using Digger.Modules.Runtime.Sources;
+#endif
 
 namespace FiveSQD.WebVerse.WorldEngine.World
 {
@@ -145,6 +149,28 @@ namespace FiveSQD.WebVerse.WorldEngine.World
         private GameObject environmentManagerGO;
 
         /// <summary>
+        /// The GameObject for the digger master.
+        /// </summary>
+        private GameObject diggerMasterGO;
+
+        /// <summary>
+        /// The GameObject for the digger master runtime.
+        /// </summary>
+        private GameObject diggerMasterRuntimeGO;
+
+#if USE_DIGGER
+        /// <summary>
+        /// The digger master.
+        /// </summary>
+        private DiggerMaster diggerMaster;
+
+        /// <summary>
+        /// The digger master runtime.
+        /// </summary>
+        private DiggerMasterRuntime diggerMasterRuntime;
+#endif
+
+        /// <summary>
         /// Initialize the World.
         /// </summary>
         /// <param name="worldInfo">World information to use.</param>
@@ -214,6 +240,17 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             environmentManager.skyMaterial = worldInfo.skyMaterial;
             environmentManager.Initialize();
 
+#if USE_DIGGER
+            diggerMasterGO = new GameObject("DiggerMaster");
+            diggerMasterGO.transform.parent = transform;
+            diggerMaster = diggerMasterGO.AddComponent<DiggerMaster>();
+            diggerMaster.SceneDataFolder = "Untitled";
+
+            diggerMasterRuntimeGO = new GameObject("DiggerMasterRuntime");
+            diggerMasterRuntimeGO.transform.parent = transform;
+            diggerMasterRuntime = diggerMasterRuntimeGO.AddComponent<DiggerMasterRuntime>();
+#endif
+
             siteName = worldInfo.siteName;
         }
 
@@ -222,6 +259,26 @@ namespace FiveSQD.WebVerse.WorldEngine.World
         /// </summary>
         public void Unload()
         {
+#if USE_DIGGER
+            if (diggerMasterGO == null)
+            {
+                LogSystem.LogError("[World->Unload] No digger master.");
+            }
+            else
+            {
+                Destroy(diggerMasterGO);
+            }
+
+            if (diggerMasterRuntimeGO == null)
+            {
+                LogSystem.LogError("[World->Unload] No digger master runtime.");
+            }
+            else
+            {
+                Destroy(diggerMasterRuntimeGO);
+            }
+#endif
+
             if (entityManager == null)
             {
                 LogSystem.LogError("[World->Unload] No entity manager.");

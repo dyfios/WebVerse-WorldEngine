@@ -145,20 +145,45 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="parentEntity">Parent entity to give the terrain entity.</param>
         /// <param name="position">Position to apply to the terrain entity.</param>
         /// <param name="rotation">Rotation to apply to the terrain entity.</param>
-        /// <param name="scale">Scale/size to apply to the terrain entity.</param>
         /// <param name="id">ID to apply to the terrain entity.</param>
-        /// <param name="isSize">Whether or not the scale value is for a size.</param>
         /// <param name="tag">Tag to apply to the terrain entity.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>The ID of the new terrain entity.</returns>
         public Guid LoadTerrainEntity(float length, float width, float height,
             float[,] heights, BaseEntity parentEntity,
-            Vector3 position, Quaternion rotation, Vector3 scale, Guid? id = null,
-            bool isSize = false, string tag = null, Action onLoaded = null)
+            Vector3 position, Quaternion rotation, Guid? id = null,
+            string tag = null, Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadTerrainEntity(length, width, height, heights, entityID,
                 parentEntity, position, rotation, tag, onLoaded));
+            return entityID;
+        }
+
+        /// <summary>
+        /// Load a terrain entity.
+        /// </summary>
+        /// <param name="length">Length of the terrain.</param>
+        /// <param name="width">Width of the terrain.</param>
+        /// <param name="height">Height of the terrain.</param>
+        /// <param name="heights">2D array of heights for the terrain.</param>
+        /// <param name="layers">Layers for the terrain.</param>
+        /// <param name="layerMasks">Layer masks for the terrain.</param>
+        /// <param name="parentEntity">Parent entity to give the terrain entity.</param>
+        /// <param name="position">Position to apply to the terrain entity.</param>
+        /// <param name="rotation">Rotation to apply to the terrain entity.</param>
+        /// <param name="id">ID to apply to the terrain entity.</param>
+        /// <param name="tag">Tag to apply to the terrain entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>The ID of the new terrain entity.</returns>
+        public Guid LoadHybridTerrainEntity(float length, float width, float height,
+            float[,] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks,
+            BaseEntity parentEntity, Vector3 position, Quaternion rotation, Vector3 scale,
+            Guid? id = null, bool isSize = false, string tag = null, Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadHybridTerrainEntity(length, width, height, heights, layers,
+                layerMasks, entityID, parentEntity, position, rotation, tag, onLoaded));
             return entityID;
         }
 
@@ -446,7 +471,42 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             Vector3 position, Quaternion rotation, string tag, Action onLoaded)
         {
             TerrainEntity entity = TerrainEntity.Create(length, width, height, heights, id);
-            GameObject terrainEntityObject = new GameObject("TerrainEntity-" + id.ToString());
+            entities.Add(id, entity);
+            entity.SetParent(parent);
+            entity.entityTag = tag;
+            entity.SetPosition(position, true);
+            entity.SetRotation(rotation, true);
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
+        /// <summary>
+        /// Loads a hybrid terrain entity.
+        /// </summary>
+        /// <param name="length">Length of the terrain.</param>
+        /// <param name="width">Width of the terrain.</param>
+        /// <param name="height">Height of the terrain.</param>
+        /// <param name="heights">2D array of heights for the terrain.</param>
+        /// <param name="layers">Layers for the terrain.</param>
+        /// <param name="layerMasks">Layer masks for the terrain.</param>
+        /// <param name="id">ID of the terrain entity.</param>
+        /// <param name="parent">Parent of the terrain entity.</param>
+        /// <param name="position">Position of the terrain entity.</param>
+        /// <param name="rotation">Rotation of the terrain entity.</param>
+        /// <param name="tag">Tag of the terrain entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
+        private System.Collections.IEnumerator LoadHybridTerrainEntity(float length, float width, float height,
+            float[,] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks, Guid id,
+            BaseEntity parent, Vector3 position, Quaternion rotation, string tag, Action onLoaded)
+        {
+            HybridTerrainEntity entity = HybridTerrainEntity.Create(
+                length, width, height, heights, layers, layerMasks, id);
             entities.Add(id, entity);
             entity.SetParent(parent);
             entity.entityTag = tag;

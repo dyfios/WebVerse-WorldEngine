@@ -2,7 +2,11 @@
     "name": "FiveSQD.WebVerse.WorldEngine",
     "rootNamespace": "fivesqd.webverse.worldengine",
     "references": [
-        "GUID:6055be8ebefd69e48b49212b09b47b2f"
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
+        "GUID:b6af883ec2a5d8f4f9ff7b816453f7b7",
+        "GUID:db664ca7e85896a4795e1c41be0bc3b8",
+        "GUID:d8b63aba1907145bea998dd612889d6b",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

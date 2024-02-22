@@ -1,6 +1,7 @@
 // Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
 using System.Collections.Generic;
 using FiveSQD.WebVerse.WorldEngine.Entity;
@@ -360,6 +361,36 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
             {
                 return cam.transform.localScale;
             }
+        }
+
+        /// <summary>
+        /// Get a raycast from the camera.
+        /// </summary>
+        /// <returns>A raycast from the camera, or null.</returns>
+        public RaycastHit? GetRaycast()
+        {
+            RaycastHit hit;
+            Ray ray = cam.ViewportPointToRay(new Vector3(0, 0, 0));
+            if (Physics.Raycast(ray, out hit))
+            {
+                return hit;
+            }
+            return null;
+        }
+
+        public RaycastHit? GetScreenPointerRaycast()
+        {
+            RaycastHit hit;
+            Ray ray = cam.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                Transform objectHit = hit.transform;
+
+                return hit;
+            }
+
+            return null;
         }
 
         private void Update()

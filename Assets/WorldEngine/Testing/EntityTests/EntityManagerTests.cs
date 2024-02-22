@@ -9,6 +9,7 @@ using System;
 using FiveSQD.WebVerse.WorldEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using FiveSQD.WebVerse.WorldEngine.Entity.Terrain;
 
 public class EntityManagerTests
 {
@@ -52,9 +53,44 @@ public class EntityManagerTests
             }
         }
         id = WorldEngine.ActiveWorld.entityManager.LoadTerrainEntity(256, 256, 256,
-            heights, null, Vector3.zero, Quaternion.identity, Vector3.one);
+            heights, null, Vector3.zero, Quaternion.identity);
         Assert.IsNotNull(id);
         eIDs.Add(id);
+
+#if TEST_HYBRID_TERRAIN
+        // Load Hybrid Terrain Entity.
+        TerrainEntityLayer[] layers = new TerrainEntityLayer[3]
+        {
+            new TerrainEntityLayer()
+            {
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Testing/TestResources/1.png")
+            },
+            new TerrainEntityLayer()
+            {
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Testing/TestResources/2.png")
+            },
+            new TerrainEntityLayer()
+            {
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Testing/TestResources/3.png")
+            }
+        };
+        float[,] layerMask = { { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f }};
+        Dictionary<int, float[,]> layerMasks = new Dictionary<int, float[,]>();
+        layerMasks.Add(0, layerMask);
+        layerMasks.Add(1, layerMask);
+        layerMasks.Add(2, layerMask);
+        id = WorldEngine.ActiveWorld.entityManager.LoadHybridTerrainEntity(256, 256, 256,
+            heights, layers, layerMasks, null, Vector3.zero, Quaternion.identity, Vector3.one);
+        Assert.IsNotNull(id);
+        eIDs.Add(id);
+#endif
 
         // Load Canvas Entity.
         Guid cId = WorldEngine.ActiveWorld.entityManager.LoadCanvasEntity(null, Vector3.zero, Quaternion.identity, Vector3.one);
