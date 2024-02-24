@@ -20,6 +20,7 @@ public class WorldTests
         {
             characterControllerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Character/Prefabs/UserAvatar.prefab"),
             highlightMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit")),
+            previewMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit")),
             inputEntityPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/UI/UIElement/Input/Prefabs/InputEntity.prefab"),
             maxEntryLength = 128,
             maxKeyLength = 16,

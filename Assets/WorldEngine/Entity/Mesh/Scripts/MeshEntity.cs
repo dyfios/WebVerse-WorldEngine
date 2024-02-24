@@ -3,7 +3,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using FiveSQD.WebVerse.WorldEngine.Materials;
-using FiveSQD.WebVerse.WorldEngine.Entity.Placement;
 using FiveSQD.WebVerse.WorldEngine.Tags;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
 
@@ -15,9 +14,14 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
     public class MeshEntity : BaseEntity
     {
         /// <summary>
-        /// Meshes on the character model.
+        /// Meshes on the mesh model.
         /// </summary>
         private Mesh[] meshes;
+
+        /// <summary>
+        /// Renderers on the mesh model.
+        /// </summary>
+        private MeshRenderer[] renderers;
 
         /// <summary>
         /// Original size of the mesh.
@@ -53,6 +57,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Cube used for highlighting the character entity.
         /// </summary>
         private GameObject highlightCube;
+
+        /// <summary>
+        /// Object to use for previewing.
+        /// </summary>
+        private GameObject previewObject;
 
         /// <summary>
         /// Delete the entity.
@@ -281,7 +290,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public override bool SetVisibility(bool visible)
         {
             // Use base functionality.
-            return base.SetVisibility(visible);
+            if (base.SetVisibility(visible))
+            {
+                SetPreviewVisibility(false);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -305,6 +319,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 ms.Add(filt.sharedMesh);
             }
             SetRenderers(ms.ToArray());
+            List<MeshRenderer> rends = new List<MeshRenderer>();
+            foreach (MeshRenderer rend in gameObject.GetComponentsInChildren<MeshRenderer>())
+            {
+                rends.Add(rend);
+            }
+            renderers = rends.ToArray();
             Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
             foreach (Mesh m in meshes)
             {
@@ -313,6 +333,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
             originalMeshSize = bounds.size;
             meshScaling = Vector3.one;
+
+            SetUpPreviewObject();
 
             BoxCollider boxCollider = null;
             foreach (BoxCollider bc in gameObject.GetComponentsInChildren<BoxCollider>())
@@ -351,6 +373,79 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        /// <summary>
+        /// Set the position of the preview.
+        /// </summary>
+        /// <param name="position">Position to apply to the preview.</param>
+        /// <param name="local">Whether or not the position is local.</param>
+        public override void SetPreviewPosition(Vector3 position, bool local)
+        {
+            if (local)
+            {
+                previewObject.transform.localPosition = position;
+            }
+            else
+            {
+                previewObject.transform.position = position;
+            }
+            base.SetPreviewPosition(position, local);
+        }
+
+        /// <summary>
+        /// Set the rotation of the preview.
+        /// </summary>
+        /// <param name="rotation">Rotation to apply to the preview.</param>
+        /// <param name="local">Whether or not the rotation is local.</param>
+        public override void SetPreviewRotation(Quaternion rotation, bool local)
+        {
+            if (local)
+            {
+                previewObject.transform.localRotation = rotation;
+            }
+            else
+            {
+                previewObject.transform.rotation = rotation;
+            }
+            base.SetPreviewRotation(rotation, local);
+        }
+
+        /// <summary>
+        /// Accept the current preview.
+        /// </summary>
+        public override void AcceptPreview()
+        {
+            transform.position = previewObject.transform.position;
+            transform.rotation = previewObject.transform.rotation;
+            base.AcceptPreview();
+        }
+
+        /// <summary>
+        /// Set the visibility of the preview.
+        /// </summary>
+        /// <param name="visible">Whether or not to make the preview visible.</param>
+        protected override void SetPreviewVisibility(bool visible)
+        {
+            base.SetPreviewVisibility(visible);
+
+            previewObject.transform.localPosition = Vector3.zero;
+            previewObject.transform.localRotation = Quaternion.identity;
+            previewObject.transform.localScale = Vector3.one;
+
+            previewObject.SetActive(visible);
+        }
+
+        /// <summary>
+        /// Set the visibility of the main mesh.
+        /// </summary>
+        /// <param name="visible">Whether or not to make the main mesh visible.</param>
+        private void SetMainMeshVisibility(bool visible)
+        {
+            foreach (MeshRenderer rend in renderers)
+            {
+                rend.enabled = visible;
+            }
         }
 
         /// <summary>
@@ -409,6 +504,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     break;
 
                 case InteractionState.Placing:
+                    SetPreviewVisibility(false);
+                    SetMainMeshVisibility(false);
                     break;
 
                 case InteractionState.Static:
@@ -446,6 +543,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     break;
 
                 case InteractionState.Placing:
+                    SetPreviewVisibility(false);
+                    SetMainMeshVisibility(true);
                     break;
 
                 case InteractionState.Static:
@@ -475,6 +574,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     break;
 
                 case InteractionState.Placing:
+                    SetPreviewVisibility(false);
+                    SetMainMeshVisibility(true);
                     break;
 
                 case InteractionState.Static:
@@ -511,10 +612,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     break;
             }
 
-#if USE_EBS
-            EBSPartCollectionManager.StartPlacing(this);
-#endif
-            
+            SetMainMeshVisibility(false);
+            SetPreviewVisibility(true);
+
             gameObject.SetActive(true);
             interactionState = InteractionState.Placing;
         }
@@ -577,6 +677,39 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             highlightCube.transform.localRotation = Quaternion.identity;
             highlightCube.transform.localScale = Vector3.one;
             highlightCube.SetActive(false);
+        }
+
+        /// <summary>
+        /// Set up the preview object.
+        /// </summary>
+        private void SetUpPreviewObject()
+        {
+            previewObject = Instantiate(gameObject, transform);
+            previewObject.name = "Preview";
+            BaseEntity entity = previewObject.GetComponent<BaseEntity>();
+            if (entity)
+            {
+                DestroyImmediate(entity);
+            }
+
+            Collider collider = previewObject.GetComponent<Collider>();
+            if (collider)
+            {
+                Destroy(collider);
+            }
+
+            Rigidbody rbody = previewObject.GetComponent<Rigidbody>();
+            if (rbody)
+            {
+                Destroy(rbody);
+            }    
+
+            foreach (MeshRenderer rend in previewObject.GetComponentsInChildren<MeshRenderer>())
+            {
+                rend.material = MaterialManager.PreviewMaterial;
+            }
+
+            SetPreviewVisibility(false);
         }
     }
 }

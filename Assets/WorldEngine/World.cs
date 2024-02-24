@@ -30,6 +30,11 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             public Material highlightMaterial;
 
             /// <summary>
+            /// Entity preview material.
+            /// </summary>
+            public Material previewMaterial;
+
+            /// <summary>
             /// Environment sky material.
             /// </summary>
             public Material skyMaterial;
@@ -227,7 +232,7 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             materialManagerGO = new GameObject("MaterialManager");
             materialManagerGO.transform.parent = transform;
             materialManager = materialManagerGO.AddComponent<MaterialManager>();
-            materialManager.Initialize(worldInfo.highlightMaterial);
+            materialManager.Initialize(worldInfo.highlightMaterial, worldInfo.previewMaterial);
 
             if (environmentManager != null)
             {

@@ -558,6 +558,20 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Add a placement socket to the entity.
+        /// </summary>
+        /// <param name="position">Position of the placement socket relative to the entity.</param>
+        /// <param name="rotation">Rotation of the placement socket relative to the entity.</param>
+        /// <param name="connectingOffset">Offset to apply when connecting to another socket.</param>
+        public virtual void AddSocket(Vector3 position, Quaternion rotation, Vector3 connectingOffset)
+        {
+            GameObject newSocketObj = new GameObject("PlacementSocket");
+            newSocketObj.transform.SetParent(transform);
+            PlacementSocket newSocket = newSocketObj.AddComponent<PlacementSocket>();
+            newSocket.Initialize(this, position, rotation, connectingOffset);
+        }
+
+        /// <summary>
         /// Start synchronizing the entity.
         /// </summary>
         /// <param name="synch">Synchronizer to use.</param>
@@ -572,6 +586,63 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public virtual void StopSynchronizing()
         {
             synchronizer = null;
+        }
+
+        /// <summary>
+        /// Set the visibility of the preview.
+        /// </summary>
+        /// <param name="visible">Whether or not to make the preview visible.</param>
+        protected virtual void SetPreviewVisibility(bool visible)
+        {
+            
+        }
+
+        /// <summary>
+        /// Set the position of the preview.
+        /// </summary>
+        /// <param name="position">Position to apply to the preview.</param>
+        /// <param name="local">Whether or not the position is local.</param>
+        public virtual void SetPreviewPosition(Vector3 position, bool local)
+        {
+            
+        }
+
+        /// <summary>
+        /// Set the rotation of the preview.
+        /// </summary>
+        /// <param name="rotation">Rotation to apply to the preview.</param>
+        /// <param name="local">Whether or not the rotation is local.</param>
+        public virtual void SetPreviewRotation(Quaternion rotation, bool local)
+        {
+            
+        }
+
+        /// <summary>
+        /// Snap the preview to a certain position and rotation.
+        /// </summary>
+        /// <param name="position">Position to snap the preview to.</param>
+        /// <param name="rotation">Rotation to snap the preview to.</param>
+        public virtual void SnapPreview(Vector3 position, Quaternion rotation)
+        {
+            SetPreviewPosition(position, false);
+            SetPreviewRotation(rotation, false);
+        }
+
+        /// <summary>
+        /// Reset the position and rotation of the preview.
+        /// </summary>
+        public virtual void ResetPreview()
+        {
+            SetPreviewPosition(Vector3.zero, true);
+            SetPreviewRotation(Quaternion.identity, false);
+        }
+
+        /// <summary>
+        /// Accept the current preview.
+        /// </summary>
+        public virtual void AcceptPreview()
+        {
+
         }
 
         /// <summary>
