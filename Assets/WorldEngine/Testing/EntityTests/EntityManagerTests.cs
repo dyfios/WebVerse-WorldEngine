@@ -52,13 +52,6 @@ public class EntityManagerTests
                 heights[i, j] = i;
             }
         }
-        id = WorldEngine.ActiveWorld.entityManager.LoadTerrainEntity(256, 256, 256,
-            heights, null, Vector3.zero, Quaternion.identity);
-        Assert.IsNotNull(id);
-        eIDs.Add(id);
-
-#if TEST_HYBRID_TERRAIN
-        // Load Hybrid Terrain Entity.
         TerrainEntityLayer[] layers = new TerrainEntityLayer[3]
         {
             new TerrainEntityLayer()
@@ -83,6 +76,16 @@ public class EntityManagerTests
                                { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
                                { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f }};
         Dictionary<int, float[,]> layerMasks = new Dictionary<int, float[,]>();
+        layerMasks.Add(0, layerMask);
+        layerMasks.Add(1, layerMask);
+        layerMasks.Add(2, layerMask);
+        id = WorldEngine.ActiveWorld.entityManager.LoadTerrainEntity(256, 256, 256,
+            heights, layers, layerMasks, null, Vector3.zero, Quaternion.identity);
+        Assert.IsNotNull(id);
+        eIDs.Add(id);
+
+#if TEST_HYBRID_TERRAIN
+        // Load Hybrid Terrain Entity.
         layerMasks.Add(0, layerMask);
         layerMasks.Add(1, layerMask);
         layerMasks.Add(2, layerMask);

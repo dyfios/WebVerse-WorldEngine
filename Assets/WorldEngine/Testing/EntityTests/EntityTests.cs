@@ -2179,7 +2179,34 @@ public class EntityTests
                              { 0, 1, 2, 3, 4, 5, 6, 7 },
                              { 0, 1, 2, 3, 4, 5, 6, 7 },
                              { 0, 1, 2, 3, 4, 5, 6, 7 }};
-        TerrainEntity te = TerrainEntity.Create(8, 8, 8, heights, tID);
+        TerrainEntityLayer[] layers = new TerrainEntityLayer[3]
+        {
+            new TerrainEntityLayer()
+            {
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Testing/TestResources/1.png")
+            },
+            new TerrainEntityLayer()
+            {
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Testing/TestResources/2.png")
+            },
+            new TerrainEntityLayer()
+            {
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Testing/TestResources/3.png")
+            }
+        };
+        float[,] layerMask = { { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
+                               { 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f }};
+        Dictionary<int, float[,]> layerMasks = new Dictionary<int, float[,]>();
+        layerMasks.Add(0, layerMask);
+        layerMasks.Add(1, layerMask);
+        layerMasks.Add(2, layerMask);
+        TerrainEntity te = TerrainEntity.Create(8, 8, 8, heights, layers, layerMasks, tID);
 
         // Initialize Entity with ID and ensure it cannot be changed.
         Assert.AreEqual(tID, te.id);

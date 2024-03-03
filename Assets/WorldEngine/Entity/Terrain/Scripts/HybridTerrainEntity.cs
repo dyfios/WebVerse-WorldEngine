@@ -216,6 +216,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         private Material[] meshMaterials;
 
         /// <summary>
+        /// TerrainEntityLayers
+        /// </summary>
+        private List<TerrainEntityLayer> terrainEntityLayers;
+
+        /// <summary>
         /// Count of textures per pass.
         /// </summary>
         private const int TxtCountPerPass = 4;
@@ -559,6 +564,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Get the base heights values.
+        /// </summary>
+        /// <returns>The base heights values.</returns>
+        public float[,] GetBaseHeights()
+        {
+            return baseHeights;
+        }
+
+        /// <summary>
         /// Set the heights of the hybrid terrain.
         /// </summary>
         /// <param name="newLength">New length in meters of the terrain.</param>
@@ -712,6 +726,35 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        ///  Get the layers for this terrain entity.
+        /// </summary>
+        /// <returns>The layers for this terrain entity.</returns>
+        public TerrainEntityLayer[] GetLayers()
+        {
+            if (terrain.terrainData.terrainLayers == null)
+            {
+                LogSystem.LogWarning("[HybridTerrainEntity->GetLayer] No layers.");
+                return null;
+            }
+
+            List<TerrainEntityLayer> layers = new List<TerrainEntityLayer>();
+            foreach (TerrainLayer layer in terrain.terrainData.terrainLayers)
+            {
+                layers.Add(new TerrainEntityLayer()
+                    {
+                        diffuse = layer.diffuseTexture,
+                        normal = layer.normalMapTexture,
+                        mask = layer.maskMapTexture,
+                        specular = layer.specular,
+                        metallic = layer.metallic,
+                        smoothness = layer.smoothness
+                    });
+            }
+
+            return layers.ToArray();
+        }
+
+        /// <summary>
         /// Get a layer mask.
         /// </summary>
         /// <param name="layer">Layer index.</param>
@@ -736,6 +779,20 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
 
             return mask;
+        }
+
+        /// <summary>
+        /// Get the layer masks for this terrain entity.
+        /// </summary>
+        /// <returns>The layer masks for this terrain entity.</returns>
+        public Dictionary<int, float[,]> GetLayerMasks()
+        {
+            Dictionary<int, float[,]> layerMasks = new Dictionary<int, float[,]>();
+            for (int i = 0; i < terrain.terrainData.terrainLayers.Length; i++)
+            {
+                layerMasks.Add(i, GetLayerMask(i));
+            }
+            return layerMasks;
         }
 
         /// <summary>
@@ -765,10 +822,13 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             meshMaterials = new Material[MaxPassCount];
 
+            terrainEntityLayers = new List<TerrainEntityLayer>();
+
             // Set up layers.
             foreach (TerrainEntityLayer layer in layers)
             {
                 AddLayer(layer);
+                terrainEntityLayers.Add(layer);
             }
 
             // Set up layer masks.
