@@ -15,14 +15,29 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity.Terrain
         public Texture2D diffuse;
 
         /// <summary>
+        /// Diffuse texture path.
+        /// </summary>
+        public string diffusePath;
+
+        /// <summary>
         /// Normal texture.
         /// </summary>
         public Texture2D normal;
 
         /// <summary>
+        /// Normal texture path.
+        /// </summary>
+        public string normalPath;
+
+        /// <summary>
         /// Mask texture.
         /// </summary>
         public Texture2D mask;
+
+        /// <summary>
+        /// Mask texture path.
+        /// </summary>
+        public string maskPath;
 
         /// <summary>
         /// Specularity.

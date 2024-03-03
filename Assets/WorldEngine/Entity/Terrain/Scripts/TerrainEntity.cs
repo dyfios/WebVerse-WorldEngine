@@ -35,35 +35,32 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         private float[,] heights;
 
         /// <summary>
+        /// TerrainEntityLayers
+        /// </summary>
+        private List<TerrainEntityLayer> terrainEntityLayers;
+
+        /// <summary>
         /// Create a terrain entity.
         /// </summary>
         /// <param name="length">Length of the terrain.</param>
         /// <param name="width">Width of the terrain.</param>
         /// <param name="height">Height of the terrain.</param>
         /// <param name="heights">2D array of heights for the terrain.</param>
+        /// <param name="layers">Array of layers for the terrain.</param>
+        /// <param name="layerMasks">Dictionary of layer indices and layer masks for the terrain.</param>
         /// <param name="id">ID for the terrain.</param>
         /// <returns>The requested terrain entity.</returns>
         public static TerrainEntity Create(float length, float width, float height,
-            float[,] heights, Guid id)
+            float[,] heights, TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks, Guid id)
         {
             GameObject terrainGO = new GameObject("TerrainEntity-" + id.ToString());
             TerrainEntity terrainEntity = terrainGO.AddComponent<TerrainEntity>();
             TerrainData terrainData = new TerrainData();
-            /*for (int i = 0; i < heights.GetLength(0); i++)
-            {
-                for (int j = 0; j < heights.GetLength(1); j++)
-                {
-                    heights[i, j] = heights[i, j] / height;
-                }
-            }*/
-            //terrainData.heightmapResolution = GetTerrainSize(Math.Max(length, width));
-            //terrainData.SetHeights(0, 0, heights);
-            //terrainData.size = new Vector3(length, height, width);
             GameObject terrainObject = UnityEngine.Terrain.CreateTerrainGameObject(terrainData);
             terrainObject.transform.SetParent(terrainGO.transform);
             terrainEntity.terrain = terrainObject.GetComponent<UnityEngine.Terrain>();
             terrainEntity.terrainCollider = terrainObject.GetComponent<TerrainCollider>();
-            terrainEntity.Initialize(id);
+            terrainEntity.Initialize(id, layers, layerMasks);
             terrainEntity.SetHeights(length, width, height, heights);
             return terrainEntity;
         }
@@ -489,6 +486,35 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        ///  Get the layers for this terrain entity.
+        /// </summary>
+        /// <returns>The layers for this terrain entity.</returns>
+        public TerrainEntityLayer[] GetLayers()
+        {
+            if (terrain.terrainData.terrainLayers == null)
+            {
+                LogSystem.LogWarning("[TerrainEntity->GetLayer] No layers.");
+                return null;
+            }
+
+            List<TerrainEntityLayer> layers = new List<TerrainEntityLayer>();
+            foreach (TerrainLayer layer in terrain.terrainData.terrainLayers)
+            {
+                layers.Add(new TerrainEntityLayer()
+                {
+                    diffuse = layer.diffuseTexture,
+                    normal = layer.normalMapTexture,
+                    mask = layer.maskMapTexture,
+                    specular = layer.specular,
+                    metallic = layer.metallic,
+                    smoothness = layer.smoothness
+                });
+            }
+
+            return layers.ToArray();
+        }
+
+        /// <summary>
         /// Set the mask for a particular layer.
         /// </summary>
         /// <param name="layer">Layer index.</param>
@@ -558,11 +584,59 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Get the layer masks for this terrain entity.
+        /// </summary>
+        /// <returns>The layer masks for this terrain entity.</returns>
+        public Dictionary<int, float[,]> GetLayerMasks()
+        {
+            Dictionary<int, float[,]> layerMasks = new Dictionary<int, float[,]>();
+            for (int i = 0; i < terrain.terrainData.terrainLayers.Length; i++)
+            {
+                layerMasks.Add(i, GetLayerMask(i));
+            }
+            return layerMasks;
+        }
+
+        /// <summary>
         /// Initialize this entity. This should only be called once.
         /// </summary>
         /// <param name="idToSet">ID to apply to the entity.</param>
         public override void Initialize(Guid idToSet)
         {
+            LogSystem.LogError("[TerrainEntity->Initialize] Terrain entity must be initialized with layers and layer masks.");
+
+            return;
+        }
+
+        /// <summary>
+        /// Initialize this entity. This should only be called once.
+        /// </summary>
+        /// <param name="idToSet">ID to apply to the entity.</param>
+        /// <param name="layers">Array of layers for the terrain.</param>
+        /// <param name="layerMasks">Dictionary of layer indices and layer masks for the terrain.</param>
+        public void Initialize(Guid idToSet, TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks)
+        {
+            if (layers == null || layers.Length < 1)
+            {
+                LogSystem.LogError("[TerrainEntity->Initialize] Terrain entity must be initialized with at least one layer.");
+                return;
+            }
+
+            terrainEntityLayers = new List<TerrainEntityLayer>();
+
+            // Set up layers.
+            foreach (TerrainEntityLayer layer in layers)
+            {
+                AddLayer(layer);
+                terrainEntityLayers.Add(layer);
+            }
+
+            // Set up layer masks.
+            foreach (KeyValuePair<int, float[,]> layerMask in layerMasks)
+            {
+                SetLayerMask(layerMask.Key, layerMask.Value);
+            }
+
             base.Initialize(idToSet);
 
             SetUpHighlightVolume();
