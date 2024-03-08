@@ -128,6 +128,22 @@ namespace FiveSQD.WebVerse.WorldEngine.Synchronization
         }
 
         /// <summary>
+        /// Method to modify a synchronized terrain entity.
+        /// </summary>
+        /// <param name="entityToSet">Terrain entity to modify.</param>
+        /// <param name="modification">Modification to be performed.</param>
+        /// <param name="position">Position value.</param>
+        /// <param name="brushType">Brush type.</param>
+        /// <param name="layer">Layer.</param>
+        /// <returns><see cref="StatusCode"/>StatusCode</returns>
+        public virtual StatusCode ModifyTerrainEntity(BaseEntity entityToSet,
+            HybridTerrainEntity.TerrainOperation modification, Vector3 position,
+            Entity.Terrain.TerrainEntityBrushType brushType, int layer)
+        {
+            return StatusCode.UNSUPPORTED;
+        }
+
+        /// <summary>
         /// Method to set the physical properties of a synchronized entity.
         /// </summary>
         /// <param name="entityToSet">The entity to set the physical properties of.</param>

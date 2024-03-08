@@ -90,7 +90,7 @@ public class EntityManagerTests
         layerMasks.Add(1, layerMask);
         layerMasks.Add(2, layerMask);
         id = WorldEngine.ActiveWorld.entityManager.LoadHybridTerrainEntity(256, 256, 256,
-            heights, layers, layerMasks, null, Vector3.zero, Quaternion.identity, Vector3.one);
+            heights, layers, layerMasks, null, Vector3.zero, Quaternion.identity);
         Assert.IsNotNull(id);
         eIDs.Add(id);
 #endif

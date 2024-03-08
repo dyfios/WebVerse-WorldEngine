@@ -180,8 +180,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>The ID of the new terrain entity.</returns>
         public Guid LoadHybridTerrainEntity(float length, float width, float height,
             float[,] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks,
-            BaseEntity parentEntity, Vector3 position, Quaternion rotation, Vector3 scale,
-            Guid? id = null, bool isSize = false, string tag = null, Action onLoaded = null)
+            BaseEntity parentEntity, Vector3 position, Quaternion rotation,
+            Guid? id = null, string tag = null, Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadHybridTerrainEntity(length, width, height, heights, layers,
