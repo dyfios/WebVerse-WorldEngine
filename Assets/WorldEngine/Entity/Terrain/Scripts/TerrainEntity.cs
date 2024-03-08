@@ -10,7 +10,7 @@ using System.Collections.Generic;
 namespace FiveSQD.WebVerse.WorldEngine.Entity
 {
     /// <summary>
-    /// WIP: Class for a terrain entity.
+    /// Class for a terrain entity.
     /// </summary>
     public class TerrainEntity : BaseEntity
     {

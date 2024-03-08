@@ -2623,9 +2623,9 @@ public class EntityTests
 
         // Get Block at Position.
         Assert.AreEqual(1, te.GetBlockAtPosition(new Vector3(1, 2, 3)).Item2);
-        Assert.AreEqual(HybridTerrainEntity.VoxelOperation.Build, te.GetBlockAtPosition(new Vector3(1, 2, 3)).Item1);
+        Assert.AreEqual(HybridTerrainEntity.TerrainOperation.Build, te.GetBlockAtPosition(new Vector3(1, 2, 3)).Item1);
         Assert.AreEqual(0, te.GetBlockAtPosition(new Vector3(3, 2, 1)).Item2);
-        Assert.AreEqual(HybridTerrainEntity.VoxelOperation.Dig, te.GetBlockAtPosition(new Vector3(3, 2, 1)).Item1);
+        Assert.AreEqual(HybridTerrainEntity.TerrainOperation.Dig, te.GetBlockAtPosition(new Vector3(3, 2, 1)).Item1);
 
         // Get Layer.
         te.GetLayer(0);

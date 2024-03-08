@@ -27,7 +27,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Dig: dig operation.
         /// Build: build operation.
         /// </summary>
-        public enum VoxelOperation
+        public enum TerrainOperation
         {
             Unset = 0,
             Dig = 1,
@@ -37,20 +37,22 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <summary>
         /// Class for a voxel map.
         /// </summary>
-        private class VoxelMap
+        public class VoxelMap
         {
             /// <summary>
             /// Hierarchical dictionary for the voxel map. Top-level dictionary is x indices,
             /// second is y indices, and third is z indices.
             /// </summary>
-            private Dictionary<int, Dictionary<int, Dictionary<int, Tuple<VoxelOperation, int>>>> map;
+            private Dictionary<int, Dictionary<int, Dictionary<int, Tuple
+                <TerrainOperation, int, TerrainEntityBrushType>>>> map;
 
             /// <summary>
             /// Constructor for a voxel map.
             /// </summary>
             public VoxelMap()
             {
-                map = new Dictionary<int, Dictionary<int, Dictionary<int, Tuple<VoxelOperation, int>>>>();
+                map = new Dictionary<int, Dictionary<int, Dictionary
+                    <int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>>>();
             }
 
             /// <summary>
@@ -59,7 +61,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             /// <param name="position">Position of the block in voxel coordinates.</param>
             /// <param name="operation">Operation being performed.</param>
             /// <param name="blockIndex">Index of the block/layer.</param>
-            public void SetBlock(Vector3Int position, VoxelOperation operation, int blockIndex)
+            /// <param name="brushType">Brush type.</param>
+            public void SetBlock(Vector3Int position, TerrainOperation operation, int blockIndex, TerrainEntityBrushType brushType)
             {
                 if (position.x < 0 || position.y < 0 || position.z < 0)
                 {
@@ -67,39 +70,42 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     return;
                 }
 
-                Dictionary<int, Dictionary<int, Tuple<VoxelOperation, int>>> xDictionary;
+                Dictionary<int, Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>> xDictionary;
                 if (map.ContainsKey(position.x))
                 {
                     xDictionary = map[position.x];
                 }
                 else
                 {
-                    xDictionary = map[position.x] = new Dictionary<int, Dictionary<int, Tuple<VoxelOperation, int>>>();
+                    xDictionary = map[position.x] = new Dictionary<int,
+                        Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>>();
                 }
 
-                Dictionary<int, Tuple<VoxelOperation, int>> yDictionary;
+                Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>> yDictionary;
                 if (xDictionary.ContainsKey(position.y))
                 {
                     yDictionary = xDictionary[position.y];
                 }
                 else
                 {
-                    yDictionary = xDictionary[position.y] = new Dictionary<int, Tuple<VoxelOperation, int>>();
+                    yDictionary = xDictionary[position.y]
+                        = new Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>();
                 }
 
                 if (yDictionary.ContainsKey(position.z))
                 {
                     // Check if this operation is inverting a previous one. If so, simply remove the block.
-                    Tuple<VoxelOperation, int> existingValue = yDictionary[position.z];
-                    if (((existingValue.Item1 == VoxelOperation.Dig && operation == VoxelOperation.Build) ||
-                        (existingValue.Item1 == VoxelOperation.Build && operation == VoxelOperation.Dig)) &&
+                    Tuple<TerrainOperation, int, TerrainEntityBrushType> existingValue = yDictionary[position.z];
+                    if (((existingValue.Item1 == TerrainOperation.Dig && operation == TerrainOperation.Build) ||
+                        (existingValue.Item1 == TerrainOperation.Build && operation == TerrainOperation.Dig)) &&
                         (existingValue.Item2 == blockIndex))
                     {
                         RemoveBlock(position);
                         return;
                     }
                 }
-                yDictionary[position.z] = new Tuple<VoxelOperation, int>(operation, blockIndex);
+                yDictionary[position.z] = new Tuple
+                    <TerrainOperation, int, TerrainEntityBrushType>(operation, blockIndex, brushType);
             }
 
             /// <summary>
@@ -114,24 +120,26 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     return;
                 }
 
-                Dictionary<int, Dictionary<int, Tuple<VoxelOperation, int>>> xDictionary;
+                Dictionary<int, Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>> xDictionary;
                 if (map.ContainsKey(position.x))
                 {
                     xDictionary = map[position.x];
                 }
                 else
                 {
-                    xDictionary = map[position.x] = new Dictionary<int, Dictionary<int, Tuple<VoxelOperation, int>>>();
+                    xDictionary = map[position.x] = new Dictionary
+                        <int, Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>>();
                 }
 
-                Dictionary<int, Tuple<VoxelOperation, int>> yDictionary;
+                Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>> yDictionary;
                 if (xDictionary.ContainsKey(position.y))
                 {
                     yDictionary = xDictionary[position.y];
                 }
                 else
                 {
-                    yDictionary = xDictionary[position.y] = new Dictionary<int, Tuple<VoxelOperation, int>>();
+                    yDictionary = xDictionary[position.y] = new Dictionary
+                        <int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>();
                 }
 
                 if (yDictionary.ContainsKey(position.z))
@@ -144,22 +152,25 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             /// Get the voxel block at a given index.
             /// </summary>
             /// <param name="position">Position of the block to get in voxel coordinates.</param>
-            /// <returns>The voxel block at the given index (tuple of operations and block index),
+            /// <returns>The voxel block at the given index (tuple of operations, block index, and brush type),
             /// or (unset, -1) if it doesn't exist.</returns>
-            public Tuple<VoxelOperation, int> GetBlock(Vector3Int position)
+            public Tuple<TerrainOperation, int, TerrainEntityBrushType> GetBlock(Vector3Int position)
             {
                 if (position.x < 0 || position.y < 0 || position.z < 0)
                 {
                     LogSystem.LogWarning("[VoxelMap->GetBlock] Invalid position.");
-                    return new Tuple<VoxelOperation, int>(VoxelOperation.Unset, -1);
+                    return new Tuple<TerrainOperation, int, TerrainEntityBrushType>(
+                        TerrainOperation.Unset, -1, TerrainEntityBrushType.sphere);
                 }
 
                 if (map.ContainsKey(position.x))
                 {
-                    Dictionary<int, Dictionary<int, Tuple<VoxelOperation, int>>> xDictionary = map[position.x];
+                    Dictionary<int, Dictionary<
+                        int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>> xDictionary = map[position.x];
                     if (xDictionary.ContainsKey(position.y))
                     {
-                        Dictionary<int, Tuple<VoxelOperation, int>> yDictionary = xDictionary[position.y];
+                        Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>
+                            yDictionary = xDictionary[position.y];
                         if (yDictionary.ContainsKey(position.z))
                         {
                             return yDictionary[position.z];
@@ -167,7 +178,36 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     }
                 }
 
-                return new Tuple<VoxelOperation, int>(VoxelOperation.Unset, -1);
+                return new Tuple<TerrainOperation, int, TerrainEntityBrushType>
+                    (TerrainOperation.Unset, -1, TerrainEntityBrushType.sphere);
+            }
+
+            /// <summary>
+            /// Get all voxel blocks.
+            /// </summary>
+            /// <returns>A dictionary of voxel block coordinates,
+            /// and a tuple of operations, block indices, and brush types.</returns>
+            public Dictionary<Vector3Int, Tuple<TerrainOperation, int, TerrainEntityBrushType>> GetBlocks()
+            {
+                Dictionary<Vector3Int, Tuple<TerrainOperation, int, TerrainEntityBrushType>> outVal
+                    = new Dictionary<Vector3Int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>();
+
+                foreach (int xIdx in map.Keys)
+                {
+                    Dictionary<int, Dictionary<int, Tuple<
+                        TerrainOperation, int, TerrainEntityBrushType>>> xDict = map[xIdx];
+                    foreach (int yIdx in xDict.Keys)
+                    {
+                        Dictionary<int, Tuple<TerrainOperation, int,
+                            TerrainEntityBrushType>> yDict = xDict[yIdx];
+                        foreach (int zIdx in yDict.Keys)
+                        {
+                            outVal.Add(new Vector3Int(xIdx, yIdx, zIdx), yDict[zIdx]);
+                        }
+                    }
+                }
+
+                return outVal;
             }
         }
 
@@ -309,8 +349,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="position">Position of the dig.</param>
         /// <param name="brushType">Brush to use.</param>
         /// <param name="layerIndex">Index of the layer to perform the dig on.</param>
+        /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the operation was successful.</returns>
-        public bool Dig(Vector3 position, TerrainEntityBrushType brushType, int layerIndex)
+        public bool Dig(Vector3 position, TerrainEntityBrushType brushType, int layerIndex, bool synchronize = true)
         {
 #if USE_DIGGER
             if (modBuf.Count >= bufferSize)
@@ -344,8 +385,14 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 Callback = null
             });
 
-            voxelValues.SetBlock(GetVoxelPosition(position), VoxelOperation.Dig, layerIndex);
+            voxelValues.SetBlock(GetVoxelPosition(position), TerrainOperation.Dig, layerIndex, brushType);
 #endif
+
+            if (synchronize && synchronizer != null)
+            {
+                synchronizer.ModifyTerrainEntity(this,
+                    TerrainOperation.Dig, position, brushType, layerIndex);
+            }
 
             return true;
         }
@@ -356,8 +403,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="position">Position of the build.</param>
         /// <param name="brushType">Brush to use.</param>
         /// <param name="layerIndex">Index of the layer to perform the build on.</param>
+        /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the operation was successful.</returns>
-        public bool Build(Vector3 position, TerrainEntityBrushType brushType, int layerIndex)
+        public bool Build(Vector3 position, TerrainEntityBrushType brushType, int layerIndex, bool synchronize = true)
         {
 #if USE_DIGGER
             if (modBuf.Count >= bufferSize)
@@ -391,8 +439,14 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 Callback = null
             });
 
-            voxelValues.SetBlock(GetVoxelPosition(position), VoxelOperation.Build, layerIndex);
+            voxelValues.SetBlock(GetVoxelPosition(position), TerrainOperation.Build, layerIndex, brushType);
 #endif
+
+            if (synchronize && synchronizer != null)
+            {
+                synchronizer.ModifyTerrainEntity(this,
+                    TerrainOperation.Build, position, brushType, layerIndex);
+            }
 
             return true;
         }
@@ -402,7 +456,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         /// <param name="position">Position to get the block at.</param>
         /// <returns>Block at the given position (tuple of the operation and layer index).</returns>
-        public Tuple<VoxelOperation, int> GetBlockAtPosition(Vector3 position)
+        public Tuple<TerrainOperation, int, TerrainEntityBrushType> GetBlockAtPosition(Vector3 position)
         {
             return voxelValues.GetBlock(GetVoxelPosition(position));
         }
@@ -793,6 +847,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 layerMasks.Add(i, GetLayerMask(i));
             }
             return layerMasks;
+        }
+
+        /// <summary>
+        /// Get the terrain modifications for this terrain entity.
+        /// </summary>
+        /// <returns>The terrain modifications for this terrain entity.</returns>
+        public Dictionary<Vector3Int, Tuple<TerrainOperation, int, TerrainEntityBrushType>> GetTerrainModifications()
+        {
+            return voxelValues.GetBlocks();
         }
 
         /// <summary>
