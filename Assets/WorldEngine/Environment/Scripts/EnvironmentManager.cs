@@ -62,6 +62,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Environment
         /// </summary>
         public void ResetSky()
         {
+            if (skyMaterial == null)
+            {
+                return;
+            }
+
             skyMaterial.SetColor("_Tint", new Color((float) 128 / 255,
                 (float) 128 / 255, (float) 128 / 255, (float) 128 / 255));
             skyMaterial.SetTexture("_MainTex", null);

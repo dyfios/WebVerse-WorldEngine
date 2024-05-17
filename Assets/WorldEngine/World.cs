@@ -45,6 +45,16 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             public GameObject inputEntityPrefab;
 
             /// <summary>
+            /// WebView prefab.
+            /// </summary>
+            public GameObject webViewPrefab;
+
+            /// <summary>
+            /// Canvas webView prefab.
+            /// </summary>
+            public GameObject canvasWebViewPrefab;
+
+            /// <summary>
             /// Character controller prefab.
             /// </summary>
             public GameObject characterControllerPrefab;
@@ -201,6 +211,8 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             entityManager = entityManagerGO.AddComponent<EntityManager>();
             entityManager.Initialize();
             entityManager.inputEntityPrefab = worldInfo.inputEntityPrefab;
+            entityManager.webViewPrefab = worldInfo.webViewPrefab;
+            entityManager.canvasWebViewPrefab = worldInfo.canvasWebViewPrefab;
             entityManager.characterControllerPrefab = worldInfo.characterControllerPrefab;
             entityManager.voxelPrefab = worldInfo.voxelPrefab;
 

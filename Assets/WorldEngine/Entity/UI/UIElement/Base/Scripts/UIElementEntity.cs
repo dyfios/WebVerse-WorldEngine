@@ -126,7 +126,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="percent">Percent to set.</param>
         /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the setting was successful.</returns>
-        public bool SetSizePercent(Vector2 percent, bool synchronize = true)
+        public virtual bool SetSizePercent(Vector2 percent, bool synchronize = true)
         {
             RectTransform rt = uiElementRectTransform;
             if (rt == null)
@@ -179,7 +179,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="percent">Percentage to set.</param>
         /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the setting was successful.</returns>
-        public bool SetPositionPercent(Vector2 percent, bool synchronize = true)
+        public virtual bool SetPositionPercent(Vector2 percent, bool synchronize = true)
         {
             RectTransform rt = uiElementRectTransform;
             if (rt == null)
@@ -277,7 +277,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Get the parent canvas entity of this entity.
         /// </summary>
         /// <returns>The parent canvas entity.</returns>
-        private CanvasEntity GetParentCanvasEntity()
+        protected CanvasEntity GetParentCanvasEntity()
         {
             return GetComponentInParent<CanvasEntity>(true);
         }

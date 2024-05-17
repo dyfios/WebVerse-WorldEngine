@@ -370,8 +370,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         public RaycastHit? GetRaycast()
         {
             RaycastHit hit;
-            Ray ray = cam.ViewportPointToRay(new Vector3(0, 0, 0));
-            if (Physics.Raycast(ray, out hit))
+            
+            if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit))
             {
                 return hit;
             }
