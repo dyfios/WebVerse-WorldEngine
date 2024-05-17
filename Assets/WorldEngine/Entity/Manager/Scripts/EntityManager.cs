@@ -26,6 +26,18 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public GameObject inputEntityPrefab;
 
         /// <summary>
+        /// Prefab for a WebView.
+        /// </summary>
+        [Tooltip("Prefab for a WebView.")]
+        public GameObject webViewPrefab;
+
+        /// <summary>
+        /// Prefab for a Canvas WebView.
+        /// </summary>
+        [Tooltip("Prefab for a Canvas WebView.")]
+        public GameObject canvasWebViewPrefab;
+
+        /// <summary>
         /// Prefab for a voxel.
         /// </summary>
         [Tooltip("Prefab for a voxel.")]
@@ -178,6 +190,46 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="tag">Tag to apply to the terrain entity.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>The ID of the new terrain entity.</returns>
+        public Guid LoadTerrainEntity(float length, float width, float height,
+            float[][] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks,
+            BaseEntity parentEntity, Vector3 position, Quaternion rotation, Guid? id = null,
+            string tag = null, Action onLoaded = null)
+        {
+            if (heights == null || heights[0] == null)
+            {
+                LogSystem.LogWarning("[EntityManager->LoadTerrainEntity] Invalid heights array.");
+                return Guid.Empty;
+            }
+
+            float[,] processedHeights = new float[heights.Length, heights[0].Length];
+            for (int i = 0; i < heights.Length; i++)
+            {
+                for (int j = 0; j < heights[0].Length; j++)
+                {
+                    processedHeights[i, j] = heights[i][j];
+                }
+            }
+
+            return LoadTerrainEntity(length, width, height, processedHeights, layers, layerMasks,
+                parentEntity, position, rotation, id, tag, onLoaded);
+        }
+
+        /// <summary>
+        /// Load a terrain entity.
+        /// </summary>
+        /// <param name="length">Length of the terrain.</param>
+        /// <param name="width">Width of the terrain.</param>
+        /// <param name="height">Height of the terrain.</param>
+        /// <param name="heights">2D array of heights for the terrain.</param>
+        /// <param name="layers">Layers for the terrain.</param>
+        /// <param name="layerMasks">Layer masks for the terrain.</param>
+        /// <param name="parentEntity">Parent entity to give the terrain entity.</param>
+        /// <param name="position">Position to apply to the terrain entity.</param>
+        /// <param name="rotation">Rotation to apply to the terrain entity.</param>
+        /// <param name="id">ID to apply to the terrain entity.</param>
+        /// <param name="tag">Tag to apply to the terrain entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>The ID of the new terrain entity.</returns>
         public Guid LoadHybridTerrainEntity(float length, float width, float height,
             float[,] heights, Terrain.TerrainEntityLayer[] layers, Dictionary<int, float[,]> layerMasks,
             BaseEntity parentEntity, Vector3 position, Quaternion rotation,
@@ -209,6 +261,55 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadCanvasEntity(entityID, parentEntity,
                 position, rotation, scale, isSize, tag, onLoaded));
+
+            return entityID;
+        }
+
+        /// <summary>
+        /// Load an HTML entity.
+        /// </summary>
+        /// <param name="parentEntity">Parent entity to give the HTML entity.</param>
+        /// <param name="position">Position to apply to the HTML entity.</param>
+        /// <param name="rotation">Rotation to apply to the HTML entity.</param>
+        /// <param name="scale">Scale/size to apply to the HTML entity.</param>
+        /// <param name="id">ID to apply to the HTML entity.</param>
+        /// <param name="isSize">Whether or not the scale value is for a size.</param>
+        /// <param name="tag">Tag to apply to the HTML entity.</param>
+        /// <param name="onMessage">Action to invoke upon receiving a world message.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>The ID of the new HTML entity.</returns>
+        public Guid LoadHTMLEntity(BaseEntity parentEntity,
+            Vector3 position, Quaternion rotation, Vector3 scale,
+            Guid? id = null, bool isSize = false,
+            string tag = null, Action<string> onMessage = null,
+            Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadHTMLEntity(entityID, parentEntity,
+                position, rotation, scale, isSize, tag, onMessage, onLoaded));
+
+            return entityID;
+        }
+
+        /// <summary>
+        /// Load an HTML UI element entity.
+        /// </summary>
+        /// <param name="parentEntity">Parent entity to give the HTML entity.</param>
+        /// <param name="positionPercent">Position of the text entity as a percentage of the canvas.</param>
+        /// <param name="sizePercent">Size of the text entity as a percentage of the canvas.</param>
+        /// <param name="id">ID to apply to the HTML entity.</param>
+        /// <param name="tag">Tag to apply to the HTML entity.</param>
+        /// <param name="onMessage">Action to invoke upon receiving a world message.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>The ID of the new HTML entity.</returns>
+        public Guid LoadHTMLUIElementEntity(CanvasEntity parentEntity,
+            Vector2 positionPercent, Vector2 sizePercent,
+            Guid? id = null, string tag = null, Action<string> onMessage = null,
+            Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadHTMLUIElementEntity(entityID, parentEntity,
+                positionPercent, sizePercent, tag, onMessage, onLoaded));
 
             return entityID;
         }
@@ -568,6 +669,84 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Loads an HTML entity.
+        /// </summary>
+        /// <param name="id">ID of the HTML entity.</param>
+        /// <param name="parent">Parent of the HTML entity.</param>
+        /// <param name="position">Position of the HTML entity.</param>
+        /// <param name="rotation">Rotation of the HTML entity.</param>
+        /// <param name="scale">Scale/size of the HTML entity.</param>
+        /// <param name="isSize">Whether or not the scale value is for a size.</param>
+        /// <param name="tag">Tag of the HTML entity.</param>
+        /// <param name="onMessage">Action to invoke upon receiving a world message.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
+        private System.Collections.IEnumerator LoadHTMLEntity(Guid id, BaseEntity parent,
+            Vector3 position, Quaternion rotation, Vector3 scale, bool isSize,
+            string tag, Action<string> onMessage, Action onLoaded)
+        {
+            GameObject htmlEntityObject = new GameObject("HTMLEntity-" + id.ToString());
+            HTMLEntity entity = htmlEntityObject.AddComponent<HTMLEntity>();
+            entities.Add(id, entity);
+            entity.Initialize(id);
+            entity.SetParent(parent);
+            entity.entityTag = tag;
+            entity.onWorldMessage = onMessage;
+            entity.SetPosition(position, true);
+            entity.SetRotation(rotation, true);
+
+            if (isSize)
+            {
+                entity.SetSize(scale);
+            }
+            else
+            {
+                entity.SetScale(scale);
+            }
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
+        /// <summary>
+        /// Loads an HTML UI element entity.
+        /// </summary>
+        /// <param name="id">ID of the HTML entity.</param>
+        /// <param name="parent">Parent of the HTML entity.</param>
+        /// <param name="positionPercent">Position of the text entity as a percentage of the canvas.</param>
+        /// <param name="sizePercent">Size of the text entity as a percentage of the canvas.</param>
+        /// <param name="tag">Tag of the HTML entity.</param>
+        /// <param name="onMessage">Action to invoke upon receiving a world message.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
+        private System.Collections.IEnumerator LoadHTMLUIElementEntity(Guid id, CanvasEntity parent,
+            Vector2 positionPercent, Vector2 sizePercent, string tag, Action<string> onMessage, Action onLoaded)
+        {
+            GameObject htmlEntityObject = new GameObject("HTMLEntity-" + id.ToString());
+            HTMLUIElementEntity entity = htmlEntityObject.AddComponent<HTMLUIElementEntity>();
+            entities.Add(id, entity);
+            entity.Initialize(id, parent);
+            entity.entityTag = tag;
+            entity.onWorldMessage = onMessage;
+            if (parent != null)
+            {
+                entity.SetPositionPercent(positionPercent, true);
+                entity.SetSizePercent(sizePercent, true);
+            }
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
+        /// <summary>
         /// Loads a text entity.
         /// </summary>
         /// <param name="text">Text of the text entity.</param>
@@ -721,6 +900,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>Reference to the found entity.</returns>
         public BaseEntity FindEntity(Guid id)
         {
+            if (!entities.ContainsKey(id))
+            {
+                return null;
+            }
+
             return entities[id];
         }
         

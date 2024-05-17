@@ -35,6 +35,18 @@ namespace FiveSQD.WebVerse.WorldEngine
         public GameObject inputEntityPrefab;
 
         /// <summary>
+        /// Prefab for a webview.
+        /// </summary>
+        [Tooltip("Prefab for a webview.")]
+        public GameObject webViewPrefab;
+
+        /// <summary>
+        /// Prefab for a canvas webview.
+        /// </summary>
+        [Tooltip("Prefab for a canvas webview.")]
+        public GameObject canvasWebViewPrefab;
+
+        /// <summary>
         /// Prefab for a character controller.
         /// </summary>
         [Tooltip("Prefab for a character controller.")]
@@ -108,6 +120,8 @@ namespace FiveSQD.WebVerse.WorldEngine
                 previewMaterial = instance.previewMaterial,
                 skyMaterial = instance.skyMaterial,
                 inputEntityPrefab = instance.inputEntityPrefab,
+                webViewPrefab = instance.webViewPrefab,
+                canvasWebViewPrefab = instance.canvasWebViewPrefab,
                 characterControllerPrefab = instance.characterControllerPrefab,
                 voxelPrefab = instance.voxelPrefab,
                 cameraOffset = instance.cameraOffset,

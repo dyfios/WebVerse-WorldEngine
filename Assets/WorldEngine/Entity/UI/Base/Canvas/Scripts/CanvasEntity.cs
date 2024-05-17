@@ -2,6 +2,7 @@
 
 using UnityEngine;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
+using UnityEngine.UI;
 
 #if WV_VR_ENABLED
 using UnityEngine.XR.Interaction.Toolkit.UI;
@@ -39,6 +40,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
 #if WV_VR_ENABLED
             gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
+#else
+            gameObject.AddComponent<GraphicRaycaster>();
 #endif
 
             MakeHidden();

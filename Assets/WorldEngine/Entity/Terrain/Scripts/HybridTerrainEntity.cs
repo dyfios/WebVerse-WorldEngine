@@ -64,12 +64,6 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             /// <param name="brushType">Brush type.</param>
             public void SetBlock(Vector3Int position, TerrainOperation operation, int blockIndex, TerrainEntityBrushType brushType)
             {
-                if (position.x < 0 || position.y < 0 || position.z < 0)
-                {
-                    LogSystem.LogWarning("[VoxelMap->SetBlock] Invalid position.");
-                    return;
-                }
-
                 Dictionary<int, Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>> xDictionary;
                 if (map.ContainsKey(position.x))
                 {
@@ -114,12 +108,6 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             /// <param name="position">Index of the block to remove.</param>
             public void RemoveBlock(Vector3Int position)
             {
-                if (position.x < 0 || position.y < 0 || position.z < 0)
-                {
-                    LogSystem.LogWarning("[VoxelMap->RemoveBlock] Invalid position.");
-                    return;
-                }
-
                 Dictionary<int, Dictionary<int, Tuple<TerrainOperation, int, TerrainEntityBrushType>>> xDictionary;
                 if (map.ContainsKey(position.x))
                 {
@@ -156,13 +144,6 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             /// or (unset, -1) if it doesn't exist.</returns>
             public Tuple<TerrainOperation, int, TerrainEntityBrushType> GetBlock(Vector3Int position)
             {
-                if (position.x < 0 || position.y < 0 || position.z < 0)
-                {
-                    LogSystem.LogWarning("[VoxelMap->GetBlock] Invalid position.");
-                    return new Tuple<TerrainOperation, int, TerrainEntityBrushType>(
-                        TerrainOperation.Unset, -1, TerrainEntityBrushType.sphere);
-                }
-
                 if (map.ContainsKey(position.x))
                 {
                     Dictionary<int, Dictionary<
@@ -221,7 +202,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         public TerrainCollider terrainCollider;
 
-        public uint bufferSize = 1;
+        public uint bufferSize = 1024;
 
         /// <summary>
         /// Highlight cube for the hybrid terrain entity.
@@ -243,6 +224,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Digger system.
         /// </summary>
         private DiggerSystem diggerSystem;
+
+        /// <summary>
+        /// Terrain cutter.
+        /// </summary>
+        private TerrainCutter cutter;
 #endif
 
         /// <summary>
@@ -430,7 +416,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 Position = position,
                 Brush = bt,
-                Action = ActionType.Dig,
+                Action = ActionType.Add,
                 TextureIndex = layerIndex,
                 Opacity = 0.5f,
                 Size = 1,
@@ -706,10 +692,14 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 }
             }
 
-            // ------- Set Up Terrain -------
+            // ------- Set Up Terrain ------
             terrain.terrainData.heightmapResolution = newTerrainDataSize;
             terrain.terrainData.SetHeights(0, 0, newFittedHeights);
             terrain.terrainData.size = new Vector3(newLength, newHeight, newWidth);
+            if (cutter != null)
+            {
+                cutter.Refresh();
+            }
             baseHeights = newHeights;
         }
 
@@ -1114,7 +1104,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             diggerSystem.Terrain = terrain;
             diggerSystem.PreInit(false);
             diggerSystem.ShowDebug = true;
-            TerrainCutter.CreateInstance(diggerSystem);
+            cutter = TerrainCutter.CreateInstance(diggerSystem);
             diggerSystem.Terrain.terrainData.enableHolesTextureCompression = false;
             diggerSystem.Init(Application.isEditor ? LoadType.Minimal : LoadType.Minimal_and_LoadVoxels);
 
@@ -1296,8 +1286,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 if (terrainLayer.maskMapTexture)
                     maskmap = true;
 
-                meshMaterials[pass].SetFloat($"_tiles{i}x", 1.0f / terrainLayer.tileSize.x);
-                meshMaterials[pass].SetFloat($"_tiles{i}y", 1.0f / terrainLayer.tileSize.y);
+                meshMaterials[pass].SetFloat($"_tiles{i}x", 1.0f / (terrainLayer.tileSize.x * 2));
+                meshMaterials[pass].SetFloat($"_tiles{i}y", 1.0f / (terrainLayer.tileSize.y * 2));
                 meshMaterials[pass].SetFloat($"_offset{i}x", terrainLayer.tileOffset.x);
                 meshMaterials[pass].SetFloat($"_offset{i}y", terrainLayer.tileOffset.y);
                 meshMaterials[pass].SetFloat($"_NormalScale{i}", terrainLayer.normalScale);
