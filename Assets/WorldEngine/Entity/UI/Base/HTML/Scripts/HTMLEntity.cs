@@ -27,6 +27,24 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             "}";
 
         /// <summary>
+        /// Message passing API setup for JavaScript.
+        /// </summary>
+        private readonly string messagePassingAPI =
+            "class VuplexPolyfill{constructor(){this._listeners={};" +
+            "window.addEventListener('message',this._handleWindowMessage.bind(this));" +
+            "}addEventListener(eventName,listener){if(!this._listeners[eventName]){" +
+            "this._listeners[eventName]=[];}if(this._listeners[eventName].indexOf(listener)===-1){" +
+            "this._listeners[eventName].push(listener);}}removeEventListener(eventName, listener){" +
+            "if(!this._listeners[eventName]){return;}const index=this._listeners[eventName].indexOf(listener);" +
+            "if(index!==-1){this._listeners[eventName].splice(index,1);}}postMessage(message){" +
+            "const messageString=typeof message==='string'?message:JSON.stringify(message);" +
+            "parent.postMessage({type:'vuplex.postMessage',message:messageString},'*')}_emit(eventName,...args)" +
+            "{if(!this._listeners[eventName]){return;}for(const listener of this._listeners[eventName]){" +
+            "try{listener(...args);}catch(error){console.error(`An error occurred while invoking the '${eventName}'" +
+            " event handler.`,error);}}}_handleWindowMessage(event){if (event.data&&event.data.type==='vuplex.postMessage')" +
+            "{this._emit('message',{data:event.data.message});}};}if(!window.vuplex){window.vuplex=new VuplexPolyfill();}";
+
+        /// <summary>
         /// Action to invoke when a world message is received from the HTML entity.
         /// </summary>
         public Action<string> onWorldMessage;
@@ -265,6 +283,23 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 #endif
         }
 
+        /// <summary>
+        /// Set up the message passing API.
+        /// </summary>
+        private void SetUpMessagePassingAPI()
+        {
+#if VUPLEX_INCLUDED
+            webViewPrefab.WebView.PageLoadScripts.Add(messagePassingAPI);
+            webViewPrefab.WebView.MessageEmitted += (sender, e) =>
+            {
+                if (onWorldMessage != null)
+                {
+                    onWorldMessage.Invoke(e.Value);
+                }
+            };
+#endif
+        }
+
         private void Update()
         {
 #if VUPLEX_INCLUDED
@@ -277,6 +312,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 string urlToLoad = urlLoadQueue.Dequeue();
                 SetUpMessagingAPI();
+                SetUpMessagePassingAPI();
                 webViewPrefab.WebView.LoadUrl(urlToLoad);
             }
 
@@ -284,6 +320,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 string htmlToLoad = htmlLoadQueue.Dequeue();
                 SetUpMessagingAPI();
+                SetUpMessagePassingAPI();
                 webViewPrefab.WebView.LoadHtml(htmlToLoad);
             }
 #endif

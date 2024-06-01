@@ -13,6 +13,10 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
     {
         protected RectTransform uiElementRectTransform;
 
+        protected Vector2 targetPosition;
+
+        protected Vector2 targetSize;
+
         /// <summary>
         /// Set the parent of the entity. This method is not valid for UI element entities.
         /// </summary>
@@ -128,35 +132,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>Whether or not the setting was successful.</returns>
         public virtual bool SetSizePercent(Vector2 percent, bool synchronize = true)
         {
-            RectTransform rt = uiElementRectTransform;
-            if (rt == null)
-            {
-                LogSystem.LogWarning("[UIElementEntity->SetSizePercent] No rect transform.");
-                return false;
-            }
+            targetSize = percent;
 
-            CanvasEntity parentCanvasEntity = GetParentCanvasEntity();
-            if (parentCanvasEntity == null)
-            {
-                LogSystem.LogError("[UIElementEntity->SetSizePercent] No parent canvas entity.");
-                return false;
-            }
-
-            RectTransform parentRT = parentCanvasEntity.GetComponent<RectTransform>();
-            if (parentRT == null)
-            {
-                LogSystem.LogError("[UIElementEntity->SetSizePercent] No parent canvas entity rect transform.");
-                return false;
-            }
-
-            Vector2 originalPosition = GetPositionPercent();
-
-            Vector2 worldSize = new Vector2(parentRT.sizeDelta.x * percent.x, parentRT.sizeDelta.y * percent.y);
-
-            rt.sizeDelta = worldSize;
-            SetPositionPercent(originalPosition, false);
-
-            return true;
+            return CorrectSizeAndPosition(Screen.width, Screen.height);
         }
 
         /// <summary>
@@ -181,36 +159,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>Whether or not the setting was successful.</returns>
         public virtual bool SetPositionPercent(Vector2 percent, bool synchronize = true)
         {
-            RectTransform rt = uiElementRectTransform;
-            if (rt == null)
-            {
-                LogSystem.LogWarning("[UIElementEntity->SetPositionPercent] No rect transform.");
-                return false;
-            }
+            targetPosition = percent;
 
-            CanvasEntity parentCanvasEntity = GetParentCanvasEntity();
-            if (parentCanvasEntity == null)
-            {
-                LogSystem.LogError("[UIElementEntity->SetPositionPercent] No parent canvas entity.");
-                return false;
-            }
-
-            RectTransform parentRT = parentCanvasEntity.GetComponent<RectTransform>();
-            if (parentRT == null)
-            {
-                LogSystem.LogError("[UIElementEntity->SetPositionPercent] No parent canvas entity rect transform.");
-                return false;
-            }
-
-            Vector3 worldPos = new Vector3(parentRT.sizeDelta.x * percent.x + rt.sizeDelta.x / 2,
-                -1 * parentRT.sizeDelta.y * percent.y - rt.sizeDelta.y / 2);
-
-            rt.anchorMin = rt.anchorMax = new Vector2(0, 1);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.localPosition = Vector3.zero;
-            rt.anchoredPosition = worldPos;
-
-            return true;
+            return CorrectSizeAndPosition(Screen.width, Screen.height);
         }
 
         /// <summary>
@@ -255,6 +206,48 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Correct the size and position of the UI element entity.
+        /// </summary>
+        /// <param name="screenWidth">Width of the screen.</param>
+        /// <param name="screenHeight">Height of the screen.</param>
+        /// <returns>Whether or not the setting was successful.</returns>
+        public virtual bool CorrectSizeAndPosition(float screenWidth, float screenHeight)
+        {
+            RectTransform rt = uiElementRectTransform;
+            if (rt == null)
+            {
+                LogSystem.LogWarning("[UIElementEntity->CorrectSizeAndPosition] No rect transform.");
+                return false;
+            }
+
+            CanvasEntity parentCanvasEntity = GetParentCanvasEntity();
+            if (parentCanvasEntity == null)
+            {
+                LogSystem.LogError("[UIElementEntity->CorrectSizeAndPosition] No parent canvas entity.");
+                return false;
+            }
+
+            RectTransform parentRT = parentCanvasEntity.GetComponent<RectTransform>();
+            if (parentRT == null)
+            {
+                LogSystem.LogError("[UIElementEntity->CorrectSizeAndPosition] No parent canvas entity rect transform.");
+                return false;
+            }
+            
+            Vector2 worldSize = new Vector2(parentRT.sizeDelta.x * targetSize.x, parentRT.sizeDelta.y * targetSize.y);
+            Vector3 worldPos = new Vector3(parentRT.sizeDelta.x * targetPosition.x + rt.sizeDelta.x / 2,
+                -1 * parentRT.sizeDelta.y * targetPosition.y - rt.sizeDelta.y / 2);
+
+            rt.sizeDelta = worldSize;
+            rt.anchorMin = rt.anchorMax = new Vector2(0, 1);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.localPosition = Vector3.zero;
+            rt.anchoredPosition = worldPos;
+
+            return true;
+        }
+
+        /// <summary>
         /// Initialize this entity. This method cannot be used for a UI element entity; it must be called with a parent canvas.
         /// </summary>
         /// <param name="idToSet">ID to apply to the entity.</param>
@@ -264,6 +257,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             return;
         }
+
         /// <summary>
         /// Initialize this entity. This should only be called once.
         /// </summary>
