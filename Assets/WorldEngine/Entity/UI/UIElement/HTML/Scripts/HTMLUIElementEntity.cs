@@ -3,6 +3,7 @@
 using FiveSQD.WebVerse.WorldEngine.Utilities;
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 #if WV_VR_ENABLED
 using UnityEngine.XR.Interaction.Toolkit.UI;
@@ -22,6 +23,24 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             "function postWorldMessage(message) {" +
             "  window.vuplex.postMessage(message);" +
             "}";
+
+        /// <summary>
+        /// Message passing API setup for JavaScript.
+        /// </summary>
+        private readonly string messagePassingAPI =
+            "class VuplexPolyfill{constructor(){this._listeners={};" + 
+            "window.addEventListener('message',this._handleWindowMessage.bind(this));" +
+            "}addEventListener(eventName,listener){if(!this._listeners[eventName]){" +
+            "this._listeners[eventName]=[];}if(this._listeners[eventName].indexOf(listener)===-1){" +
+            "this._listeners[eventName].push(listener);}}removeEventListener(eventName, listener){" +
+            "if(!this._listeners[eventName]){return;}const index=this._listeners[eventName].indexOf(listener);" +
+            "if(index!==-1){this._listeners[eventName].splice(index,1);}}postMessage(message){" +
+            "const messageString=typeof message==='string'?message:JSON.stringify(message);" +
+            "parent.postMessage({type:'vuplex.postMessage',message:messageString},'*')}_emit(eventName,...args)" +
+            "{if(!this._listeners[eventName]){return;}for(const listener of this._listeners[eventName]){" +
+            "try{listener(...args);}catch(error){console.error(`An error occurred while invoking the '${eventName}'" +
+            " event handler.`,error);}}}_handleWindowMessage(event){if (event.data&&event.data.type==='vuplex.postMessage')" +
+            "{this._emit('message',{data:event.data.message});}};}if(!window.vuplex){window.vuplex=new VuplexPolyfill();}";
 
         /// <summary>
         /// Action to invoke when a world message is received from the HTML entity.
@@ -91,65 +110,54 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
         public override bool SetSizePercent(Vector2 percent, bool synchronize = true)
         {
-            RectTransform rt = uiElementRectTransform;
-            if (rt == null)
-            {
-                LogSystem.LogWarning("[HTMLUIElementEntity->SetSizePercent] No rect transform.");
-                return false;
-            }
+            targetSize = percent;
 
-            CanvasEntity parentCanvasEntity = GetParentCanvasEntity();
-            if (parentCanvasEntity == null)
-            {
-                LogSystem.LogError("[HTMLUIElementEntity->SetSizePercent] No parent canvas entity.");
-                return false;
-            }
-
-            RectTransform parentRT = parentCanvasEntity.GetComponent<RectTransform>();
-            if (parentRT == null)
-            {
-                LogSystem.LogError("[HTMLUIElementEntity->SetSizePercent] No parent canvas entity rect transform.");
-                return false;
-            }
-
-            Vector2 originalPosition = GetPositionPercent();
-
-            Vector2 worldSize = new Vector2(parentRT.sizeDelta.x * percent.x, parentRT.sizeDelta.y * percent.y);
-
-            rt.sizeDelta = worldSize;
-            SetPositionPercent(originalPosition, false);
-
-            return true;
+            return CorrectSizeAndPosition(Screen.width, Screen.height);
         }
 
         public override bool SetPositionPercent(Vector2 percent, bool synchronize = true)
         {
-            transform.localPosition = Vector3.zero;
-            transform.localScale = Vector3.one;
+            targetPosition = percent;
 
+            return CorrectSizeAndPosition(Screen.width, Screen.height);
+        }
+
+        /// <summary>
+        /// Correct the size and position of the UI element entity.
+        /// </summary>
+        /// <param name="screenWidth">Width of the screen.</param>
+        /// <param name="screenHeight">Height of the screen.</param>
+        /// <returns>Whether or not the setting was successful.</returns>
+        public override bool CorrectSizeAndPosition(float screenWidth, float screenHeight)
+        {
             RectTransform rt = uiElementRectTransform;
             if (rt == null)
             {
-                LogSystem.LogWarning("[HTMLUIElementEntity->SetPositionPercent] No rect transform.");
+                LogSystem.LogWarning("[HTMLUIElementEntity->CorrectSizeAndPosition] No rect transform.");
                 return false;
             }
 
             CanvasEntity parentCanvasEntity = GetParentCanvasEntity();
             if (parentCanvasEntity == null)
             {
-                LogSystem.LogError("[HTMLUIElementEntity->SetPositionPercent] No parent canvas entity.");
+                LogSystem.LogError("[HTMLUIElementEntity->CorrectSizeAndPosition] No parent canvas entity.");
                 return false;
             }
 
             RectTransform parentRT = parentCanvasEntity.GetComponent<RectTransform>();
             if (parentRT == null)
             {
-                LogSystem.LogError("[HTMLUIElementEntity->SetPositionPercent] No parent canvas entity rect transform.");
+                LogSystem.LogError("[HTMLUIElementEntity->CorrectSizeAndPosition] No parent canvas entity rect transform.");
                 return false;
             }
+
+            Vector2 worldSize = new Vector2(parentRT.sizeDelta.x * targetSize.x, parentRT.sizeDelta.y * targetSize.y);
+            Vector3 worldPos = new Vector3(parentRT.sizeDelta.x * targetPosition.x, -1 * parentRT.sizeDelta.y * targetPosition.y);
             
-            Vector3 worldPos = new Vector3(parentRT.sizeDelta.x * percent.x, -1 * parentRT.sizeDelta.y * percent.y);
-            
+            transform.localPosition = Vector3.zero;
+            transform.localScale = Vector3.one;
+
+            rt.sizeDelta = worldSize;
             rt.anchorMin = rt.anchorMax = new Vector2(0, 1);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.localPosition = Vector3.zero;
@@ -253,6 +261,23 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 #endif
         }
 
+        /// <summary>
+        /// Set up the message passing API.
+        /// </summary>
+        private void SetUpMessagePassingAPI()
+        {
+#if VUPLEX_INCLUDED
+            canvasWebViewPrefab.WebView.PageLoadScripts.Add(messagePassingAPI);
+            canvasWebViewPrefab.WebView.MessageEmitted += (sender, e) =>
+            {
+                if (onWorldMessage != null)
+                {
+                    onWorldMessage.Invoke(e.Value);
+                }
+            };
+#endif
+        }
+
         private void Update()
         {
 #if VUPLEX_INCLUDED
@@ -265,6 +290,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 string urlToLoad = urlLoadQueue.Dequeue();
                 SetUpMessagingAPI();
+                SetUpMessagePassingAPI();
                 canvasWebViewPrefab.WebView.LoadUrl(urlToLoad);
             }
 
@@ -272,6 +298,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 string htmlToLoad = htmlLoadQueue.Dequeue();
                 SetUpMessagingAPI();
+                SetUpMessagePassingAPI();
                 canvasWebViewPrefab.WebView.LoadHtml(htmlToLoad);
             }
 
@@ -279,6 +306,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 Tuple<string, Action<string>> javascriptToExecute = javascriptExecuteQueue.Dequeue();
                 SetUpMessagingAPI();
+                SetUpMessagePassingAPI();
                 
                 if (javascriptToExecute != null)
                 {
