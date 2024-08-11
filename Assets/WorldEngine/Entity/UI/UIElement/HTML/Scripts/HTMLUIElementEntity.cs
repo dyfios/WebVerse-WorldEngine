@@ -70,6 +70,16 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         private Queue<Tuple<string, Action<string>>> javascriptExecuteQueue;
 
         /// <summary>
+        /// Whether or not messaging API has been set up.
+        /// </summary>
+        private bool messagingAPISetUp;
+
+        /// <summary>
+        /// Whether or not message passing API has been set up.
+        /// </summary>
+        private bool messagePassingAPISetUp;
+
+        /// <summary>
         /// Initialize this entity. This should only be called once.
         /// </summary>
         /// <param name="idToSet">ID to apply to the entity.</param>
@@ -77,6 +87,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public override void Initialize(Guid idToSet, CanvasEntity parentCanvas)
         {
             base.Initialize(idToSet, parentCanvas);
+
+            messagingAPISetUp = false;
+            messagePassingAPISetUp = false;
 
             GameObject canvasWebView = Instantiate(WorldEngine.ActiveWorld.entityManager.canvasWebViewPrefab);
             canvasWebView.transform.SetParent(transform);
@@ -250,14 +263,23 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         private void SetUpMessagingAPI()
         {
 #if VUPLEX_INCLUDED
-            canvasWebViewPrefab.WebView.PageLoadScripts.Add(messagingAPI);
-            canvasWebViewPrefab.WebView.MessageEmitted += (sender, e) =>
+            if (!messagingAPISetUp)
             {
-                if (onWorldMessage != null)
+                if (!canvasWebViewPrefab.WebView.PageLoadScripts.Contains(messagingAPI))
                 {
-                    onWorldMessage.Invoke(e.Value);
+                    canvasWebViewPrefab.WebView.PageLoadScripts.Add(messagingAPI);
                 }
-            };
+
+                canvasWebViewPrefab.WebView.MessageEmitted += (sender, e) =>
+                {
+                    if (onWorldMessage != null)
+                    {
+                        onWorldMessage.Invoke(e.Value);
+                    }
+                };
+
+                messagingAPISetUp = true;
+            }
 #endif
         }
 
@@ -267,14 +289,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         private void SetUpMessagePassingAPI()
         {
 #if VUPLEX_INCLUDED
-            canvasWebViewPrefab.WebView.PageLoadScripts.Add(messagePassingAPI);
-            canvasWebViewPrefab.WebView.MessageEmitted += (sender, e) =>
+            if (!messagePassingAPISetUp)
             {
-                if (onWorldMessage != null)
+                if (!canvasWebViewPrefab.WebView.PageLoadScripts.Contains(messagePassingAPI))
                 {
-                    onWorldMessage.Invoke(e.Value);
+                    canvasWebViewPrefab.WebView.PageLoadScripts.Add(messagePassingAPI);
                 }
-            };
+
+                messagePassingAPISetUp = true;
+            }
 #endif
         }
 

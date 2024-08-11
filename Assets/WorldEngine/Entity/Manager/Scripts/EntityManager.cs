@@ -20,6 +20,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public GameObject characterControllerPrefab;
 
         /// <summary>
+        /// Prefab for a character controller label.
+        /// </summary>
+        [Tooltip("Prefab for a character controller label.")]
+        public GameObject characterControllerLabelPrefab;
+
+        /// <summary>
         /// Prefab for an input entity.
         /// </summary>
         [Tooltip("Prefab for an input entity.")]
@@ -88,6 +94,10 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Load a character entity.
         /// </summary>
         /// <param name="parentEntity">Parent entity to give the character entity.</param>
+        /// <param name="meshPrefab">Prefab to load mesh character entity from.</param>
+        /// <param name="meshOffset">Offset for the mesh character entity object.</param>
+        /// <param name="meshRotation">Rotation for the mesh character entity object.</param>
+        /// <param name="avatarLabelOffset">Offset for the mesh character entity's label.</param>
         /// <param name="position">Position to apply to the character entity.</param>
         /// <param name="rotation">Rotation to apply to the character entity.</param>
         /// <param name="scale">Scale/size to apply to the character entity.</param>
@@ -97,12 +107,22 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>The ID of the new character entity.</returns>
         public Guid LoadCharacterEntity(BaseEntity parentEntity,
-            Vector3 position, Quaternion rotation, Vector3 scale, Guid? id = null,
-            string tag = null, bool isSize = false, Action onLoaded = null)
+            GameObject meshPrefab, Vector3 meshOffset, Quaternion meshRotation,
+            Vector3 avatarLabelOffset, Vector3 position, Quaternion rotation,
+            Vector3 scale, Guid? id = null, string tag = null, bool isSize = false,
+            Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
-            StartCoroutine(LoadDefaultCharacterEntity(entityID, tag,
-                parentEntity, position, rotation, scale, isSize, onLoaded));
+            if (meshPrefab == null)
+            {
+                StartCoroutine(LoadDefaultCharacterEntity(entityID, tag,
+                    parentEntity, position, rotation, scale, isSize, onLoaded));
+            }
+            else
+            {
+                StartCoroutine(LoadMeshCharacterEntity(entityID, tag, parentEntity,
+                    meshPrefab, meshOffset, meshRotation, avatarLabelOffset, position, rotation, scale, isSize, onLoaded));
+            }
             return entityID;
         }
 
@@ -441,7 +461,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             entity.center = center;
             entity.radius = radius;
             entity.height = height;
-            entity.Initialize(id);
+            entity.Initialize(id, null, Vector3.zero, Quaternion.identity, Vector3.zero);
             entity.entityTag = tag == null ? "" : tag;
 
             if (onLoaded != null)
@@ -449,6 +469,59 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 onLoaded.Invoke();
             }
             
+            yield return null;
+        }
+
+        /// <summary>
+        /// Loads the default character entity model.
+        /// </summary>
+        /// <param name="id">ID of the character entity.</param>
+        /// <param name="tag">Tag of the character entity.</param>
+        /// <param name="parent">Parent of the character entity.</param>
+        /// <param name="meshPrefab">Prefab to load mesh character entity from.</param>
+        /// <param name="meshOffset">Offset for the mesh character entity object.</param>
+        /// <param name="meshRotation">Rotation for the mesh character entity object.</param>
+        /// <param name="avatarLabelOffset">Offset for the mesh character entity's label.</param>
+        /// <param name="position">Position of the character entity.</param>
+        /// <param name="rotation">Rotation of the character entity.</param>
+        /// <param name="scale">Scale/size of the character entity.</param>
+        /// <param name="isSize">Whether or not the scale value is for a size.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <param name="radius">Radius of the character entity model.</param>
+        /// <param name="height">Height of the character entity model.</param>
+        /// <param name="center">Center of the character entity model.</param>
+        /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
+        private System.Collections.IEnumerator LoadMeshCharacterEntity(Guid id, string tag, BaseEntity parent,
+            GameObject meshPrefab, Vector3 meshOffset, Quaternion meshRotation, Vector3 avatarLabelOffset,
+            Vector3 position, Quaternion rotation, Vector3 scale, bool isSize, Action onLoaded,
+            float radius = 0.22f, float height = 1.69f, float center = 0.854f)
+        {
+            GameObject characterEntityObject = new GameObject();
+            characterEntityObject.name = "CharacterEntity-" + id.ToString();
+            CharacterEntity entity = characterEntityObject.AddComponent<CharacterEntity>();
+            entities.Add(id, entity);
+            entity.SetParent(parent);
+            entity.SetPosition(position, true);
+            entity.SetRotation(rotation, true);
+            if (isSize)
+            {
+                entity.SetSize(scale);
+            }
+            else
+            {
+                entity.SetScale(scale);
+            }
+            entity.center = center;
+            entity.radius = radius;
+            entity.height = height;
+            entity.Initialize(id, meshPrefab, meshOffset, meshRotation, avatarLabelOffset);
+            entity.entityTag = tag == null ? "" : tag;
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
             yield return null;
         }
 

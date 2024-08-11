@@ -202,7 +202,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         public TerrainCollider terrainCollider;
 
-        public uint bufferSize = 1024;
+        public uint bufferSize = 65536;
+
+        public uint modBatchSize = 256;
 
         /// <summary>
         /// Highlight cube for the hybrid terrain entity.
@@ -364,7 +366,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 Brush = bt,
                 Action = ActionType.Dig,
                 TextureIndex = layerIndex,
-                Opacity = 0.5f,
+                Opacity = 1f,
                 Size = 1,
                 StalagmiteUpsideDown = false,
                 OpacityIsTarget = false,
@@ -418,7 +420,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 Brush = bt,
                 Action = ActionType.Add,
                 TextureIndex = layerIndex,
-                Opacity = 0.5f,
+                Opacity = 1f,
                 Size = 1,
                 StalagmiteUpsideDown = false,
                 OpacityIsTarget = false,
@@ -1150,6 +1152,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             newLayer.specular = layer.specular;
             newLayer.metallic = layer.metallic;
             newLayer.smoothness = layer.smoothness;
+            newLayer.tileSize = new Vector2(16, 16);
             newLayers.Add(newLayer);
 
             terrain.terrainData.terrainLayers = newLayers.ToArray();
@@ -1302,7 +1305,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 meshMaterials[pass].SetVector($"_MaskMapRemapOffset{i}", terrainLayer.maskMapRemapMin);
                 meshMaterials[pass].SetVector($"_MaskMapRemapScale{i}", terrainLayer.maskMapRemapMax);
                 meshMaterials[pass].SetVector($"_DiffuseRemapScale{i}", terrainLayer.diffuseRemapMax - terrainLayer.diffuseRemapMin);
-                meshMaterials[pass].SetTextureScale($"_Splat{i}", new Vector2(1f / terrainLayer.tileSize.x, 1f / terrainLayer.tileSize.y));
+                //meshMaterials[pass].SetTextureScale($"_Splat{i}", new Vector2(1f / terrainLayer.tileSize.x, 1f / terrainLayer.tileSize.y));
                 meshMaterials[pass].SetTextureOffset($"_Splat{i}", terrainLayer.tileOffset);
                 textures.Add(terrainLayer.diffuseTexture);
             }
@@ -1424,6 +1427,34 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Perform a asynchronous modifications of a batch.
+        /// </summary>
+        /// <param name="ps">Parameters array.</param>
+        /// <returns>Coroutine.</returns>
+        private IEnumerator ModifyBatchAsync(ModificationParameters[] ps)
+        {
+            foreach (ModificationParameters _p in ps)
+            {
+                ModificationParameters p = _p;
+                if (p.Action == ActionType.Smooth && p.Brush != BrushType.Sphere)
+                {
+                    LogSystem.LogError("[HybridTerrain->ModifyAsync] Sphere brush is required to smooth.");
+                    p.Brush = BrushType.Sphere;
+                }
+
+                if (p.Action == ActionType.Smooth || p.Action == ActionType.BETA_Sharpen)
+                {
+                    kernelOperation.Params = p;
+                    yield return ModifyAsync(kernelOperation, p.Callback);
+                }
+
+                basicOperation.Params = p;
+                yield return ModifyAsync(basicOperation, p.Callback);
+            }
+            yield return null;
+        }
+
+        /// <summary>
         /// Perform an asynchronous modification.
         /// </summary>
         /// <typeparam name="T">Type.</typeparam>
@@ -1463,6 +1494,48 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             modifying = false;
             callback?.Invoke();
         }
+
+        /// <summary>
+        /// Perform an asynchronous modification of a batch of operations.
+        /// </summary>
+        /// <typeparam name="T">Type.</typeparam>
+        /// <param name="operations">Modification operations.</param>
+        /// <returns>Coroutine.</returns>
+        private IEnumerator ModifyBatchAsync<T>(IOperation<T>[] operations) where T : struct, IJobParallelFor
+        {
+            if (modifying)
+            {
+                LogSystem.LogError("[HybridTerrainEntity->ModifyAsync] Attempting to perform a modification while another is ongoing.");
+                yield break;
+            }
+
+            modifying = true;
+
+            foreach (IOperation<T> operation in operations)
+            {
+                var area = operation.GetAreaToModify(diggerSystem);
+                if (!area.NeedsModification)
+                {
+
+                }
+                else
+                {
+                    yield return diggerSystem.ModifyAsync(operation);
+                }
+
+                area = operation.GetAreaToModify(diggerSystem);
+                if (!area.NeedsModification)
+                {
+
+                }
+                else
+                {
+                    diggerSystem.ApplyModify();
+                }
+            }
+
+            modifying = false;
+        }
 #endif
 
         /// <summary>
@@ -1482,11 +1555,23 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 #if USE_DIGGER
         private void Update()
         {
-            if (!modifying && modBuf.Count > 0)
+            List<ModificationParameters> parametersList = new List<ModificationParameters>();
+            if (!modifying)
+            {
+                while (modBuf.Count > 0 && parametersList.Count < modBatchSize)
+                {
+                    parametersList.Add(modBuf.Dequeue());
+                }
+                if (parametersList.Count > 0)
+                {
+                    StartCoroutine(ModifyBatchAsync(parametersList.ToArray()));
+                }
+            }
+            /*if (!modifying && modBuf.Count > 0)
             {
                 var parameters = modBuf.Dequeue();
                 StartCoroutine(ModifyAsync(parameters));
-            }
+            }*/
         }
 #endif
     }
