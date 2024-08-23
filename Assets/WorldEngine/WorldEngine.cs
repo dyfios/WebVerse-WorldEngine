@@ -53,6 +53,12 @@ namespace FiveSQD.WebVerse.WorldEngine
         public GameObject characterControllerPrefab;
 
         /// <summary>
+        /// Character controller label prefab.
+        /// </summary>
+        [Tooltip("Character controller label prefab.")]
+        public GameObject characterControllerLabelPrefab;
+
+        /// <summary>
         /// Prefab for a voxel block.
         /// </summary>
         [Tooltip("Prefab for a voxel block.")]
@@ -123,6 +129,7 @@ namespace FiveSQD.WebVerse.WorldEngine
                 webViewPrefab = instance.webViewPrefab,
                 canvasWebViewPrefab = instance.canvasWebViewPrefab,
                 characterControllerPrefab = instance.characterControllerPrefab,
+                characterControllerLabelPrefab = instance.characterControllerLabelPrefab,
                 voxelPrefab = instance.voxelPrefab,
                 cameraOffset = instance.cameraOffset,
                 vr = instance.vr,
@@ -155,6 +162,11 @@ namespace FiveSQD.WebVerse.WorldEngine
                 instance.currentWorld.Unload();
             }
             instance.currentWorld = null;
+
+            if (instance.currentWorldGO != null)
+            {
+                Destroy(instance.currentWorldGO);
+            }
         }
 
         /// <summary>

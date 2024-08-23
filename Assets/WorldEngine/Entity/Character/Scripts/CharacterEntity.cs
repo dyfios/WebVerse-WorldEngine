@@ -354,17 +354,49 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Initialize this entity. This method cannot be used for a character entity; it must be called
+        /// with a character object prefab (nullable).
+        /// </summary>
+        /// <param name="idToSet">ID to apply to the entity.</param>
+        /*public override void Initialize(Guid idToSet)
+        {
+            LogSystem.LogError("[CharacterEntity->Initialize] Character entity must be " +
+                "initialized with a character object prefab (nullable).");
+
+            return;
+        }*/
+
+        /// <summary>
         /// Initialize this entity. This should only be called once.
         /// </summary>
         /// <param name="idToSet">ID to apply to the entity.</param>
-        public override void Initialize(Guid idToSet)
+        /// <param name="characterObjectPrefab">Prefab to use for the character object.</param>
+        /// <param name="characterObjectOffset">Offset for the character object.</param>
+        /// <param name="characterObjectRotation">Rotation for the character object.</param>
+        /// <param name="avatarLabelOffset">Offset for the avatar label.</param>
+        public void Initialize(Guid idToSet, GameObject characterObjectPrefab,
+            Vector3 characterObjectOffset, Quaternion characterObjectRotation, Vector3 avatarLabelOffset)
         {
             base.Initialize(idToSet);
 
-            characterGO = Instantiate(WorldEngine.ActiveWorld.entityManager.characterControllerPrefab);
+            if (characterObjectPrefab == null)
+            {
+                characterGO = Instantiate(WorldEngine.ActiveWorld.entityManager.characterControllerPrefab);
+            }
+            else
+            {
+                characterGO = Instantiate(characterObjectPrefab);
+                characterGO.SetActive(true);
+                GameObject characterLabel = Instantiate(WorldEngine.ActiveWorld.entityManager.characterControllerLabelPrefab);
+                characterLabel.transform.SetParent(characterGO.transform);
+                characterLabel.transform.localPosition = avatarLabelOffset;
+                //characterLabel.transform.localRotation = Quaternion.identity;
+                //characterLabel.transform.localScale = Vector3.one;
+                characterLabel.SetActive(true);
+            }
             characterGO.transform.SetParent(transform);
-            characterGO.transform.localPosition = Vector3.zero;
-            characterGO.transform.localRotation = Quaternion.identity;
+            characterGO.transform.localPosition = characterObjectOffset;
+            characterGO.transform.localRotation = characterObjectRotation;
 
             Rigidbody rb = characterGO.GetComponent<Rigidbody>();
             if (rb == null)

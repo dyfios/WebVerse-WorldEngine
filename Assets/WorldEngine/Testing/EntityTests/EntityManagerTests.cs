@@ -34,7 +34,7 @@ public class EntityManagerTests
         eIDs.Add(id);
 
         // Load Character Entity.
-        id = WorldEngine.ActiveWorld.entityManager.LoadCharacterEntity(null, Vector3.zero, Quaternion.identity, Vector3.one);
+        id = WorldEngine.ActiveWorld.entityManager.LoadCharacterEntity(null, null, Vector3.zero, Quaternion.identity, Vector3.zero, Vector3.zero, Quaternion.identity, Vector3.one);
         Assert.IsNotNull(id);
         eIDs.Add(id);
 

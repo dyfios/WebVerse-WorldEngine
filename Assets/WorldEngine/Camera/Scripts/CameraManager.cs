@@ -116,7 +116,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         }
 
         /// <summary>
-        /// Set parent for the camera manager. If null is provided, will use the default camera parent.
+        /// Set parent for the camera. If null is provided, will use the default camera parent.
         /// </summary>
         /// <param name="parent">Parent GameObject to apply to the camera.</param>
         public void SetParent(GameObject parent)
@@ -129,7 +129,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
                 }
                 else
                 {
-                    cam.transform.SetParent(defaultCameraParent.transform);
+                    cam.transform.SetParent(defaultCameraParent == null ? null : defaultCameraParent.transform);
                 }
             }
             else

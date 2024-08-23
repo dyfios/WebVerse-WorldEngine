@@ -556,9 +556,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             rigidBody.isKinematic = true;
             foreach (MeshCollider meshCollider in meshColliders)
             {
-                meshCollider.enabled = false;
+                meshCollider.enabled = true;
             }
-            boxCollider.enabled = false;
+            boxCollider.enabled = true;
             interactionState = InteractionState.Static;
         }
 
@@ -588,6 +588,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
 
             gameObject.SetActive(true);
+            rigidBody.isKinematic = false;
+            foreach (MeshCollider meshCollider in meshColliders)
+            {
+                meshCollider.enabled = true;
+            }
+            boxCollider.enabled = true;
             interactionState = InteractionState.Physical;
         }
 
@@ -616,6 +622,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             SetPreviewVisibility(true);
 
             gameObject.SetActive(true);
+            rigidBody.isKinematic = true;
+            foreach (MeshCollider meshCollider in meshColliders)
+            {
+                meshCollider.enabled = true;
+            }
+            boxCollider.enabled = true;
             interactionState = InteractionState.Placing;
         }
 

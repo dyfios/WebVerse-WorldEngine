@@ -60,6 +60,11 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             public GameObject characterControllerPrefab;
 
             /// <summary>
+            /// Character controller label prefab.
+            /// </summary>
+            public GameObject characterControllerLabelPrefab;
+
+            /// <summary>
             /// Voxel prefab.
             /// </summary>
             public GameObject voxelPrefab;
@@ -214,6 +219,7 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             entityManager.webViewPrefab = worldInfo.webViewPrefab;
             entityManager.canvasWebViewPrefab = worldInfo.canvasWebViewPrefab;
             entityManager.characterControllerPrefab = worldInfo.characterControllerPrefab;
+            entityManager.characterControllerLabelPrefab = worldInfo.characterControllerLabelPrefab;
             entityManager.voxelPrefab = worldInfo.voxelPrefab;
 
             if (storageManager != null)
@@ -234,7 +240,7 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             cameraManagerGO = new GameObject("CameraManager");
             cameraManagerGO.transform.parent = transform;
             cameraManager = cameraManagerGO.AddComponent<CameraManager>();
-            cameraManager.Initialize(UnityEngine.Camera.main, worldInfo.cameraOffset, worldInfo.vr, entityManagerGO);
+            cameraManager.Initialize(UnityEngine.Camera.main, worldInfo.cameraOffset, worldInfo.vr, null);
 
             if (materialManager != null)
             {
@@ -295,6 +301,11 @@ namespace FiveSQD.WebVerse.WorldEngine.World
                 Destroy(diggerMasterRuntimeGO);
             }
 #endif
+
+            if (cameraManager != null)
+            {
+                cameraManager.SetParent(null);
+            }
 
             if (entityManager == null)
             {
