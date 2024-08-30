@@ -113,7 +113,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Initialize this entity. This should only be called once.
         /// </summary>
         /// <param name="idToSet">ID to apply to the entity.</param>
-        /// <param name="parentCanvas">Canvas to place the input entity on.</param>
+        /// <param name="parentCanvas">Canvas to place the text entity on.</param>
         public override void Initialize(System.Guid idToSet, CanvasEntity parentCanvas)
         {
             base.Initialize(idToSet, parentCanvas);

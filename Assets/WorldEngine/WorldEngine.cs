@@ -135,7 +135,8 @@ namespace FiveSQD.WebVerse.WorldEngine
                 vr = instance.vr,
                 maxStorageEntries = 2048,
                 maxEntryLength = 2048,
-                maxKeyLength = 128
+                maxKeyLength = 128,
+                siteName = worldName
             };
 
             instance.currentWorldGO = new GameObject(worldName);
