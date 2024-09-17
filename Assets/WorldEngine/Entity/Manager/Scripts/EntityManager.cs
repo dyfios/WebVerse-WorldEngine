@@ -261,6 +261,14 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             return entityID;
         }
 
+        public Guid LoadAudioEntity(BaseEntity parentEntity, Vector3 position, Quaternion rotation,
+            Guid? id = null, string tag = null, Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadAudioEntity(entityID, parentEntity, position, rotation, tag, onLoaded));
+            return entityID;
+        }
+
         /// <summary>
         /// Load a canvas entity.
         /// </summary>
@@ -399,6 +407,29 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadInputEntity(entityID,
+                parentEntity, positionPercent, sizePercent, tag, onLoaded));
+            return entityID;
+        }
+
+        /// <summary>
+        /// Load an image entity.
+        /// </summary>
+        /// <param name="texture">Texture to place on the image entity.</param>
+        /// <param name="parentEntity">Parent entity to give the image entity.</param>
+        /// <param name="positionPercent">Position to apply to the image entity
+        /// as a percentage of the canvas.</param>
+        /// <param name="sizePercent">Size to apply to the image entity
+        /// as a percentage of the canvas.</param>
+        /// <param name="id">ID to apply to the image entity.</param>
+        /// <param name="tag">Tag to apply to the image entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>The ID of the new image entity.</returns>
+        public Guid LoadImageEntity(Texture texture, CanvasEntity parentEntity,
+            Vector2 positionPercent, Vector2 sizePercent, Guid? id = null,
+            string tag = null, Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadImageEntity(texture, entityID,
                 parentEntity, positionPercent, sizePercent, tag, onLoaded));
             return entityID;
         }
@@ -699,6 +730,26 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             yield return null;
         }
 
+        private System.Collections.IEnumerator LoadAudioEntity(Guid id, BaseEntity parent, Vector3 position, Quaternion rotation,
+            string tag, Action onLoaded)
+        {
+            GameObject audioEntityObject = new GameObject("AudioEntity-" + id.ToString());
+            AudioEntity entity = audioEntityObject.AddComponent<AudioEntity>();
+            entities.Add(id, entity);
+            entity.SetParent(parent);
+            entity.entityTag = tag;
+            entity.SetPosition(position, true);
+            entity.SetRotation(rotation, true);
+            entity.Initialize(id);
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
         /// <summary>
         /// Loads a canvas entity.
         /// </summary>
@@ -914,6 +965,41 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 entity.SetPositionPercent(positionPercent, true);
                 entity.SetSizePercent(sizePercent, true);
             }
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
+        /// <summary>
+        /// Loads a image entity.
+        /// </summary>
+        /// <param name="image">Image to place on the image entity.</param>
+        /// <param name="id">ID of the text entity.</param>
+        /// <param name="parent">Parent of the text entity.</param>
+        /// <param name="positionPercent">Position of the text entity as a percentage of the canvas.</param>
+        /// <param name="sizePercent">Size of the text entity as a percentage of the canvas.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <param name="tag">Tag of the text entity.</param>
+        /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
+        private System.Collections.IEnumerator LoadImageEntity(Texture image,
+            Guid id, CanvasEntity parent, Vector2 positionPercent, Vector2 sizePercent,
+            string tag, Action onLoaded)
+        {
+            GameObject imageEntityObject = new GameObject("ImageEntity-" + id.ToString());
+            ImageEntity entity = imageEntityObject.AddComponent<ImageEntity>();
+            entities.Add(id, entity);
+            entity.Initialize(id, parent);
+            entity.entityTag = tag;
+            if (parent != null)
+            {
+                entity.SetPositionPercent(positionPercent, true);
+                entity.SetSizePercent(sizePercent, true);
+            }
+            entity.SetTexture(image);
 
             if (onLoaded != null)
             {
