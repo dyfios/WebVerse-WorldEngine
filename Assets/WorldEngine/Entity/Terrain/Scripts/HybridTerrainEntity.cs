@@ -1152,7 +1152,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             newLayer.specular = layer.specular;
             newLayer.metallic = layer.metallic;
             newLayer.smoothness = layer.smoothness;
-            newLayer.tileSize = new Vector2(16, 16);
+            newLayer.tileSize = new Vector2(4, 4);
             newLayers.Add(newLayer);
 
             terrain.terrainData.terrainLayers = newLayers.ToArray();
