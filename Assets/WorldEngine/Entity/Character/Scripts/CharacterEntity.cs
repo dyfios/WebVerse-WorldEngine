@@ -49,6 +49,24 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public float height;
 
         /// <summary>
+        /// The offset of the character object.
+        /// </summary>
+        [Tooltip("The offset of the character object.")]
+        public Vector3 characterObjectOffset { get; private set; }
+
+        /// <summary>
+        /// The rotation of the character object.
+        /// </summary>
+        [Tooltip("The rotation of the character object.")]
+        public Quaternion characterObjectRotation { get; private set; }
+
+        /// <summary>
+        /// The offset of the character label.
+        /// </summary>
+        [Tooltip("The offset of the character label.")]
+        public Vector3 characterLabelOffset { get; private set; }
+
+        /// <summary>
         /// Character model GameObject.
         /// </summary>
         private GameObject characterGO;
@@ -397,6 +415,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             characterGO.transform.SetParent(transform);
             characterGO.transform.localPosition = characterObjectOffset;
             characterGO.transform.localRotation = characterObjectRotation;
+            this.characterObjectOffset = characterObjectOffset;
+            this.characterObjectRotation = characterObjectRotation;
+            this.characterLabelOffset = avatarLabelOffset;
 
             Rigidbody rb = characterGO.GetComponent<Rigidbody>();
             if (rb == null)
