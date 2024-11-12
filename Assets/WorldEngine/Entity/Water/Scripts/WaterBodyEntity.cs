@@ -1,5 +1,6 @@
-﻿// Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
+// Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using FiveSQD.WebVerse.WorldEngine.Materials;
@@ -9,52 +10,32 @@ using FiveSQD.WebVerse.WorldEngine.Utilities;
 namespace FiveSQD.WebVerse.WorldEngine.Entity
 {
     /// <summary>
-    /// Class for a mesh entity.
+    /// Class for a water body entity.
     /// </summary>
-    public class MeshEntity : BaseEntity
+    public class WaterBodyEntity : BaseEntity
     {
         /// <summary>
-        /// Meshes on the mesh model.
+        /// Mesh renderer used by the entity.
         /// </summary>
-        private Mesh[] meshes;
+        public MeshRenderer meshRenderer;
 
         /// <summary>
-        /// Renderers on the mesh model.
-        /// </summary>
-        private MeshRenderer[] renderers;
-
-        /// <summary>
-        /// Original size of the mesh.
-        /// </summary>
-        private Vector3 originalMeshSize;
-
-        /// <summary>
-        /// Current scaling of the mesh.
-        /// </summary>
-        private Vector3 meshScaling;
-
-        /// <summary>
-        /// Mesh colliders used by the MeshEntity.
-        /// </summary>
-        private MeshCollider[] meshColliders;
-
-        /// <summary>
-        /// Box colliders used by the MeshEntity.
+        /// Box colliders used by the entity.
         /// </summary>
         private BoxCollider boxCollider;
 
         /// <summary>
-        /// Rigidbody used by the character.
+        /// Rigidbody used by the water body.
         /// </summary>
         private Rigidbody rigidBody;
 
         /// <summary>
-        /// Whether or not the character is gravitational.
+        /// Whether or not the water body is gravitational.
         /// </summary>
         private bool gravitational = false;
 
         /// <summary>
-        /// Cube used for highlighting the character entity.
+        /// Cube used for highlighting the water body entity.
         /// </summary>
         private GameObject highlightCube;
 
@@ -62,6 +43,124 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Object to use for previewing.
         /// </summary>
         private GameObject previewObject;
+
+        /// <summary>
+        /// Create a water body entity.
+        /// </summary>
+        /// <param name="shallowColor">Color for the shallow zone.</param>
+        /// <param name="deepColor">Color for the deep zone.</param>
+        /// <param name="specularColor">Specular color.</param>
+        /// <param name="scatteringColor">Scattering color.</param>
+        /// <param name="deepStart">Start of deep zone.</param>
+        /// <param name="deepEnd">End of deep zone.</param>
+        /// <param name="distortion">Distortion factor (range 0-128).</param>
+        /// <param name="smoothness">Smoothness factor (range 0-1).</param>
+        /// <param name="numWaves">Number of waves (range 1-32).</param>
+        /// <param name="waveAmplitude">Wave amplitude (range 0-1).</param>
+        /// <param name="waveSteepness">Wave steepness (range 0-1).</param>
+        /// <param name="waveSpeed">Wave speed.</param>
+        /// <param name="waveLength">Wave length.</param>
+        /// <param name="id">ID for the water body entity.</param>
+        /// <returns>The requested water body entity.</returns>
+        public static WaterBodyEntity Create(Color shallowColor, Color deepColor, Color specularColor, Color scatteringColor,
+            float deepStart, float deepEnd, float distortion, float smoothness, float numWaves, float waveAmplitude,
+            float waveSteepness, float waveSpeed, float waveLength, Guid id)
+        {
+            GameObject waterBodyGO = new GameObject("WaterBodyEntity-" + id.ToString());
+            WaterBodyEntity waterBodyEntity = waterBodyGO.AddComponent<WaterBodyEntity>();
+            waterBodyEntity.Initialize(id);
+            waterBodyEntity.SetProperties(shallowColor, deepColor, specularColor, scatteringColor,
+                deepStart, deepEnd, distortion, smoothness, numWaves, waveAmplitude,
+                waveSteepness, waveSpeed, waveLength);
+            return waterBodyEntity;
+        }
+
+        /// <summary>
+        /// Set properties for the water body.
+        /// </summary>
+        /// <param name="shallowColor">Color for the shallow zone.</param>
+        /// <param name="deepColor">Color for the deep zone.</param>
+        /// <param name="specularColor">Specular color.</param>
+        /// <param name="scatteringColor">Scattering color.</param>
+        /// <param name="deepStart">Start of deep zone.</param>
+        /// <param name="deepEnd">End of deep zone.</param>
+        /// <param name="distortion">Distortion factor (range 0-128).</param>
+        /// <param name="smoothness">Smoothness factor (range 0-1).</param>
+        /// <param name="numWaves">Number of waves (range 1-32).</param>
+        /// <param name="waveAmplitude">Wave amplitude (range 0-1).</param>
+        /// <param name="waveSteepness">Wave steepness (range 0-1).</param>
+        /// <param name="waveSpeed">Wave speed.</param>
+        /// <param name="waveLength">Wave length.</param>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public bool SetProperties(Color shallowColor, Color deepColor, Color specularColor, Color scatteringColor,
+            float deepStart, float deepEnd, float distortion, float smoothness, float numWaves, float waveAmplitude,
+            float waveSteepness, float waveSpeed, float waveLength)
+        {
+            if (distortion < 0 || distortion > 128)
+            {
+                LogSystem.LogWarning("[WaterBodyEntity->SetProperties] Parameter distortion out of range.");
+                return false;
+            }
+
+            if (smoothness < 0 || smoothness > 1)
+            {
+                LogSystem.LogWarning("[WaterBodyEntity->SetProperties] Parameter smoothness out of range.");
+                return false;
+            }
+
+            if (numWaves < 1 || numWaves > 32)
+            {
+                LogSystem.LogWarning("[WaterBodyEntity->SetProperties] Parameter numWaves out of range.");
+                return false;
+            }
+
+            if (waveAmplitude < 0 || waveAmplitude > 1)
+            {
+                LogSystem.LogWarning("[WaterBodyEntity->SetProperties] Parameter waveAmplitude out of range.");
+                return false;
+            }
+
+            if (waveSteepness < 0 || waveSteepness > 1)
+            {
+                LogSystem.LogWarning("[WaterBodyEntity->SetProperties] Parameter waveSteepness out of range.");
+                return false;
+            }
+
+            Material mat = meshRenderer.material;
+            mat.SetColor("_Color", shallowColor);
+            mat.SetColor("_DepthColor", deepColor);
+            mat.SetColor("_SpecColor", specularColor);
+            mat.SetColor("_ScatteringColor", scatteringColor);
+            mat.SetFloat("_DepthStart", deepStart);
+            mat.SetFloat("_DepthEnd", deepEnd);
+            mat.SetFloat("_Distortion", distortion);
+            mat.SetFloat("_Smoothness", smoothness);
+            mat.SetFloat("_WaveCount", numWaves);
+            mat.SetFloat("_WaveAmplitude", waveAmplitude);
+            mat.SetFloat("_WaveSteepness", waveSteepness);
+            mat.SetFloat("_WaveSpeed", waveSpeed);
+            mat.SetFloat("_WaveLength", waveLength);
+            
+            return true;
+        }
+
+        public bool SetSpecular(Color shallowColor, Color deepColor, float depthStart, float depthEnd, float distortion)
+        {
+            if (distortion < 0 || distortion > 128)
+            {
+                LogSystem.LogWarning("[WaterBodyEntity->SetRefraction] Parameter distortion out of range.");
+                return false;
+            }
+
+            Material mat = meshRenderer.material;
+            mat.SetColor("_Color", shallowColor);
+            mat.SetColor("_DepthColor", deepColor);
+            mat.SetFloat("_DepthStart", depthStart);
+            mat.SetFloat("_DepthEnd", depthEnd);
+            mat.SetFloat("_Distortion", distortion);
+            
+            return true;
+        }
 
         /// <summary>
         /// Delete the entity.
@@ -80,7 +179,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             if (rigidBody == null)
             {
-                LogSystem.LogError("[MeshEntity->GetMotion] No rigidbody for mesh entity.");
+                LogSystem.LogError("[WaterBodyEntity->GetMotion] No rigidbody for water body entity.");
                 return null;
             }
 
@@ -100,7 +199,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             if (rigidBody == null)
             {
-                LogSystem.LogError("[MeshEntity->GetPhysicalProperties] No rigidbody for mesh entity.");
+                LogSystem.LogError("[WaterBodyEntity->GetPhysicalProperties] No rigidbody for water body entity.");
                 return null;
             }
 
@@ -120,8 +219,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>The size of the entity.</returns>
         public override Vector3 GetSize()
         {
-            return new Vector3(originalMeshSize.x * meshScaling.x,
-                originalMeshSize.y * meshScaling.y, originalMeshSize.z * meshScaling.z);
+            return gameObject.transform.localScale;
         }
 
         /// <summary>
@@ -162,7 +260,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     return true;
                 
                 default:
-                    LogSystem.LogWarning("[MeshEntity->SetInteractionState] Interaction state invalid.");
+                    LogSystem.LogWarning("[WaterBodyEntity->SetInteractionState] Interaction state invalid.");
                     return false;
             }
         }
@@ -176,13 +274,13 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             if (!motionToSet.HasValue)
             {
-                LogSystem.LogWarning("[MeshEntity->SetMotion] Invalid motion.");
+                LogSystem.LogWarning("[WaterBodyEntity->SetMotion] Invalid motion.");
                 return false;
             }
 
             if (rigidBody == null)
             {
-                LogSystem.LogError("[MeshEntity->SetMotion] No rigidbody for mesh entity.");
+                LogSystem.LogError("[WaterBodyEntity->SetMotion] No rigidbody for water body entity.");
                 return false;
             }
 
@@ -225,13 +323,13 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             if (!epp.HasValue)
             {
-                LogSystem.LogWarning("[MeshEntity->SetPhysicalProperties] Invalid physical properties.");
+                LogSystem.LogWarning("[WaterBodyEntity->SetPhysicalProperties] Invalid physical properties.");
                 return false;
             }
 
             if (rigidBody == null)
             {
-                LogSystem.LogError("[MeshEntity->SetPhysicalProperties] No rigidbody for mesh entity.");
+                LogSystem.LogError("[WaterBodyEntity->SetPhysicalProperties] No rigidbody for water body entity.");
                 return false;
             }
 
@@ -272,12 +370,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>Whether or not the setting was successful.</returns>
         public override bool SetSize(Vector3 size, bool synchronize = true)
         {
-            float xSclFactor = size.x / originalMeshSize.x;
-            float ySclFactor = size.y / originalMeshSize.y;
-            float zSclFactor = size.z / originalMeshSize.z;
-            meshScaling = new Vector3(xSclFactor, ySclFactor, zSclFactor);
-            transform.localScale = new Vector3(transform.localScale.x * xSclFactor,
-                transform.localScale.y * ySclFactor, transform.localScale.z * zSclFactor);
+            transform.localScale = size;
 
             return true;
         }
@@ -306,6 +399,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             base.Initialize(idToSet);
 
+            GameObject waterBody = Instantiate(WorldEngine.ActiveWorld.entityManager.waterBodyPrefab);
+            waterBody.transform.SetParent(transform);
+
             Rigidbody rb = gameObject.GetComponent<Rigidbody>();
             if (rb == null)
             {
@@ -313,26 +409,13 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
             SetRigidbody(rb);
 
-            List<Mesh> ms = new List<Mesh>();
-            foreach (MeshFilter filt in gameObject.GetComponentsInChildren<MeshFilter>())
-            {
-                ms.Add(filt.sharedMesh);
-            }
-            SetRenderers(ms.ToArray());
             List<MeshRenderer> rends = new List<MeshRenderer>();
             foreach (MeshRenderer rend in gameObject.GetComponentsInChildren<MeshRenderer>())
             {
                 rends.Add(rend);
             }
-            renderers = rends.ToArray();
-            Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
-            foreach (Mesh m in meshes)
-            {
-                m.RecalculateBounds();
-                bounds.Encapsulate(m.bounds);
-            }
-            originalMeshSize = bounds.size;
-            meshScaling = Vector3.one;
+
+            meshRenderer = waterBody.GetComponentInChildren<MeshRenderer>();
 
             SetUpPreviewObject();
 
@@ -351,17 +434,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 boxCollider = gameObject.AddComponent<BoxCollider>();
             }
 
-            List<MeshCollider> mcs = new List<MeshCollider>();
-            foreach (MeshCollider mc in gameObject.GetComponentsInChildren<MeshCollider>())
-            {
-                if (mc.tag == TagManager.meshColliderTag)
-                {
-                    mcs.Add(mc);
-                    break;
-                }
-            }
-
-            SetColliders(boxCollider, mcs.ToArray());
+            SetCollider(boxCollider);
 
             MakeHidden();
             SetUpHighlightVolume();
@@ -442,42 +515,20 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="visible">Whether or not to make the main mesh visible.</param>
         private void SetMainMeshVisibility(bool visible)
         {
-            foreach (MeshRenderer rend in renderers)
-            {
-                rend.enabled = visible;
-            }
+            meshRenderer.enabled = visible;
         }
 
         /// <summary>
-        /// Set mesh renderers for the entity.
+        /// Set collider for the entity.
         /// </summary>
-        /// <param name="ms">Meshes to apply.</param>
-        private void SetRenderers(Mesh[] ms)
-        {
-            if (ms == null)
-            {
-                LogSystem.LogWarning("[MeshEntity->SetRenderer] No mesh.");
-            }
-            meshes = ms;
-        }
-
-        /// <summary>
-        /// Set colliders for the entity.
-        /// </summary>
-        /// <param name="cc">Colliders to apply.</param>
-        private void SetColliders(BoxCollider bc, MeshCollider[] mc)
+        /// <param name="cc">Collider to apply.</param>
+        private void SetCollider(BoxCollider bc)
         {
             if (bc == null)
             {
-                LogSystem.LogWarning("[MeshEntity->SetColliders] No box collider.");
+                LogSystem.LogWarning("[WaterBodyEntity->SetColliders] No box collider.");
             }
             boxCollider = bc;
-
-            if (mc == null)
-            {
-                LogSystem.LogWarning("[MeshEntity->SetColliders] No mesh collider.");
-            }
-            meshColliders = mc;
         }
 
         /// <summary>
@@ -488,7 +539,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             if (rb == null)
             {
-                LogSystem.LogWarning("[MeshEntity->SetRigidbody] No rigidbody.");
+                LogSystem.LogWarning("[WaterBodyEntity->SetRigidbody] No rigidbody.");
             }
             rigidBody = rb;
         }
@@ -518,10 +569,6 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             rigidBody.isKinematic = true;
 
-            foreach (MeshCollider meshCollider in meshColliders)
-            {
-                meshCollider.enabled = false;
-            }
             boxCollider.enabled = false;
             gameObject.SetActive(false);
             interactionState = InteractionState.Hidden;
@@ -554,11 +601,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             gameObject.SetActive(true);
             rigidBody.isKinematic = true;
-            foreach (MeshCollider meshCollider in meshColliders)
-            {
-                meshCollider.enabled = true;
-            }
-            boxCollider.enabled = false;
+
+            boxCollider.enabled = true;
             interactionState = InteractionState.Static;
         }
 
@@ -589,10 +633,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             gameObject.SetActive(true);
             rigidBody.isKinematic = false;
-            foreach (MeshCollider meshCollider in meshColliders)
-            {
-                meshCollider.enabled = true;
-            }
+
             boxCollider.enabled = true;
             interactionState = InteractionState.Physical;
         }
@@ -623,10 +664,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             gameObject.SetActive(true);
             rigidBody.isKinematic = true;
-            foreach (MeshCollider meshCollider in meshColliders)
-            {
-                meshCollider.enabled = true;
-            }
+
             boxCollider.enabled = true;
             interactionState = InteractionState.Placing;
         }

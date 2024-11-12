@@ -55,5 +55,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity.Terrain
         /// </summary>
         [Range(0, 1)]
         public float smoothness;
+
+        /// <summary>
+        /// Size factor to apply to terrain textures.
+        /// </summary>
+        [Range(1, int.MaxValue)]
+        public int sizeFactor;
     }
 }

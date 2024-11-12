@@ -65,6 +65,18 @@ namespace FiveSQD.WebVerse.WorldEngine
         public GameObject voxelPrefab;
 
         /// <summary>
+        /// Prefab for a water body.
+        /// </summary>
+        [Tooltip("Prefab for a water body.")]
+        public GameObject waterBodyPrefab;
+
+        /// <summary>
+        /// Prefab for a water blocker.
+        /// </summary>
+        [Tooltip("Prefab for a water blocker.")]
+        public GameObject waterBlockerPrefab;
+
+        /// <summary>
         /// Camera offset.
         /// </summary>
         [Tooltip("Camera offset.")]
@@ -131,6 +143,8 @@ namespace FiveSQD.WebVerse.WorldEngine
                 characterControllerPrefab = instance.characterControllerPrefab,
                 characterControllerLabelPrefab = instance.characterControllerLabelPrefab,
                 voxelPrefab = instance.voxelPrefab,
+                waterBodyPrefab = instance.waterBodyPrefab,
+                waterBlockerPrefab = instance.waterBlockerPrefab,
                 cameraOffset = instance.cameraOffset,
                 vr = instance.vr,
                 maxStorageEntries = 2048,

@@ -50,6 +50,18 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public GameObject voxelPrefab;
 
         /// <summary>
+        /// Prefab for a water body.
+        /// </summary>
+        [Tooltip("Prefab for a water body.")]
+        public GameObject waterBodyPrefab;
+
+        /// <summary>
+        /// Prefab for a water blocker.
+        /// </summary>
+        [Tooltip("Prefab for a water blocker.")]
+        public GameObject waterBlockerPrefab;
+
+        /// <summary>
         /// Dictionary of loaded entities.
         /// </summary>
         private Dictionary<Guid, BaseEntity> entities = new Dictionary<Guid, BaseEntity>();
@@ -258,6 +270,60 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadHybridTerrainEntity(length, width, height, heights, layers,
                 layerMasks, entityID, parentEntity, position, rotation, tag, onLoaded));
+            return entityID;
+        }
+
+        /// <summary>
+        /// Load a water body entity.
+        /// </summary>
+        /// <param name="shallowColor">Color for the shallow zone.</param>
+        /// <param name="deepColor">Color for the deep zone.</param>
+        /// <param name="specularColor">Specular color.</param>
+        /// <param name="scatteringColor">Scattering color.</param>
+        /// <param name="deepStart">Start of deep zone.</param>
+        /// <param name="deepEnd">End of deep zone.</param>
+        /// <param name="distortion">Distortion factor (range 0-128).</param>
+        /// <param name="smoothness">Smoothness factor (range 0-1).</param>
+        /// <param name="numWaves">Number of waves (range 1-32).</param>
+        /// <param name="waveAmplitude">Wave amplitude (range 0-1).</param>
+        /// <param name="waveSteepness">Wave steepness (range 0-1).</param>
+        /// <param name="waveSpeed">Wave speed.</param>
+        /// <param name="waveLength">Wave length.</param>
+        /// <param name="parentEntity">Parent entity to give the water body entity.</param>
+        /// <param name="position">Position to apply to the water body entity.</param>
+        /// <param name="rotation">Rotation to apply to the water body entity.</param>
+        /// <param name="id">ID to apply to the water body entity.</param>
+        /// <param name="tag">Tag to apply to the water body entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>The ID of the new water body entity.</returns>
+        public Guid LoadWaterBodyEntity(Color shallowColor, Color deepColor,
+            Color specularColor, Color scatteringColor, float deepStart, float deepEnd, float distortion,
+            float smoothness, float numWaves, float waveAmplitude, float waveSteepness, float waveSpeed,
+            float waveLength, BaseEntity parentEntity, Vector3 position, Quaternion rotation,
+            Guid? id = null, string tag = null, Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadWaterBodyEntity(shallowColor, deepColor, specularColor, scatteringColor,
+            deepStart, deepEnd, distortion, smoothness, numWaves, waveAmplitude, waveSteepness, waveSpeed,
+            waveLength, entityID, parentEntity, position, rotation, tag, onLoaded));
+            return entityID;
+        }
+
+        /// <summary>
+        /// Load a water blocker entity.
+        /// </summary>
+        /// <param name="parentEntity">Parent entity to give the water blocker entity.</param>
+        /// <param name="position">Position to apply to the water blocker entity.</param>
+        /// <param name="rotation">Rotation to apply to the water blocker entity.</param>
+        /// <param name="id">ID to apply to the water blocker entity.</param>
+        /// <param name="tag">Tag to apply to the water blocker entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>The ID of the new water blocker entity.</returns>
+        public Guid LoadWaterBlockerEntity(BaseEntity parentEntity, Vector3 position, Quaternion rotation,
+            Guid? id = null, string tag = null, Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadWaterBlockerEntity(entityID, parentEntity, position, rotation, tag, onLoaded));
             return entityID;
         }
 
@@ -716,6 +782,82 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             HybridTerrainEntity entity = HybridTerrainEntity.Create(
                 length, width, height, heights, layers, layerMasks, id);
+            entities.Add(id, entity);
+            entity.SetParent(parent);
+            entity.entityTag = tag;
+            entity.SetPosition(position, true);
+            entity.SetRotation(rotation, true);
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
+        /// <summary>
+        /// Loads a water body entity.
+        /// </summary>
+        /// <param name="shallowColor">Color for the shallow zone.</param>
+        /// <param name="deepColor">Color for the deep zone.</param>
+        /// <param name="specularColor">Specular color.</param>
+        /// <param name="scatteringColor">Scattering color.</param>
+        /// <param name="deepStart">Start of deep zone.</param>
+        /// <param name="deepEnd">End of deep zone.</param>
+        /// <param name="distortion">Distortion factor (range 0-128).</param>
+        /// <param name="smoothness">Smoothness factor (range 0-1).</param>
+        /// <param name="numWaves">Number of waves (range 1-32).</param>
+        /// <param name="waveAmplitude">Wave amplitude (range 0-1).</param>
+        /// <param name="waveSteepness">Wave steepness (range 0-1).</param>
+        /// <param name="waveSpeed">Wave speed.</param>
+        /// <param name="waveLength">Wave length.</param>
+        /// <param name="id">ID of the water body entity.</param>
+        /// <param name="parent">Parent of the water body entity.</param>
+        /// <param name="position">Position of the water body entity.</param>
+        /// <param name="rotation">Rotation of the water body entity.</param>
+        /// <param name="tag">Tag of the water body entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
+        private System.Collections.IEnumerator LoadWaterBodyEntity(Color shallowColor, Color deepColor,
+            Color specularColor, Color scatteringColor, float deepStart, float deepEnd, float distortion,
+            float smoothness, float numWaves, float waveAmplitude, float waveSteepness, float waveSpeed,
+            float waveLength, Guid id, BaseEntity parent, Vector3 position, Quaternion rotation, string tag,
+            Action onLoaded)
+        {
+            WaterBodyEntity entity = WaterBodyEntity.Create(shallowColor, deepColor, specularColor,
+                scatteringColor, deepStart, deepEnd, distortion, smoothness, numWaves, waveAmplitude,
+                waveSteepness, waveSpeed, waveLength, id);
+            
+            entities.Add(id, entity);
+            entity.SetParent(parent);
+            entity.entityTag = tag;
+            entity.SetPosition(position, true);
+            entity.SetRotation(rotation, true);
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
+        /// <summary>
+        /// Loads a water blocker entity.
+        /// </summary>
+        /// <param name="id">ID of the water blocker entity.</param>
+        /// <param name="parent">Parent of the water blocker entity.</param>
+        /// <param name="position">Position of the water blocker entity.</param>
+        /// <param name="rotation">Rotation of the water blocker entity.</param>
+        /// <param name="tag">Tag of the water blocker entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
+        private System.Collections.IEnumerator LoadWaterBlockerEntity(Guid id,
+        BaseEntity parent, Vector3 position, Quaternion rotation, string tag, Action onLoaded)
+        {
+            WaterBlockerEntity entity = WaterBlockerEntity.Create(id);
+            
             entities.Add(id, entity);
             entity.SetParent(parent);
             entity.entityTag = tag;
