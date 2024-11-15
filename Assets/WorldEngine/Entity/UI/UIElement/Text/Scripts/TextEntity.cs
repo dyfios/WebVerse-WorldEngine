@@ -135,6 +135,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 SetParent(parentCanvas);
             }
 
+            SetColor(Color.black);
+
             MakeHidden();
         }
     }

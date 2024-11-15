@@ -56,17 +56,17 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             base.Initialize(idToSet, parentCanvas);
 
-            GameObject inputGO = Instantiate(WorldEngine.ActiveWorld.entityManager.inputEntityPrefab);
-            inputGO.transform.SetParent(transform);
+            //GameObject inputGO = Instantiate(WorldEngine.ActiveWorld.entityManager.inputEntityPrefab);
+            //inputGO.transform.SetParent(transform);
 
-            canvasObject = inputGO.GetComponent<Canvas>();
-            imageObject = inputGO.GetComponentInChildren<Image>();
-            inputObject = inputGO.GetComponentInChildren<TMP_InputField>();
+            canvasObject = gameObject.GetComponent<Canvas>();
+            imageObject = gameObject.GetComponentInChildren<Image>();
+            inputObject = gameObject.GetComponentInChildren<TMP_InputField>();
 
-            RectTransform rt = inputGO.GetComponent<RectTransform>();
+            RectTransform rt = gameObject.GetComponent<RectTransform>();
             if (rt == null)
             {
-                rt = inputGO.gameObject.AddComponent<RectTransform>();
+                rt = gameObject.AddComponent<RectTransform>();
             }
             rt.position = Vector3.zero;
             rt.anchorMin = rt.anchorMax = Vector2.zero;

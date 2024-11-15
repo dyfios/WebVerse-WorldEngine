@@ -226,18 +226,25 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 LogSystem.LogError("[UIElementEntity->CorrectSizeAndPosition] No parent canvas entity.");
                 return false;
             }
+			
+			UIEntity parentUIEntity = GetParentUIEntity();
+            if (parentUIEntity == null)
+            {
+                LogSystem.LogError("[UIElementEntity->CorrectSizeAndPosition] No parent UI entity.");
+                return false;
+            }
 
-            RectTransform parentRT = parentCanvasEntity.GetComponent<RectTransform>();
+            RectTransform parentRT = parentUIEntity.GetComponent<RectTransform>();
             if (parentRT == null)
             {
-                LogSystem.LogError("[UIElementEntity->CorrectSizeAndPosition] No parent canvas entity rect transform.");
+                LogSystem.LogError("[UIElementEntity->CorrectSizeAndPosition] No parent UI entity rect transform.");
                 return false;
             }
             
             Vector2 worldSize = new Vector2(parentRT.sizeDelta.x * targetSize.x, parentRT.sizeDelta.y * targetSize.y);
             Vector3 worldPos = new Vector3(parentRT.sizeDelta.x * targetPosition.x + rt.sizeDelta.x / 2,
                 -1 * parentRT.sizeDelta.y * targetPosition.y - rt.sizeDelta.y / 2);
-
+Debug.Log("asdf " + gameObject.name + " " + worldSize + " " + worldPos);
             rt.sizeDelta = worldSize;
             rt.anchorMin = rt.anchorMax = new Vector2(0, 1);
             rt.pivot = new Vector2(0.5f, 0.5f);
@@ -275,5 +282,18 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             return GetComponentInParent<CanvasEntity>(true);
         }
+		
+		/// <summary>
+        /// Get the parent UI entity of this entity.
+        /// </summary>
+        /// <returns>The parent UI entity.</returns>
+		protected UIEntity GetParentUIEntity()
+		{
+			if (transform.parent == null)
+			{
+				return null;
+			}
+			return transform.parent.GetComponentInParent<UIEntity>(true);
+		}
     }
 }
