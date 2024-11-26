@@ -60,18 +60,20 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="waveSteepness">Wave steepness (range 0-1).</param>
         /// <param name="waveSpeed">Wave speed.</param>
         /// <param name="waveLength">Wave length.</param>
+        /// <param name="scale">Scale of the waves.</param>
+        /// <param name="intensity">Intensity factor (range 0-1).</param>
         /// <param name="id">ID for the water body entity.</param>
         /// <returns>The requested water body entity.</returns>
         public static WaterBodyEntity Create(Color shallowColor, Color deepColor, Color specularColor, Color scatteringColor,
             float deepStart, float deepEnd, float distortion, float smoothness, float numWaves, float waveAmplitude,
-            float waveSteepness, float waveSpeed, float waveLength, Guid id)
+            float waveSteepness, float waveSpeed, float waveLength, float scale, float intensity, Guid id)
         {
             GameObject waterBodyGO = new GameObject("WaterBodyEntity-" + id.ToString());
             WaterBodyEntity waterBodyEntity = waterBodyGO.AddComponent<WaterBodyEntity>();
             waterBodyEntity.Initialize(id);
             waterBodyEntity.SetProperties(shallowColor, deepColor, specularColor, scatteringColor,
                 deepStart, deepEnd, distortion, smoothness, numWaves, waveAmplitude,
-                waveSteepness, waveSpeed, waveLength);
+                waveSteepness, waveSpeed, waveLength, scale, intensity);
             return waterBodyEntity;
         }
 
@@ -91,10 +93,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="waveSteepness">Wave steepness (range 0-1).</param>
         /// <param name="waveSpeed">Wave speed.</param>
         /// <param name="waveLength">Wave length.</param>
+        /// <param name="scale">Scale of the waves.</param>
+        /// <param name="intensity">Intensity factor (range 0-1).</param>
         /// <returns>Whether or not the operation was successful.</returns>
         public bool SetProperties(Color shallowColor, Color deepColor, Color specularColor, Color scatteringColor,
             float deepStart, float deepEnd, float distortion, float smoothness, float numWaves, float waveAmplitude,
-            float waveSteepness, float waveSpeed, float waveLength)
+            float waveSteepness, float waveSpeed, float waveLength, float scale, float intensity)
         {
             if (distortion < 0 || distortion > 128)
             {
@@ -126,6 +130,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 return false;
             }
 
+            if (intensity < 0 || intensity > 1)
+            {
+                LogSystem.LogWarning("[WaterBodyEntity->SetProperties] Parameter intensity out of range.");
+                return false;
+            }
+
             Material mat = meshRenderer.material;
             mat.SetColor("_Color", shallowColor);
             mat.SetColor("_DepthColor", deepColor);
@@ -140,6 +150,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             mat.SetFloat("_WaveSteepness", waveSteepness);
             mat.SetFloat("_WaveSpeed", waveSpeed);
             mat.SetFloat("_WaveLength", waveLength);
+            mat.SetVector("_NormalMapATilings", new Vector4(scale, scale, scale * 0.75f, scale * 0.75f));
+            mat.SetVector("_NormalMapASpeeds", new Vector4(waveSpeed, waveSpeed, waveSpeed * 0.75f, waveSpeed * 0.75f));
+            mat.SetFloat("_NormalMapAIntensity", intensity);
             
             return true;
         }
@@ -165,10 +178,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <summary>
         /// Delete the entity.
         /// </summary>
+        /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the setting was successful.</returns>
-        public override bool Delete()
+        public override bool Delete(bool synchronize = true)
         {
-            return base.Delete();
+            return base.Delete(synchronize);
         }
 
         /// <summary>
@@ -340,7 +354,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             if (epp.Value.centerOfMass != null)
             {
-                rigidBody.centerOfMass = epp.Value.centerOfMass;
+                rigidBody.centerOfMass = epp.Value.centerOfMass.Value;
             }
 
             if (epp.Value.drag.HasValue)

@@ -68,10 +68,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <summary>
         /// Delete the terrain entity.
         /// </summary>
+        /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns></returns>
-        public override bool Delete()
+        public override bool Delete(bool synchronize = true)
         {
-            return base.Delete();
+            return base.Delete(synchronize);
         }
 
         /// <summary>

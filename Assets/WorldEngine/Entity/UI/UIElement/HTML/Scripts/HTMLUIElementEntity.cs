@@ -3,7 +3,6 @@
 using FiveSQD.WebVerse.WorldEngine.Utilities;
 using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 #if WV_VR_ENABLED
 using UnityEngine.XR.Interaction.Toolkit.UI;
@@ -94,6 +93,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             GameObject canvasWebView = Instantiate(WorldEngine.ActiveWorld.entityManager.canvasWebViewPrefab);
             canvasWebView.transform.SetParent(transform);
             transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
             transform.localScale = Vector3.one;
 #if VUPLEX_INCLUDED
             canvasWebViewPrefab = canvasWebView.GetComponent<CanvasWebViewPrefab>();
@@ -168,6 +168,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             Vector3 worldPos = new Vector3(parentRT.sizeDelta.x * targetPosition.x, -1 * parentRT.sizeDelta.y * targetPosition.y);
             
             transform.localPosition = Vector3.zero;
+            transform.localRotation = Quaternion.identity;
             transform.localScale = Vector3.one;
 
             rt.sizeDelta = worldSize;

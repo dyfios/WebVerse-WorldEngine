@@ -67,6 +67,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public Vector3 characterLabelOffset { get; private set; }
 
         /// <summary>
+        /// Whether or not to fix the height if below ground.
+        /// </summary>
+        [Tooltip("Whether or not to fix the height if below ground.")]
+        public bool fixHeight = true;
+
+        /// <summary>
         /// Character model GameObject.
         /// </summary>
         private GameObject characterGO;
@@ -112,12 +118,109 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         private GameObject highlightCube;
 
         /// <summary>
+        /// The current applied velocity.
+        /// </summary>
+        private Vector3 currentVelocity = Vector3.zero;
+
+        /// <summary>
+        /// Apply motion to the character entity with the given vector.
+        /// </summary>
+        /// <param name="amount">Amount to move the character entity.</param>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public bool Move(Vector3 amount)
+        {
+            if (characterController == null)
+            {
+                LogSystem.LogError("[CharacterEntity->Move] No character controller for character entity.");
+                return false;
+            }
+
+            if (rigidBody == null)
+            {
+                LogSystem.LogError("[CharacterEntity->Move] No rigidbody for character entity.");
+                return false;
+            }
+
+            currentVelocity = new Vector3(currentVelocity.x + amount.x, currentVelocity.y + amount.y, currentVelocity.z + amount.z);
+            characterController.Move(amount);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Apply a jump to the character entity by the given amount.
+        /// </summary>
+        /// <param name="amount">Amount to jump the character entity.</param>
+        /// <param name="discardIfFalling">Whether or not to discard jump if currently falling.</param>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public bool Jump(float amount, bool discardIfFalling = true)
+        {
+            if (characterController == null)
+            {
+                LogSystem.LogError("[CharacterEntity->Jump] No character controller for character entity.");
+                return false;
+            }
+
+            if (rigidBody == null)
+            {
+                LogSystem.LogError("[CharacterEntity->Jump] No rigidbody for character entity.");
+                return false;
+            }
+            
+            if (IsOnSurface() || !discardIfFalling)
+            {
+                currentVelocity.y += amount;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns whether or not the character entity is on a surface.
+        /// </summary>
+        /// <returns>Whether or not the character entity is on a surface.</returns>
+        public bool IsOnSurface()
+        {
+            if (characterController == null)
+            {
+                LogSystem.LogError("[CharacterEntity->IsOnSurface] No character controller for character entity.");
+                return false;
+            }
+
+            if (rigidBody == null)
+            {
+                LogSystem.LogError("[CharacterEntity->IsOnSurface] No rigidbody for character entity.");
+                return false;
+            }
+
+            return Physics.Raycast(transform.position - new Vector3(0, characterController.height / 2, 0), Vector3.down, 0.25f);
+        }
+
+        public bool IsAboveGround()
+        {
+            if (characterController == null)
+            {
+                LogSystem.LogError("[CharacterEntity->IsOnSurface] No character controller for character entity.");
+                return false;
+            }
+
+            if (rigidBody == null)
+            {
+                LogSystem.LogError("[CharacterEntity->IsOnSurface] No rigidbody for character entity.");
+                return false;
+            }
+
+            return Physics.Raycast(transform.position - new Vector3(0, characterController.height / 2, 0), Vector3.down);
+        }
+
+        /// <summary>
         /// Delete the entity.
         /// </summary>
+        /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the setting was successful.</returns>
-        public override bool Delete()
+        public override bool Delete(bool synchronize = true)
         {
-            return base.Delete();
+            return base.Delete(synchronize);
         }
 
         /// <summary>
@@ -314,7 +417,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             if (epp.Value.centerOfMass != null)
             {
-                rigidBody.centerOfMass = epp.Value.centerOfMass;
+                rigidBody.centerOfMass = epp.Value.centerOfMass.Value;
             }
 
             if (epp.Value.drag.HasValue)
@@ -419,10 +522,10 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             this.characterObjectRotation = characterObjectRotation;
             this.characterLabelOffset = avatarLabelOffset;
 
-            Rigidbody rb = characterGO.GetComponent<Rigidbody>();
+            Rigidbody rb = gameObject.GetComponent<Rigidbody>();
             if (rb == null)
             {
-                rb = characterGO.AddComponent<Rigidbody>();
+                rb = gameObject.AddComponent<Rigidbody>();
             }
             SetRigidbody(rb);
 
@@ -442,7 +545,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             meshScaling = Vector3.one;
 
             CapsuleCollider capsuleCollider = null;
-            foreach (CapsuleCollider cc in characterGO.GetComponentsInChildren<CapsuleCollider>())
+            foreach (CapsuleCollider cc in gameObject.GetComponentsInChildren<CapsuleCollider>())
             {
                 if (cc.tag == TagManager.physicsColliderTag)
                 {
@@ -453,15 +556,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             if (capsuleCollider == null)
             {
-                capsuleCollider = characterGO.AddComponent<CapsuleCollider>();
+                capsuleCollider = gameObject.AddComponent<CapsuleCollider>();
             }
             
             SetColliders(capsuleCollider);
 
-            CharacterController characterController = characterGO.GetComponent<CharacterController>();
+            CharacterController characterController = gameObject.GetComponent<CharacterController>();
             if (characterController == null)
             {
-                characterController = characterGO.AddComponent<CharacterController>();
+                characterController = gameObject.AddComponent<CharacterController>();
             }
 
             SetController(characterController);
@@ -681,6 +784,59 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             highlightCube.transform.localRotation = Quaternion.identity;
             highlightCube.transform.localScale = Vector3.one;
             highlightCube.SetActive(false);
+        }
+
+        private float timeToWaitForUpdate = 0.025f;
+        private float timeWaitedForUpdate = 0;
+        private int stepToRaise = 1;
+        private int maxStepToRaise = 1024;
+        private void Update()
+        {
+            timeWaitedForUpdate += Time.deltaTime;
+            if (timeWaitedForUpdate >= timeToWaitForUpdate)
+            {
+                timeWaitedForUpdate = 0;
+            }
+            else
+            {
+                return;
+            }
+
+            //if (currentVelocity.x == 0 && currentVelocity.y == 0 && currentVelocity.z == 0)
+            //{
+            //    return;
+            //}
+
+            if (characterController == null)
+            {
+                LogSystem.LogError("[CharacterEntity->Update] No character controller for character entity.");
+                return;
+            }
+
+            if (IsOnSurface() && currentVelocity.y < 0)
+            {
+                currentVelocity.y = 0f;
+            }
+
+            if (rigidBody.useGravity)
+            {
+                currentVelocity.y += -9.81f * Time.deltaTime; // TODO: Magic number, tie into larger gravity system.
+            }
+            characterController.Move(currentVelocity);
+            currentVelocity.x = currentVelocity.z = 0;
+
+            if (fixHeight)
+            {
+                if (!IsAboveGround())
+                {
+                    characterController.transform.position = new Vector3(characterController.transform.position.x, 
+                        characterController.transform.position.y + (stepToRaise *= 2), characterController.transform.position.z);
+                    if (stepToRaise > maxStepToRaise)
+                    {
+                        stepToRaise = maxStepToRaise;
+                    }
+                }
+            }
         }
     }
 }
