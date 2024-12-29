@@ -26,7 +26,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             /// <summary>
             /// Center of mass of the entity.
             /// </summary>
-            public Vector3 centerOfMass;
+            public Vector3? centerOfMass;
 
             /// <summary>
             /// Drag of the entity.
@@ -178,11 +178,16 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <summary>
         /// Delete the entity.
         /// </summary>
+        /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the setting was successful.</returns>
-        public virtual bool Delete()
+        public virtual bool Delete(bool synchronize = true)
         {
-            Destroy(gameObject);
-            if (synchronizer != null)
+            if (gameObject != null)
+            {
+                Destroy(gameObject);
+            }
+
+            if (synchronizer != null && synchronize == true)
             {
                 synchronizer.DeleteSynchronizedEntity(this);
             }
@@ -643,6 +648,101 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public virtual void AcceptPreview()
         {
 
+        }
+
+        /// <summary>
+        /// Play an animation.
+        /// </summary>
+        /// <param name="animationName">Name of animation to play.</param>
+        /// <returns>Whether or not the animation was found.</returns>
+        public virtual bool PlayAnimation(string animationName)
+        {
+            Animation[] entityAnimations = GetAnimations();
+            if (entityAnimations != null)
+            {
+                foreach (Animation animation in entityAnimations)
+                {
+                    AnimationClip clip = animation.GetClip(animationName);
+                    if (clip != null)
+                    {
+                        animation[animationName].weight = 0.1f;
+                        animation.Play(animationName);
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Stop an animation.
+        /// </summary>
+        /// <param name="animationName">Name of animation to stop.</param>
+        /// <returns>Whether or not the animation was found.</returns>
+        public virtual bool StopAnimation(string animationName)
+        {
+            Animation[] entityAnimations = GetAnimations();
+            if (entityAnimations != null)
+            {
+                foreach (Animation animation in entityAnimations)
+                {
+                    AnimationClip clip = animation.GetClip(animationName);
+                    if (clip != null)
+                    {
+                        animation.Stop(animationName);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Set the speed of an animation.
+        /// </summary>
+        /// <param name="animationName">Name of animation to set speed of.</param>
+        /// <param name="speed">Speed to set animation to.</param>
+        /// <returns>Whether or not the animation was found.</returns>
+        public virtual bool SetAnimationSpeed(string animationName, float speed)
+        {
+            Animation[] entityAnimations = GetAnimations();
+            if (entityAnimations != null)
+            {
+                foreach (Animation animation in entityAnimations)
+                {
+                    AnimationClip clip = animation.GetClip(animationName);
+                    if (clip != null)
+                    {
+                        animation[animationName].speed = speed;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Get Animations for this entity.
+        /// </summary>
+        /// <returns>Animations for this entity.</returns>
+        private Animation[] GetAnimations()
+        {
+            Animation[] rawAnimations = GetComponentsInChildren<Animation>();
+
+            List<Animation> filteredAnimations = new List<Animation>();
+            if (rawAnimations != null)
+            {
+                foreach (Animation anim in rawAnimations)
+                {
+                    if (anim.GetComponentInParent<BaseEntity>(true) == this)
+                    {
+                        filteredAnimations.Add(anim);
+                    }
+                }
+            }
+            return filteredAnimations.ToArray();
         }
 
         /// <summary>

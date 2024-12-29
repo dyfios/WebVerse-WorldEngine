@@ -457,10 +457,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <summary>
         /// Delete the hybrid terrain entity.
         /// </summary>
+        /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the operation was successful.</returns>
-        public override bool Delete()
+        public override bool Delete(bool synchronize = true)
         {
-            return base.Delete();
+            return base.Delete(synchronize);
         }
 
         /// <summary>

@@ -3,10 +3,7 @@
 using UnityEngine;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
 using UnityEngine.UI;
-
-#if WV_VR_ENABLED
 using UnityEngine.XR.Interaction.Toolkit.UI;
-#endif
 
 namespace FiveSQD.WebVerse.WorldEngine.Entity
 {
@@ -38,11 +35,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             rt.position = Vector3.zero;
             rt.anchorMin = rt.anchorMax = Vector2.zero;
 
-#if WV_VR_ENABLED
             gameObject.AddComponent<TrackedDeviceGraphicRaycaster>();
-#else
             gameObject.AddComponent<GraphicRaycaster>();
-#endif
 
             MakeHidden();
         }

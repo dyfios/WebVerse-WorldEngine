@@ -286,6 +286,7 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             diggerMasterRuntimeGO = new GameObject("DiggerMasterRuntime");
             diggerMasterRuntimeGO.transform.parent = transform;
             diggerMasterRuntime = diggerMasterRuntimeGO.AddComponent<DiggerMasterRuntime>();
+            diggerMasterRuntime.BufferSize = 1024;
 #endif
 
             siteName = worldInfo.siteName;

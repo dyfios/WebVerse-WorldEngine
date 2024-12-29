@@ -289,6 +289,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="waveSteepness">Wave steepness (range 0-1).</param>
         /// <param name="waveSpeed">Wave speed.</param>
         /// <param name="waveLength">Wave length.</param>
+        /// <param name="waveScale">Scale of the waves.</param>
+        /// <param name="intensity">Intensity factor (range 0-1).</param>
         /// <param name="parentEntity">Parent entity to give the water body entity.</param>
         /// <param name="position">Position to apply to the water body entity.</param>
         /// <param name="rotation">Rotation to apply to the water body entity.</param>
@@ -299,13 +301,13 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public Guid LoadWaterBodyEntity(Color shallowColor, Color deepColor,
             Color specularColor, Color scatteringColor, float deepStart, float deepEnd, float distortion,
             float smoothness, float numWaves, float waveAmplitude, float waveSteepness, float waveSpeed,
-            float waveLength, BaseEntity parentEntity, Vector3 position, Quaternion rotation,
+            float waveLength, float scale, float intensity, BaseEntity parentEntity, Vector3 position, Quaternion rotation,
             Guid? id = null, string tag = null, Action onLoaded = null)
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadWaterBodyEntity(shallowColor, deepColor, specularColor, scatteringColor,
             deepStart, deepEnd, distortion, smoothness, numWaves, waveAmplitude, waveSteepness, waveSpeed,
-            waveLength, entityID, parentEntity, position, rotation, tag, onLoaded));
+            waveLength, scale, intensity, entityID, parentEntity, position, rotation, tag, onLoaded));
             return entityID;
         }
 
@@ -452,6 +454,31 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadButtonEntity(entityID,
                 parentEntity, positionPercent, sizePercent, onClick, tag, onLoaded));
+            return entityID;
+        }
+
+        /// <summary>
+        /// Load a dropdown entity.
+        /// </summary>
+        /// <param name="parentEntity">Parent entity to give the dropdown entity.</param>
+        /// <param name="positionPercent">Position to apply to the dropdown entity
+        /// as a percentage of the canvas.</param>
+        /// <param name="sizePercent">Size to apply to the dropdown entity
+        /// as a percentage of the canvas.</param>
+        /// <param name="onChange">Action to perform on change of the dropdown.</param>
+        /// <param name="options">Options to apply to the dropdown</param>
+        /// <param name="id">ID to apply to the dropdown entity.</param>
+        /// <param name="tag">Tag to apply to the dropdown entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>The ID of the new dropdown entity.</returns>
+        public Guid LoadDropdownEntity(CanvasEntity parentEntity,
+            Vector2 positionPercent, Vector2 sizePercent, Action<int> onChange,
+            List<string> options, Guid? id = null,
+            string tag = null, Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadDropdownEntity(entityID,
+                parentEntity, positionPercent, sizePercent, onChange, options, tag, onLoaded));
             return entityID;
         }
 
@@ -812,6 +839,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="waveSteepness">Wave steepness (range 0-1).</param>
         /// <param name="waveSpeed">Wave speed.</param>
         /// <param name="waveLength">Wave length.</param>
+        /// <param name="scale">Scale of the waves.</param>
+        /// <param name="intensity">Intensity factor (range 0-1).</param>
         /// <param name="id">ID of the water body entity.</param>
         /// <param name="parent">Parent of the water body entity.</param>
         /// <param name="position">Position of the water body entity.</param>
@@ -822,12 +851,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         private System.Collections.IEnumerator LoadWaterBodyEntity(Color shallowColor, Color deepColor,
             Color specularColor, Color scatteringColor, float deepStart, float deepEnd, float distortion,
             float smoothness, float numWaves, float waveAmplitude, float waveSteepness, float waveSpeed,
-            float waveLength, Guid id, BaseEntity parent, Vector3 position, Quaternion rotation, string tag,
-            Action onLoaded)
+            float waveLength, float scale, float intensity, Guid id, BaseEntity parent,
+            Vector3 position, Quaternion rotation, string tag, Action onLoaded)
         {
             WaterBodyEntity entity = WaterBodyEntity.Create(shallowColor, deepColor, specularColor,
                 scatteringColor, deepStart, deepEnd, distortion, smoothness, numWaves, waveAmplitude,
-                waveSteepness, waveSpeed, waveLength, id);
+                waveSteepness, waveSpeed, waveLength, scale, intensity, id);
             
             entities.Add(id, entity);
             entity.SetParent(parent);
@@ -1056,6 +1085,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="parent">Parent of the button entity.</param>
         /// <param name="positionPercent">Position of the button entity as a percentage of the canvas.</param>
         /// <param name="sizePercent">Size of the button entity as a percentage of the canvas.</param>
+        /// <param name="onClick">Action to perform on click of the button.</param>
         /// <param name="tag">Tag of the button entity.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
@@ -1079,6 +1109,50 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
 
             entity.SetOnClick(onClick);
+
+            yield return null;
+        }
+
+        /// <summary>
+        /// Loads a dropdown entity.
+        /// </summary>
+        /// <param name="id">ID of the dropdown entity.</param>
+        /// <param name="parent">Parent of the dropdown entity.</param>
+        /// <param name="positionPercent">Position of the dropdown entity as a percentage of the canvas.</param>
+        /// <param name="sizePercent">Size of the dropdown entity as a percentage of the canvas.</param>
+        /// <param name="onChange">Action to perform on change of the dropdown.</param>
+        /// <param name="options">Options to apply to the dropdown</param>
+        /// <param name="tag">Tag of the dropdown entity.</param>
+        /// <param name="onLoaded">Action to perform when loading is complete.</param>
+        /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
+        private System.Collections.IEnumerator LoadDropdownEntity(Guid id, CanvasEntity parent,
+            Vector2 positionPercent, Vector2 sizePercent, Action<int> onChange, List<string> options,
+            string tag, Action onLoaded)
+        {
+            GameObject dropdownEntityObject = new GameObject("DropdownEntity-" + id.ToString());
+            DropdownEntity entity = dropdownEntityObject.AddComponent<DropdownEntity>();
+            entities.Add(id, entity);
+            entity.Initialize(id, parent);
+            entity.entityTag = tag;
+            if (parent != null)
+            {
+                entity.SetPositionPercent(positionPercent, true);
+                entity.SetSizePercent(sizePercent, true);
+            }
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            entity.SetOnChange(onChange);
+            if (options != null)
+            {
+                foreach (string option in options)
+                {
+                    entity.AddOption(option);
+                }
+            }
 
             yield return null;
         }
@@ -1227,7 +1301,10 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             foreach (BaseEntity entity in entities.Values)
             {
-                entity.Delete();
+                if (entity != null)
+                {
+                    entity.Delete(false);
+                }
             }
             entities.Clear();
         }

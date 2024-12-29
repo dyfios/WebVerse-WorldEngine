@@ -95,6 +95,11 @@ namespace FiveSQD.WebVerse.WorldEngine
         {
             get
             {
+                if (instance == null)
+                {
+                    return null;
+                }
+                
                 return instance.currentWorld;
             }
         }

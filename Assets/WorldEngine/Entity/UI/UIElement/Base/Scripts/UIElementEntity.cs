@@ -244,7 +244,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             Vector2 worldSize = new Vector2(parentRT.sizeDelta.x * targetSize.x, parentRT.sizeDelta.y * targetSize.y);
             Vector3 worldPos = new Vector3(parentRT.sizeDelta.x * targetPosition.x + rt.sizeDelta.x / 2,
                 -1 * parentRT.sizeDelta.y * targetPosition.y - rt.sizeDelta.y / 2);
-Debug.Log("asdf " + gameObject.name + " " + worldSize + " " + worldPos);
+            
             rt.sizeDelta = worldSize;
             rt.anchorMin = rt.anchorMax = new Vector2(0, 1);
             rt.pivot = new Vector2(0.5f, 0.5f);
