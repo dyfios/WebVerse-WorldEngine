@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
+// Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using System;
 using UnityEngine;
@@ -109,7 +109,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         /// <param name="idToSet">ID to apply to the entity.</param>
         /// <param name="parentCanvas">Canvas to place the button entity on.</param>
-        public override void Initialize(Guid idToSet, CanvasEntity parentCanvas)
+        public override void Initialize(Guid idToSet, UIEntity parentCanvas)
         {
             base.Initialize(idToSet, parentCanvas);
 

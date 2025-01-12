@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
+// Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using System;
 using UnityEngine;
@@ -802,11 +802,6 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 return;
             }
 
-            //if (currentVelocity.x == 0 && currentVelocity.y == 0 && currentVelocity.z == 0)
-            //{
-            //    return;
-            //}
-
             if (characterController == null)
             {
                 LogSystem.LogError("[CharacterEntity->Update] No character controller for character entity.");
@@ -835,6 +830,10 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     {
                         stepToRaise = maxStepToRaise;
                     }
+                }
+                else
+                {
+                    stepToRaise = 1;
                 }
             }
         }
