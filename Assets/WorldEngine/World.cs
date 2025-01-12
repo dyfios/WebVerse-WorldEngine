@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
+// Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using FiveSQD.WebVerse.WorldEngine.Camera;
 using FiveSQD.WebVerse.WorldEngine.Entity;
@@ -38,6 +38,22 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             /// Environment sky material.
             /// </summary>
             public Material skyMaterial;
+
+            /// <summary>
+            /// Material to use for the lite procedural sky.
+            /// </summary>
+            [Tooltip("Material to use for the lite procedural sky.")]
+            public Material liteProceduralSkyMaterial;
+
+            /// <summary>
+            /// Environment default sky texture.
+            /// </summary>
+            public Texture2D defaultCloudTexture;
+
+            /// <summary>
+            /// Environment default sky texture.
+            /// </summary>
+            public Texture2D defaultStarTexture;
 
             /// <summary>
             /// Input entity prefab.
@@ -149,6 +165,12 @@ namespace FiveSQD.WebVerse.WorldEngine.World
         /// Name/URI for the world's site.
         /// </summary>
         public string siteName { get; private set; }
+
+        /// <summary>
+        /// GameObject for the lite procedural sky.
+        /// </summary>
+        [Tooltip("GameObject for the lite procedural sky.")]
+        public GameObject liteProceduralSkyObject;
 
         /// <summary>
         /// The GameObject for the mesh manager.
@@ -275,6 +297,10 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             environmentManagerGO.transform.parent = transform;
             environmentManager = environmentManagerGO.AddComponent<EnvironmentManager>();
             environmentManager.skyMaterial = worldInfo.skyMaterial;
+            environmentManager.liteProceduralSkyMaterial = worldInfo.liteProceduralSkyMaterial;
+            environmentManager.liteProceduralSkyObject = liteProceduralSkyObject;
+            environmentManager.defaultCloudTexture = worldInfo.defaultCloudTexture;
+            environmentManager.defaultStarTexture = worldInfo.defaultStarTexture;
             environmentManager.Initialize();
 
 #if USE_DIGGER

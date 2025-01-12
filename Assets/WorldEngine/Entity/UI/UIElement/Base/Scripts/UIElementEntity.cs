@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
+// Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using System;
 using UnityEngine;
@@ -269,7 +269,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Initialize this entity. This should only be called once.
         /// </summary>
         /// <param name="idToSet">ID to apply to the entity.</param>
-        public virtual void Initialize(Guid idToSet, CanvasEntity parentCanvas)
+        public virtual void Initialize(Guid idToSet, UIEntity parentCanvas)
         {
             base.Initialize(idToSet);
         }

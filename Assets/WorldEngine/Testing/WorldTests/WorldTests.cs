@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
+// Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using NUnit.Framework;
 using UnityEngine;
@@ -26,6 +26,9 @@ public class WorldTests
             maxKeyLength = 16,
             maxStorageEntries = 16,
             skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/skybox.mat"),
+            liteProceduralSkyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/WorldEngine/Environment/Materials/LiteProceduralSkybox.mat"),
+            defaultCloudTexture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Environment/Textures/DefaultClouds.png"),
+            defaultStarTexture = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/WorldEngine/Environment/Textures/DefaultStars.png"),
             voxelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/WorldEngine/Entity/Voxel/Prefabs/Voxel.prefab")
         };
         world.Initialize(worldInfo);

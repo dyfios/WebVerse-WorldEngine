@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
+// Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,6 +27,28 @@ namespace FiveSQD.WebVerse.WorldEngine
         /// </summary>
         [Tooltip("Material to use for the environment sky.")]
         public Material skyMaterial;
+
+        /// <summary>
+        /// Material to use for the lite procedural sky.
+        /// </summary>
+        [Tooltip("Material to use for the lite procedural sky.")]
+        public Material liteProceduralSkyMaterial;
+
+        /// <summary>
+        /// GameObject for the lite procedural sky.
+        /// </summary>
+        [Tooltip("GameObject for the lite procedural sky.")]
+        public GameObject liteProceduralSkyObject;
+
+        /// <summary>
+        /// Environment default sky texture.
+        /// </summary>
+        public Texture2D defaultCloudTexture;
+
+        /// <summary>
+        /// Environment default sky texture.
+        /// </summary>
+        public Texture2D defaultStarTexture;
 
         /// <summary>
         /// Prefab for an input entity.
@@ -142,6 +164,9 @@ namespace FiveSQD.WebVerse.WorldEngine
                 highlightMaterial = instance.highlightMaterial,
                 previewMaterial = instance.previewMaterial,
                 skyMaterial = instance.skyMaterial,
+                liteProceduralSkyMaterial = instance.liteProceduralSkyMaterial,
+                defaultCloudTexture = instance.defaultCloudTexture,
+                defaultStarTexture = instance.defaultStarTexture,
                 inputEntityPrefab = instance.inputEntityPrefab,
                 webViewPrefab = instance.webViewPrefab,
                 canvasWebViewPrefab = instance.canvasWebViewPrefab,
@@ -161,6 +186,7 @@ namespace FiveSQD.WebVerse.WorldEngine
             instance.currentWorldGO = new GameObject(worldName);
             instance.currentWorldGO.transform.parent = instance.transform;
             instance.currentWorld = instance.currentWorldGO.AddComponent<World.World>();
+            instance.currentWorld.liteProceduralSkyObject = instance.liteProceduralSkyObject;
             instance.currentWorld.Initialize(wInfo);
 
             instance.queryParams = new Dictionary<string, string>();
@@ -177,16 +203,22 @@ namespace FiveSQD.WebVerse.WorldEngine
         /// </summary>
         public static void UnloadWorld()
         {
+            Utilities.LogSystem.Log("[WorldEngine->UnloadWorld] Unloading World...");
+
             if (instance.currentWorld != null)
             {
                 instance.currentWorld.Unload();
             }
             instance.currentWorld = null;
 
+            Utilities.LogSystem.Log("[WorldEngine->UnloadWorld] World Unloaded. Destroying World Object...");
+
             if (instance.currentWorldGO != null)
             {
                 Destroy(instance.currentWorldGO);
             }
+
+            Utilities.LogSystem.Log("[WorldEngine->UnloadWorld] World Object Destroyed.");
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2024 Five Squared Interactive. All rights reserved.
+// Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using System;
 using System.Collections.Generic;
@@ -424,7 +424,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <param name="tag">Tag to apply to the text entity.</param>
         /// <returns>The ID of the new text entity.</returns>
-        public Guid LoadTextEntity(string text, int fontSize, CanvasEntity parentEntity,
+        public Guid LoadTextEntity(string text, int fontSize, UIEntity parentEntity,
             Vector2 positionPercent, Vector2 sizePercent, Guid? id = null,
             string tag = null, Action onLoaded = null)
         {
@@ -517,7 +517,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="tag">Tag to apply to the image entity.</param>
         /// <param name="onLoaded">Action to perform when loading is complete.</param>
         /// <returns>The ID of the new image entity.</returns>
-        public Guid LoadImageEntity(Texture texture, CanvasEntity parentEntity,
+        public Guid LoadImageEntity(Texture texture, UIEntity parentEntity,
             Vector2 positionPercent, Vector2 sizePercent, Guid? id = null,
             string tag = null, Action onLoaded = null)
         {
@@ -1054,7 +1054,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="tag">Tag of the text entity.</param>
         /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
         private System.Collections.IEnumerator LoadTextEntity(string text, int fontSize,
-            Guid id, CanvasEntity parent, Vector2 positionPercent, Vector2 sizePercent,
+            Guid id, UIEntity parent, Vector2 positionPercent, Vector2 sizePercent,
             string tag, Action onLoaded)
         {
             GameObject textEntityObject = new GameObject("TextEntity-" + id.ToString());
@@ -1202,7 +1202,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <param name="tag">Tag of the text entity.</param>
         /// <returns>Coroutine, completes after invocation of the onLoaded action.</returns>
         private System.Collections.IEnumerator LoadImageEntity(Texture image,
-            Guid id, CanvasEntity parent, Vector2 positionPercent, Vector2 sizePercent,
+            Guid id, UIEntity parent, Vector2 positionPercent, Vector2 sizePercent,
             string tag, Action onLoaded)
         {
             GameObject imageEntityObject = new GameObject("ImageEntity-" + id.ToString());
@@ -1281,6 +1281,24 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
 
             return entities[id];
+        }
+
+        /// <summary>
+        /// Find entity with given tag.
+        /// </summary>
+        /// <param name="tag">Tag of entity to get.</param>
+        /// <returns>Entity with given tag.</returns>
+        public BaseEntity FindEntityByTag(string tag)
+        {
+            foreach (BaseEntity entity in GetAllEntities())
+            {
+                if (entity.entityTag == tag)
+                {
+                    return entity;
+                }
+            }
+
+            return null;
         }
         
         /// <summary>
