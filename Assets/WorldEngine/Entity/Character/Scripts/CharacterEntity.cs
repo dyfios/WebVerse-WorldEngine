@@ -126,8 +126,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Apply motion to the character entity with the given vector.
         /// </summary>
         /// <param name="amount">Amount to move the character entity.</param>
+        /// <param name="synchronize">Whether or not to synchronize the move.</param>
         /// <returns>Whether or not the operation was successful.</returns>
-        public bool Move(Vector3 amount)
+        public bool Move(Vector3 amount, bool synchronize = true)
         {
             if (characterController == null)
             {
@@ -144,6 +145,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             currentVelocity = new Vector3(currentVelocity.x + amount.x, currentVelocity.y + amount.y, currentVelocity.z + amount.z);
             characterController.Move(amount);
 
+            if (synchronizer != null && synchronize == true)
+            {
+
+            }
+
             return true;
         }
 
@@ -152,8 +158,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         /// <param name="amount">Amount to jump the character entity.</param>
         /// <param name="discardIfFalling">Whether or not to discard jump if currently falling.</param>
+        /// <param name="synchronize">Whether or not to synchronize the jump.</param>
         /// <returns>Whether or not the operation was successful.</returns>
-        public bool Jump(float amount, bool discardIfFalling = true)
+        public bool Jump(float amount, bool discardIfFalling = true, bool synchronize = true)
         {
             if (characterController == null)
             {
@@ -170,6 +177,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             if (IsOnSurface() || !discardIfFalling)
             {
                 currentVelocity.y += amount;
+            }
+
+            if (synchronizer != null && synchronize == true)
+            {
+
             }
 
             return true;
@@ -245,7 +257,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 angularVelocity = rigidBody.angularVelocity,
                 stationary = rigidBody.isKinematic,
-                velocity = rigidBody.velocity
+                velocity = rigidBody.linearVelocity
             };
         }
 
@@ -269,9 +281,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             return new EntityPhysicalProperties
             {
-                angularDrag = rigidBody.angularDrag,
+                angularDrag = rigidBody.angularDamping,
                 centerOfMass = rigidBody.centerOfMass,
-                drag = rigidBody.drag,
+                drag = rigidBody.linearDamping,
                 gravitational = gravitational,
                 mass = rigidBody.mass
             };
@@ -362,7 +374,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                     rigidBody.isKinematic = true;
                     rigidBody.useGravity = false;
                     rigidBody.angularVelocity = Vector3.zero;
-                    rigidBody.velocity = Vector3.zero;
+                    rigidBody.linearVelocity = Vector3.zero;
                     return true;
                 }
                 else
@@ -379,7 +391,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             if (motionToSet.Value.velocity != null)
             {
-                rigidBody.velocity = motionToSet.Value.velocity;
+                rigidBody.linearVelocity = motionToSet.Value.velocity;
             }
 
             return true;
@@ -412,7 +424,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             if (epp.Value.angularDrag.HasValue)
             {
-                rigidBody.angularDrag = epp.Value.angularDrag.Value;
+                rigidBody.angularDamping = epp.Value.angularDrag.Value;
             }
 
             if (epp.Value.centerOfMass != null)
@@ -422,7 +434,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             if (epp.Value.drag.HasValue)
             {
-                rigidBody.drag = epp.Value.drag.Value;
+                rigidBody.linearDamping = epp.Value.drag.Value;
             }
 
             if (epp.Value.gravitational.HasValue)
@@ -468,10 +480,23 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         /// <param name="visible">Whether or not to set the entity to visible.</param>
         /// <returns>Whether or not the setting was successful.</returns>
-        public override bool SetVisibility(bool visible)
+        public override bool SetVisibility(bool visible, bool synchronize = true)
         {
             // Use base functionality.
-            return base.SetVisibility(visible);
+            //return base.SetVisibility(visible);
+            if (meshes != null)
+            {
+                foreach (MeshRenderer ms in characterGO.gameObject.GetComponentsInChildren<MeshRenderer>(true))
+                {
+                    ms.enabled = visible;
+                }
+            }
+            //characterGO.gameObject.SetActive(visible);
+            if (synchronizer != null && synchronize == true)
+            {
+                synchronizer.SetVisibility(this, visible);
+            }
+            return true;
         }
 
         /// <summary>
@@ -790,8 +815,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         private float timeWaitedForUpdate = 0;
         private int stepToRaise = 1;
         private int maxStepToRaise = 1024;
-        private void Update()
+        protected override void Update()
         {
+            base.Update();
             timeWaitedForUpdate += Time.deltaTime;
             if (timeWaitedForUpdate >= timeToWaitForUpdate)
             {
@@ -804,7 +830,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             if (characterController == null)
             {
-                LogSystem.LogError("[CharacterEntity->Update] No character controller for character entity.");
+                //LogSystem.LogError("[CharacterEntity->Update] No character controller for character entity.");
                 return;
             }
 

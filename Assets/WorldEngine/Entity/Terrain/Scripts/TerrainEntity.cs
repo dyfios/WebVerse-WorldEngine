@@ -205,11 +205,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Set the visibility state of the entity.
         /// </summary>
         /// <param name="visible">Whether or not to set the entity to visible.</param>
+        /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the setting was successful.</returns>
-        public override bool SetVisibility(bool visible)
+        public override bool SetVisibility(bool visible, bool synchronize = true)
         {
             terrain.drawHeightmap = visible;
-
+            if (synchronizer != null && synchronize == true)
+            {
+                synchronizer.SetVisibility(this, visible);
+            }
             return true;
         }
 
