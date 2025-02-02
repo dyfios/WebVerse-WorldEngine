@@ -105,6 +105,36 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         private Guid id_internal;
 
         /// <summary>
+        /// Interval at which position will be broadcast out of synchronizer. -1 won't publish.
+        /// </summary>
+        private float positionBroadcastInterval;
+
+        /// <summary>
+        /// Interval at which rotation will be broadcast out of synchronizer. -1 won't publish.
+        /// </summary>
+        private float rotationBroadcastInterval;
+
+        /// <summary>
+        /// Last position that was broadcast.
+        /// </summary>
+        private Vector3 lastBroadcastPosition;
+
+        /// <summary>
+        /// Last rotation that was broadcast.
+        /// </summary>
+        private Quaternion lastBroadcastRotation;
+
+        /// <summary>
+        /// Minimum delta for a position update to be broadcast.
+        /// </summary>
+        private float minPositionBroadcastDelta = 0.001f;
+
+        /// <summary>
+        /// Minimum delta for a rotation update to be broadcast.
+        /// </summary>
+        private float minRotationBroadcastDelta = 0.01f;
+
+        /// <summary>
         /// ID of the entity. This is an immutable property. It can only be set once and is intended
         /// to be set by the entity at initialization.
         /// </summary>
@@ -155,11 +185,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Set the visibility state of the entity.
         /// </summary>
         /// <param name="visible">Whether or not to set the entity to visible.</param>
+        /// <param name="synchronize">Whether or not to synchronize the setting.</param>
         /// <returns>Whether or not the setting was successful.</returns>
-        public virtual bool SetVisibility(bool visible)
+        public virtual bool SetVisibility(bool visible, bool synchronize = true)
         {
             gameObject.SetActive(visible);
-            if (synchronizer != null)
+            if (synchronizer != null && synchronize == true)
             {
                 synchronizer.SetVisibility(this, visible);
             }
@@ -316,6 +347,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 synchronizer.SetPosition(this, position);
                 positionUpdateTime = 0;
+                lastBroadcastPosition = position;
             }
             return true;
         }
@@ -357,6 +389,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 synchronizer.SetRotation(this, rotation);
                 rotationUpdateTime = 0;
+                lastBroadcastRotation = rotation;
             }
             return true;
         }
@@ -551,6 +584,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             id = idToSet;
             synchronizer = null;
 
+            positionBroadcastInterval = -1;
+            rotationBroadcastInterval = -1;
+
             // TODO event.
         }
 
@@ -724,6 +760,64 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Enable broadcasting of position via synchronizer.
+        /// </summary>
+        /// <param name="interval">Interval at which to broadcast, <= 0 to not broadcast.</param>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public virtual bool EnablePositionBroadcast(float interval)
+        {
+            if (interval <= 0)
+            {
+                positionBroadcastInterval = -1;
+            }
+            else
+            {
+                positionBroadcastInterval = interval;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Disable broadcasting of position via synchronizer.
+        /// </summary>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public virtual bool DisablePositionBroadcast()
+        {
+            positionBroadcastInterval = -1;
+            return true;
+        }
+
+        /// <summary>
+        /// Enable broadcasting of rotation via synchronizer.
+        /// </summary>
+        /// <param name="interval">Interval at which to broadcast, <= 0 to not broadcast.</param>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public virtual bool EnableRotationBroadcast(float interval)
+        {
+            if (interval <= 0)
+            {
+                rotationBroadcastInterval = -1;
+            }
+            else
+            {
+                rotationBroadcastInterval = interval;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Disable broadcasting of rotation via synchronizer.
+        /// </summary>
+        /// <returns>Whether or not the operation was successful.</returns>
+        public virtual bool DisableRotationBroadcast()
+        {
+            rotationBroadcastInterval = -1;
+            return true;
+        }
+
+        /// <summary>
         /// Get Animations for this entity.
         /// </summary>
         /// <returns>Animations for this entity.</returns>
@@ -748,7 +842,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <summary>
         /// Unity update method.
         /// </summary>
-        private void Update()
+        protected virtual void Update()
         {
             float time = Time.deltaTime;
             if (synchronizer != null)
@@ -757,6 +851,28 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 rotationUpdateTime += time;
                 scaleUpdateTime += time;
                 sizeUpdateTime += time;
+                
+                if (positionUpdateTime > positionBroadcastInterval)
+                {
+                    Vector3 currentPos = GetPosition(false);
+                    if (Math.Abs(Vector3.Distance(currentPos, lastBroadcastPosition)) > minPositionBroadcastDelta)
+                    {
+                        synchronizer.SetPosition(this, currentPos);
+                        lastBroadcastPosition = currentPos;
+                    }
+                    positionUpdateTime = 0;
+                }
+
+                if (rotationUpdateTime > rotationBroadcastInterval)
+                {
+                    Quaternion currentRot = GetRotation(false);
+                    if (Math.Abs(Quaternion.Angle(currentRot, lastBroadcastRotation)) > minRotationBroadcastDelta)
+                    {
+                        synchronizer.SetRotation(this, currentRot);
+                        lastBroadcastRotation = currentRot;
+                    }
+                    rotationUpdateTime = 0;
+                }
             }
         }
     }
