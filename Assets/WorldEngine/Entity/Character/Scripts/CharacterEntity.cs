@@ -73,6 +73,18 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         public bool fixHeight = true;
 
         /// <summary>
+        /// Minimum height to allow character entity to be at.
+        /// </summary>
+        [Tooltip("Minimum height to allow character entity to be at.")]
+        public float minHeight = -8192;
+
+        /// <summary>
+        /// Maximum height to allow character entity to be at.
+        /// </summary>
+        [Tooltip("Maximum height to allow character entity to be at.")]
+        public float maxHeight = 8192;
+
+        /// <summary>
         /// Character model GameObject.
         /// </summary>
         private GameObject characterGO;
@@ -860,6 +872,18 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 else
                 {
                     stepToRaise = 1;
+                }
+
+                if (characterController.transform.position.y < minHeight)
+                {UnityEngine.Debug.Log("1");
+                    characterController.transform.position = new Vector3(characterController.transform.position.x,
+                        maxHeight - 1, characterController.transform.position.z);
+                }
+
+                if (characterController.transform.position.y > maxHeight)
+                {UnityEngine.Debug.Log("2");
+                    characterController.transform.position = new Vector3(characterController.transform.position.x,
+                        minHeight + 1, characterController.transform.position.z);
                 }
             }
         }
