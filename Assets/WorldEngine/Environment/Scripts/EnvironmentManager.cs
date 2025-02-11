@@ -413,7 +413,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Environment
             liteProceduralSkyMaterial.SetInt("_Clouds_Enabled", cloudsEnabled == true ? 1 : 0);
             liteProceduralSkyMaterial.SetTexture("_CloudTexture", cloudsTexture == null ? defaultCloudTexture : cloudsTexture);
             liteProceduralSkyMaterial.SetVector("_CloudScale", new Vector4(cloudsScale.x, cloudsScale.y, 0, 0));
-            liteProceduralSkyMaterial.SetVector("_CloudWindSpeed", new Vector4(cloudsSpeed.x, cloudsSpeed.y, 0, 0));UnityEngine.Debug.Log(liteProceduralSkyMaterial.GetVector("_CloudWindSpeed"));
+            liteProceduralSkyMaterial.SetVector("_CloudWindSpeed", new Vector4(cloudsSpeed.x, cloudsSpeed.y, 0, 0));
             liteProceduralSkyMaterial.SetFloat("_Cloudiness", cloudiness);
             liteProceduralSkyMaterial.SetFloat("_CloudOpacity", cloudsOpacity);
             liteProceduralSkyMaterial.SetFloat("_CloudSharpness", cloudsSharpness);
