@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
+using UnityEngine.Audio;
 
 namespace FiveSQD.WebVerse.WorldEngine.Entity
 {
@@ -13,6 +14,24 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
     /// </summary>
     public class EntityManager : BaseManager
     {
+        /// <summary>
+        /// Enumeration for an automobile entity type.
+        /// </summary>
+        [Tooltip("Enumeration for an automobile entity type.")]
+        public enum AutomobileEntityType { Default = 0 };
+
+        /// <summary>
+        /// Map for automobile entity types to their NWH State Settings object.
+        /// </summary>
+        [Tooltip("Map for automobile entity types to their NWH State Settings object.")]
+        public Dictionary<AutomobileEntityType, NWH.VehiclePhysics2.StateSettings> automobileEntityTypeMap;
+
+        /// <summary>
+        /// Audio mixer for automobile.
+        /// </summary>
+        [Tooltip("Audio mixer for automobile.")]
+        public AudioMixer automobileAudioMixer;
+
         /// <summary>
         /// Prefab for a character controller.
         /// </summary>
@@ -60,6 +79,12 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// </summary>
         [Tooltip("Prefab for a water blocker.")]
         public GameObject waterBlockerPrefab;
+
+        /// <summary>
+        /// Prefab for an airplane entity.
+        /// </summary>
+        [Tooltip("Prefab for an airplane entity.")]
+        public GameObject airplaneEntityPrefab;
 
         /// <summary>
         /// Dictionary of loaded entities.
@@ -334,6 +359,25 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         {
             Guid entityID = id.HasValue ? id.Value : GetEntityID();
             StartCoroutine(LoadAudioEntity(entityID, parentEntity, position, rotation, tag, onLoaded));
+            return entityID;
+        }
+
+        public Guid LoadAutomobileEntity(BaseEntity parentEntity, Vector3 position, Quaternion rotation,
+            GameObject meshPrefab, Dictionary<string, float> wheels, float mass,
+            AutomobileEntityType type, Guid? id = null, string tag = null, Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadAutomobileEntity(entityID, parentEntity, meshPrefab, position, rotation,
+                tag, wheels, mass, type, onLoaded));
+            return entityID;
+        }
+
+        public Guid LoadAirplaneEntity(BaseEntity parentEntity, Vector3 position, Quaternion rotation,
+            GameObject meshPrefab, float mass, Guid? id = null, string tag = null, Action onLoaded = null)
+        {
+            Guid entityID = id.HasValue ? id.Value : GetEntityID();
+            StartCoroutine(LoadAirplaneEntity(entityID, parentEntity, meshPrefab, position, rotation,
+                tag, mass, onLoaded));
             return entityID;
         }
 
@@ -921,6 +965,66 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             yield return null;
         }
 
+        private System.Collections.IEnumerator LoadAutomobileEntity(Guid id, BaseEntity parent,
+            GameObject meshPrefab, Vector3 position, Quaternion rotation, string tag,
+            Dictionary<string, float> wheels, float mass, AutomobileEntityType type, Action onLoaded)
+        {
+            GameObject automobileGO = Instantiate(meshPrefab);
+            automobileGO.name = "AutomobileEntity-" + id.ToString();
+            AutomobileEntity entity = automobileGO.AddComponent<AutomobileEntity>();
+            entities.Add(id, entity);
+            entity.SetParent(parent);
+            entity.entityTag = tag;
+            entity.SetPosition(position, true);
+            entity.SetRotation(rotation, true);
+
+            Dictionary<GameObject, float> convertedWheels = new Dictionary<GameObject, float>();
+            foreach (KeyValuePair<string, float> wheel in wheels)
+            {
+                GameObject wheelSubMesh = FindChildObjectByName(automobileGO, wheel.Key);
+                if (wheelSubMesh == null)
+                {
+                    LogSystem.LogWarning("[EntityManager->LoadAutomobileEntity] Unable to find wheel submesh "
+                        + wheel.Key);
+                }
+                else
+                {
+                    convertedWheels.Add(wheelSubMesh, wheel.Value);
+                }
+            }
+
+            entity.Initialize(id, convertedWheels, mass, type);
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
+        private System.Collections.IEnumerator LoadAirplaneEntity(Guid id, BaseEntity parent,
+            GameObject meshPrefab, Vector3 position, Quaternion rotation, string tag, float mass, Action onLoaded)
+        {
+            GameObject airplaneMeshGO = Instantiate(meshPrefab);
+            GameObject airplaneGO = Instantiate(airplaneEntityPrefab);
+            airplaneGO.name = "AirplaneEntity-" + id.ToString();
+            AirplaneEntity entity = airplaneGO.AddComponent<AirplaneEntity>();
+            entities.Add(id, entity);
+            entity.SetParent(parent);
+            entity.entityTag = tag;
+            entity.SetPosition(position, true);
+            entity.SetRotation(rotation, true);
+            entity.Initialize(id, airplaneMeshGO, mass);
+
+            if (onLoaded != null)
+            {
+                onLoaded.Invoke();
+            }
+
+            yield return null;
+        }
+
         /// <summary>
         /// Loads a canvas entity.
         /// </summary>
@@ -1325,6 +1429,19 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 }
             }
             entities.Clear();
+        }
+
+        private GameObject FindChildObjectByName(GameObject parentObject, string childName)
+        {
+            Transform[] transforms = parentObject.GetComponentsInChildren<Transform>();
+            foreach (Transform t in transforms)
+            {
+                if (t.name == childName)
+                {
+                    return t.gameObject;
+                }
+            }
+            return null;
         }
     }
 }

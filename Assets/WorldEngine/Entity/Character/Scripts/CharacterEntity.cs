@@ -875,13 +875,13 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 }
 
                 if (characterController.transform.position.y < minHeight)
-                {UnityEngine.Debug.Log("1");
+                {
                     characterController.transform.position = new Vector3(characterController.transform.position.x,
                         maxHeight - 1, characterController.transform.position.z);
                 }
 
                 if (characterController.transform.position.y > maxHeight)
-                {UnityEngine.Debug.Log("2");
+                {
                     characterController.transform.position = new Vector3(characterController.transform.position.x,
                         minHeight + 1, characterController.transform.position.z);
                 }
