@@ -1417,6 +1417,28 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         }
 
         /// <summary>
+        /// Get all top-level entities.
+        /// </summary>
+        /// <returns>Array of all top level entities.</returns>
+        public BaseEntity[] GetAllTopLevelEntities()
+        {
+            List<BaseEntity> topLevelEntities = new List<BaseEntity>();
+            foreach (BaseEntity entity in entities.Values)
+            {
+                if (entity == null)
+                {
+                    continue;
+                }
+
+                if (entity.GetParent() == null)
+                {
+                    topLevelEntities.Add(entity);
+                }
+            }
+            return topLevelEntities.ToArray();
+        }
+
+        /// <summary>
         /// Unload all entities.
         /// </summary>
         public void Unload()

@@ -366,7 +366,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Environment
                 Destroy(setStarRotationToRemove);
             }
 
+            Light light = sunObject.GetComponent<Light>();
+            if (light == null)
+            {
+                Debug.LogWarning("[EnvironmentManager->CreateDayNightSky] Invalid sun object.");
+                return false;
+            }
+
             Sun sun = sunObject.AddComponent<Sun>();
+            sun.MaximumLightIntensity = light.intensity;
 
             SetStarRotation setStarRotation = sunObject.AddComponent<SetStarRotation>();
 
@@ -670,7 +678,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Environment
                 Destroy(setStarRotationToRemove);
             }
 
+            Light light = sunObject.GetComponent<Light>();
+            if (light == null)
+            {
+                Debug.LogWarning("[EnvironmentManager->CreateDayNightSky] Invalid sun object.");
+                return false;
+            }
+
             Sun sun = sunObject.AddComponent<Sun>();
+            sun.MaximumLightIntensity = light.intensity;
 
             SetStarRotation setStarRotation = sunObject.AddComponent<SetStarRotation>();
 

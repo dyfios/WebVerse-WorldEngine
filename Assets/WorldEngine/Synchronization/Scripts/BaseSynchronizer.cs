@@ -2,6 +2,7 @@
 
 using UnityEngine;
 using FiveSQD.WebVerse.WorldEngine.Entity;
+using System.Collections.Generic;
 
 namespace FiveSQD.WebVerse.WorldEngine.Synchronization
 {
@@ -37,10 +38,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Synchronization
         /// <param name="modelOffset">Offset for a model.</param>
         /// <param name="modelRotation">Rotation for a model.</param>
         /// <param name="labelOffset">Offset for a label.</param>
+        /// <param name="mass">Mass for an airplane/automobile entity.</param>
+        /// <param name="type">Type of the entity.</param>
+        /// <param name="wheels">Wheels for an automobile entity.</param>
+        /// <param name="menuOptions">Options for a menu.</param>
         /// <returns><see cref="StatusCode"/>StatusCode</returns>
         public virtual StatusCode AddSynchronizedEntity(BaseEntity entityToSynchronize, bool deleteWithClient,
             string filePath = null, string[] resources = null, Vector3? modelOffset = null, Quaternion? modelRotation = null,
-            Vector3? labelOffset = null)
+            Vector3? labelOffset = null, float? mass = null, string type = null, Dictionary<string, float> wheels = null,
+            string[] menuOptions = null)
         {
             return StatusCode.UNSUPPORTED;
         }

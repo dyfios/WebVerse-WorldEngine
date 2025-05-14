@@ -112,6 +112,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             if (parentCanvas != null)
             {
                 SetParent(parentCanvas);
+                ((CanvasEntity) parentCanvas).canvasObject.sortingOrder = -1;
             }
 
             MakeHidden();

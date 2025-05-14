@@ -536,7 +536,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
             else
             {
-                previewObject.transform.position = position;
+                Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
+                previewObject.transform.position = new Vector3(position.x + worldOffset.x,
+                    position.y + worldOffset.y, position.z + worldOffset.z);
             }
             base.SetPreviewPosition(position, local);
         }
@@ -869,7 +871,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             highlightCube.transform.SetParent(transform);
             highlightCube.transform.localPosition = Vector3.zero;
             highlightCube.transform.localRotation = Quaternion.identity;
-            highlightCube.transform.localScale = Vector3.one;
+            highlightCube.transform.localScale = new Vector3(1.01f, 1.01f, 1.01f);
             highlightCube.SetActive(false);
         }
 

@@ -122,6 +122,11 @@ namespace FiveSQD.WebVerse.WorldEngine
         public GameObject airplaneEntityPrefab;
 
         /// <summary>
+        /// Crosshair.
+        /// </summary>
+        public GameObject crosshair;
+
+        /// <summary>
         /// The active world loaded by the world engine.
         /// </summary>
         public static World.World ActiveWorld
@@ -200,6 +205,7 @@ namespace FiveSQD.WebVerse.WorldEngine
             instance.currentWorldGO.transform.parent = instance.transform;
             instance.currentWorld = instance.currentWorldGO.AddComponent<World.World>();
             instance.currentWorld.liteProceduralSkyObject = instance.liteProceduralSkyObject;
+            instance.currentWorld.crosshair = instance.crosshair;
             instance.currentWorld.Initialize(wInfo);
 
             instance.queryParams = new Dictionary<string, string>();

@@ -785,7 +785,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             highlightCube.transform.SetParent(transform);
             highlightCube.transform.localPosition = Vector3.zero;
             highlightCube.transform.localRotation = Quaternion.identity;
-            highlightCube.transform.localScale = Vector3.one;
+            highlightCube.transform.localScale = new Vector3(1.01f, 1.01f, 1.01f);
             highlightCube.SetActive(false);
         }
 

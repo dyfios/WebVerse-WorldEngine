@@ -22,7 +22,8 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <summary>
         /// Box colliders used by the entity.
         /// </summary>
-        private BoxCollider boxCollider;
+        private MeshCollider meshCollider;
+        //private BoxCollider boxCollider;
 
         /// <summary>
         /// Rigidbody used by the water body.
@@ -434,7 +435,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             SetUpPreviewObject();
 
-            BoxCollider boxCollider = null;
+            /*BoxCollider boxCollider = null;
             foreach (BoxCollider bc in gameObject.GetComponentsInChildren<BoxCollider>())
             {
                 if (bc.tag == TagManager.physicsColliderTag)
@@ -449,7 +450,13 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 boxCollider = gameObject.AddComponent<BoxCollider>();
             }
 
-            SetCollider(boxCollider);
+            SetCollider(boxCollider);*/
+
+            meshCollider = GetComponentInChildren<MeshCollider>();
+            if (meshCollider == null)
+            {
+                LogSystem.LogError("[WaterBodyEntity->Initialize] Unable to find mesh collider.");
+            }
 
             MakeHidden();
             SetUpHighlightVolume();
@@ -476,7 +483,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
             else
             {
-                previewObject.transform.position = position;
+                Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
+                previewObject.transform.position = new Vector3(position.x + worldOffset.x,
+                    position.y + worldOffset.y, position.z + worldOffset.z);;
             }
             base.SetPreviewPosition(position, local);
         }
@@ -543,7 +552,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             {
                 LogSystem.LogWarning("[WaterBodyEntity->SetColliders] No box collider.");
             }
-            boxCollider = bc;
+            //boxCollider = bc;
         }
 
         /// <summary>
@@ -584,7 +593,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
 
             rigidBody.isKinematic = true;
 
-            boxCollider.enabled = false;
+            meshCollider.enabled = false;
             gameObject.SetActive(false);
             interactionState = InteractionState.Hidden;
         }
@@ -617,7 +626,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             gameObject.SetActive(true);
             rigidBody.isKinematic = true;
 
-            boxCollider.enabled = true;
+            meshCollider.enabled = true;
             interactionState = InteractionState.Static;
         }
 
@@ -649,7 +658,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             gameObject.SetActive(true);
             rigidBody.isKinematic = false;
 
-            boxCollider.enabled = true;
+            meshCollider.enabled = true;
             interactionState = InteractionState.Physical;
         }
 
@@ -680,7 +689,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             gameObject.SetActive(true);
             rigidBody.isKinematic = true;
 
-            boxCollider.enabled = true;
+            meshCollider.enabled = true;
             interactionState = InteractionState.Placing;
         }
 
@@ -740,7 +749,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             highlightCube.transform.SetParent(transform);
             highlightCube.transform.localPosition = Vector3.zero;
             highlightCube.transform.localRotation = Quaternion.identity;
-            highlightCube.transform.localScale = Vector3.one;
+            highlightCube.transform.localScale = new Vector3(1.01f, 1.01f, 1.01f);
             highlightCube.SetActive(false);
         }
 

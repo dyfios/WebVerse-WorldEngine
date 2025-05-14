@@ -108,7 +108,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
             else
             {
-                transform.position = position;
+                Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
+                transform.position = new Vector3(position.x + worldOffset.x,
+                    position.y + worldOffset.y, position.z + worldOffset.z);;
             }
 
             if (synchronize && synchronizer != null && positionUpdateTime > minUpdateTime)
@@ -168,7 +170,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>The position of the entity.</returns>
         public override Vector3 GetPosition(bool local)
         {
-            return local ? transform.localPosition : transform.position;
+            Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
+            return local ? transform.localPosition : new Vector3(transform.position.x - worldOffset.x,
+                    transform.position.y - worldOffset.y, transform.position.z - worldOffset.z);;
         }
 
         /// <summary>
