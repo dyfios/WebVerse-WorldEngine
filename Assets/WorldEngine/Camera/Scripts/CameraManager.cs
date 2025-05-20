@@ -35,6 +35,18 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
         [Tooltip("Default parent for the camera (i.e. when null is provided).")]
         public GameObject defaultCameraParent { get; private set; }
 
+        public bool crosshairEnabled
+        {
+            get
+            {
+                return WorldEngine.ActiveWorld.crosshair.activeSelf;
+            }
+            set
+            {
+                WorldEngine.ActiveWorld.crosshair.SetActive(value);
+            }
+        }
+
         /// <summary>
         /// Entities that will follow the camera's rotation.
         /// </summary>
@@ -53,6 +65,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
             this.vr = vr;
             this.defaultCameraParent = defaultCameraParent;
             followers = new List<BaseEntity>();
+            this.crosshairEnabled = false;
         }
 
         /// <summary>
@@ -165,13 +178,16 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
             }
             else
             {
+                Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
                 if (vr)
                 {
-                    cameraOffset.transform.position = position;
+                    cameraOffset.transform.position = new Vector3(position.x + worldOffset.x,
+                        position.y + worldOffset.y, position.z + worldOffset.z);
                 }
                 else
                 {
-                    cam.transform.position = position;
+                    cam.transform.position = new Vector3(position.x + worldOffset.x,
+                        position.y + worldOffset.y, position.z + worldOffset.z);
                 }
             }
         }
@@ -196,13 +212,17 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
             }
             else
             {
+                Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
                 if (vr)
                 {
-                    return cameraOffset.transform.position;
+                    return new Vector3(cameraOffset.transform.position.x - worldOffset.x,
+                        cameraOffset.transform.position.y - worldOffset.y,
+                        cameraOffset.transform.position.z - worldOffset.z);
                 }
                 else
                 {
-                    return cam.transform.position;
+                    return new Vector3(cam.transform.position.x - worldOffset.x,
+                        cam.transform.position.y - worldOffset.y, cam.transform.position.z - worldOffset.z);
                 }
             }
         }
@@ -399,11 +419,13 @@ namespace FiveSQD.WebVerse.WorldEngine.Camera
             {
                 foreach (BaseEntity follower in followers)
                 {
+                    Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
                     //Vector3 cameraEulerAngles = new Vector3(cam.transform.eulerAngles.x, cam.transform.eulerAngles.y + 90, cam.transform.eulerAngles.z);
                     follower.SetRotation(cam.transform.rotation, false);
                     Vector3 cameraEulerAngles = new Vector3(cam.transform.localEulerAngles.x, cam.transform.localEulerAngles.y, cam.transform.localEulerAngles.z);
                     follower.SetEulerRotation(cameraEulerAngles, true, false);
-                    follower.SetPosition(cam.transform.position, false);
+                    follower.SetPosition(new Vector3(cam.transform.position.x - worldOffset.x, cam.transform.position.y - worldOffset.y, cam.transform.position.z - worldOffset.z),
+                        false);
                 }
             }
         }

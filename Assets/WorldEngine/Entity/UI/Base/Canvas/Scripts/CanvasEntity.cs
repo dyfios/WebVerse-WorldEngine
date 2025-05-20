@@ -62,7 +62,9 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             }
             else
             {
-                transform.position = position;
+                Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
+                transform.position = new Vector3(position.x + worldOffset.x,
+                    position.y + worldOffset.y, position.z + worldOffset.z);;
             }
 
             if (synchronize && synchronizer != null && positionUpdateTime > minUpdateTime)

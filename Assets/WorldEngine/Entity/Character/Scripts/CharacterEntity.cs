@@ -819,7 +819,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             highlightCube.transform.SetParent(transform);
             highlightCube.transform.localPosition = Vector3.zero;
             highlightCube.transform.localRotation = Quaternion.identity;
-            highlightCube.transform.localScale = Vector3.one;
+            highlightCube.transform.localScale = new Vector3(1.01f, 1.01f, 1.01f);
             highlightCube.SetActive(false);
         }
 
@@ -875,13 +875,13 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 }
 
                 if (characterController.transform.position.y < minHeight)
-                {UnityEngine.Debug.Log("1");
+                {
                     characterController.transform.position = new Vector3(characterController.transform.position.x,
                         maxHeight - 1, characterController.transform.position.z);
                 }
 
                 if (characterController.transform.position.y > maxHeight)
-                {UnityEngine.Debug.Log("2");
+                {
                     characterController.transform.position = new Vector3(characterController.transform.position.x,
                         minHeight + 1, characterController.transform.position.z);
                 }

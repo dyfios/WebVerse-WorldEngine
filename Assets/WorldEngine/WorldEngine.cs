@@ -111,6 +111,22 @@ namespace FiveSQD.WebVerse.WorldEngine
         public bool vr;
 
         /// <summary>
+        /// Map for automobile entity types to their NWH State Settings object.
+        /// </summary>
+        public Dictionary<Entity.EntityManager.AutomobileEntityType,
+            NWH.VehiclePhysics2.StateSettings> automobileEntityTypeMap;
+
+        /// <summary>
+        /// Prefab for an airplane entity.
+        /// </summary>
+        public GameObject airplaneEntityPrefab;
+
+        /// <summary>
+        /// Crosshair.
+        /// </summary>
+        public GameObject crosshair;
+
+        /// <summary>
         /// The active world loaded by the world engine.
         /// </summary>
         public static World.World ActiveWorld
@@ -161,6 +177,8 @@ namespace FiveSQD.WebVerse.WorldEngine
 
             World.World.WorldInfo wInfo = new World.World.WorldInfo()
             {
+                automobileEntityTypeMap = instance.automobileEntityTypeMap,
+                airplaneEntityPrefab = instance.airplaneEntityPrefab,
                 highlightMaterial = instance.highlightMaterial,
                 previewMaterial = instance.previewMaterial,
                 skyMaterial = instance.skyMaterial,
@@ -187,6 +205,7 @@ namespace FiveSQD.WebVerse.WorldEngine
             instance.currentWorldGO.transform.parent = instance.transform;
             instance.currentWorld = instance.currentWorldGO.AddComponent<World.World>();
             instance.currentWorld.liteProceduralSkyObject = instance.liteProceduralSkyObject;
+            instance.currentWorld.crosshair = instance.crosshair;
             instance.currentWorld.Initialize(wInfo);
 
             instance.queryParams = new Dictionary<string, string>();

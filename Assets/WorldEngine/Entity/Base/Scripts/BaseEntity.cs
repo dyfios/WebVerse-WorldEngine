@@ -285,6 +285,11 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>The parent of the entity, or null if none.</returns>
         public BaseEntity GetParent()
         {
+            if (transform == null)
+            {
+                return null;
+            }
+
             if (transform.parent == null) // TODO.
             {
                 return null;
@@ -335,13 +340,15 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
                 return false;
             }
 
-            if (local)
+            if (local && GetParent() != null)
             {
                 transform.localPosition = position;
             }
             else
             {
-                transform.position = position;
+                Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
+                transform.position = new Vector3(position.x + worldOffset.x,
+                    position.y + worldOffset.y, position.z + worldOffset.z);
             }
             if (synchronize && synchronizer != null && positionUpdateTime > minUpdateTime)
             {
@@ -359,7 +366,10 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// <returns>The position of the entity.</returns>
         public virtual Vector3 GetPosition(bool local)
         {
-            return local ? transform.localPosition : transform.position;
+            Vector3 worldOffset = WorldEngine.ActiveWorld.worldOffset;
+            Vector3 pos = transform.position;
+            return local ? transform.localPosition :
+                new Vector3(pos.x - worldOffset.x, pos.y - worldOffset.y, pos.z - worldOffset.z);
         }
 
         /// <summary>
@@ -429,10 +439,20 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
         /// Get the rotation of the entity.
         /// </summary>
         /// <param name="local">Whether or not to provide the local rotation.</param>
-        /// <returns>The rotation of the entity.</returns>
-        public Quaternion GetRotation(bool local)
+        /// <returns>The Euler rotation of the entity.</returns>
+        public virtual Quaternion GetRotation(bool local)
         {
             return local ? transform.localRotation : transform.rotation;
+        }
+
+        /// <summary>
+        /// Get the Euler rotation of the entity.
+        /// </summary>
+        /// <param name="local">Whether or not to provide the local rotation.</param>
+        /// <returns>The rotation of the entity.</returns>
+        public Vector3 GetEulerRotation(bool local)
+        {
+            return local ? transform.localEulerAngles : transform.eulerAngles;
         }
 
         /// <summary>

@@ -126,7 +126,7 @@ Material:
     - _Metallic: 0
     - _MoonAngularDiameter: 2
     - _MoonFalloff: 60
-    - _Moon_Enabled: 1
+    - _Moon_Enabled: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _ProceduralStarsEnabled: 1

@@ -6,6 +6,7 @@ using FiveSQD.WebVerse.WorldEngine.Materials;
 using FiveSQD.WebVerse.WorldEngine.WorldStorage;
 using FiveSQD.WebVerse.WorldEngine.Utilities;
 using FiveSQD.WebVerse.WorldEngine.Environment;
+using System.Collections.Generic;
 using UnityEngine;
 #if USE_DIGGER
 using Digger.Modules.Core.Sources;
@@ -24,6 +25,17 @@ namespace FiveSQD.WebVerse.WorldEngine.World
         /// </summary>
         public class WorldInfo
         {
+            /// <summary>
+            /// Map for automobile entity types to their NWH State Settings object.
+            /// </summary>
+            public Dictionary<EntityManager.AutomobileEntityType,
+                NWH.VehiclePhysics2.StateSettings> automobileEntityTypeMap;
+
+            /// <summary>
+            /// Prefab for an airplane entity.
+            /// </summary>
+            public GameObject airplaneEntityPrefab;
+
             /// <summary>
             /// Entity highlight material.
             /// </summary>
@@ -173,6 +185,45 @@ namespace FiveSQD.WebVerse.WorldEngine.World
         public GameObject liteProceduralSkyObject;
 
         /// <summary>
+        /// Crosshair.
+        /// </summary>
+        [Tooltip("Crosshair.")]
+        public GameObject crosshair;
+
+        /// <summary>
+        /// Offset for the world.
+        /// </summary>
+        [Tooltip("Offset for the world.")]
+        public Vector3 worldOffset
+        {
+            get
+            {
+                return _worldOffset;
+            }
+            set
+            {
+                List<Vector3> topLevelEntityPositions = new List<Vector3>();
+                foreach (BaseEntity entity in entityManager.GetAllTopLevelEntities())
+                {
+                    topLevelEntityPositions.Add(entity.GetPosition(false));
+                }
+
+                Vector3 offsetDelta = new Vector3(value.x - worldOffset.x,
+                    value.y - worldOffset.y, value.z - worldOffset.z);
+                
+                _worldOffset = value;
+
+                int idx = 0;
+                foreach (BaseEntity entity in entityManager.GetAllTopLevelEntities())
+                {
+                    entity.SetPosition(topLevelEntityPositions[idx++], false, false);
+                }
+            }
+        }
+
+        private Vector3 _worldOffset;
+
+        /// <summary>
         /// The GameObject for the mesh manager.
         /// </summary>
         private GameObject meshManagerGO;
@@ -249,6 +300,8 @@ namespace FiveSQD.WebVerse.WorldEngine.World
             entityManagerGO.transform.parent = transform;
             entityManager = entityManagerGO.AddComponent<EntityManager>();
             entityManager.Initialize();
+            entityManager.automobileEntityTypeMap = worldInfo.automobileEntityTypeMap;
+            entityManager.airplaneEntityPrefab = worldInfo.airplaneEntityPrefab;
             entityManager.inputEntityPrefab = worldInfo.inputEntityPrefab;
             entityManager.webViewPrefab = worldInfo.webViewPrefab;
             entityManager.canvasWebViewPrefab = worldInfo.canvasWebViewPrefab;
