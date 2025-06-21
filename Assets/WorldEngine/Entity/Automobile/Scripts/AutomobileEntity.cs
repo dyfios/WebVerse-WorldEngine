@@ -777,6 +777,7 @@ namespace FiveSQD.WebVerse.WorldEngine.Entity
             rbody.isKinematic = false;
             foreach (MeshCollider meshCollider in meshColliders)
             {
+                if (meshCollider == null) continue;
                 meshCollider.enabled = true;
             }
             interactionState = InteractionState.Physical;
