@@ -1,11 +1,11 @@
 // Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using UnityEngine;
-using FiveSQD.StraightFour.WorldEngine.Utilities;
+using FiveSQD.StraightFour.Utilities;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
-namespace FiveSQD.StraightFour.WorldEngine.Entity
+namespace FiveSQD.StraightFour.Entity
 {
     /// <summary>
     /// Class for a canvas entity.

@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FiveSQD.StraightFour.WorldEngine
+namespace FiveSQD.StraightFour
 {
     /// <summary>
     /// Class for the World Engine.

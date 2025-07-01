@@ -3,7 +3,7 @@
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using FiveSQD.StraightFour.WorldEngine.World;
+using FiveSQD.StraightFour.World;
 using UnityEditor;
 using System.Collections;
 

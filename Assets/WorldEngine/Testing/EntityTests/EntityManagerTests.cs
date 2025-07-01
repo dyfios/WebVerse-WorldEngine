@@ -4,12 +4,12 @@ using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using FiveSQD.StraightFour.WorldEngine.Entity;
+using FiveSQD.StraightFour.Entity;
 using System;
-using FiveSQD.StraightFour.WorldEngine;
+using FiveSQD.StraightFour;
 using UnityEditor;
 using System.Collections.Generic;
-using FiveSQD.StraightFour.WorldEngine.Entity.Terrain;
+using FiveSQD.StraightFour.Entity.Terrain;
 
 public class EntityManagerTests
 {

@@ -10,11 +10,11 @@ using Digger.Modules.Core.Sources;
 using Digger.Modules.Core.Sources.Operations;
 using Digger.Modules.Core.Sources.TerrainInterface;
 #endif
-using FiveSQD.StraightFour.WorldEngine.Entity.Terrain;
-using FiveSQD.StraightFour.WorldEngine.Utilities;
-using FiveSQD.StraightFour.WorldEngine.Materials;
+using FiveSQD.StraightFour.Entity.Terrain;
+using FiveSQD.StraightFour.Utilities;
+using FiveSQD.StraightFour.Materials;
 
-namespace FiveSQD.StraightFour.WorldEngine.Entity
+namespace FiveSQD.StraightFour.Entity
 {
     /// <summary>
     /// Class for a hybrid terrain entity.

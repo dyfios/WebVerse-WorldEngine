@@ -7,11 +7,11 @@ using NWH.VehiclePhysics2.Damage;
 using NWH.VehiclePhysics2.Modules.FlipOver;
 using NWH.WheelController3D;
 using UnityEngine;
-using FiveSQD.StraightFour.WorldEngine.Utilities;
-using FiveSQD.StraightFour.WorldEngine.Tags;
-using FiveSQD.StraightFour.WorldEngine.Materials;
+using FiveSQD.StraightFour.Utilities;
+using FiveSQD.StraightFour.Tags;
+using FiveSQD.StraightFour.Materials;
 
-namespace FiveSQD.StraightFour.WorldEngine.Entity
+namespace FiveSQD.StraightFour.Entity
 {
     /// <summary>
     /// Class for an automobile entity.

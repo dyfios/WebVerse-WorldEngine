@@ -2,9 +2,9 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using FiveSQD.StraightFour.WorldEngine.Utilities;
+using FiveSQD.StraightFour.Utilities;
 
-namespace FiveSQD.StraightFour.WorldEngine.Entity.Voxels
+namespace FiveSQD.StraightFour.Entity.Voxels
 {
     /// <summary>
     /// Class for a voxel chunk.

@@ -3,12 +3,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using FiveSQD.StraightFour.WorldEngine.Utilities;
-using FiveSQD.StraightFour.WorldEngine.Tags;
-using FiveSQD.StraightFour.WorldEngine.Materials;
+using FiveSQD.StraightFour.Utilities;
+using FiveSQD.StraightFour.Tags;
+using FiveSQD.StraightFour.Materials;
 using Oyedoyin.FixedWing;
 
-namespace FiveSQD.StraightFour.WorldEngine.Entity
+namespace FiveSQD.StraightFour.Entity
 {
     /// <summary>
     /// Class for an airplane entity.

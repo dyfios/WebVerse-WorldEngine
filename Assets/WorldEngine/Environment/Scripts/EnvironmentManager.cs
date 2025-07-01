@@ -1,10 +1,10 @@
 // Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
-using FiveSQD.StraightFour.WorldEngine.Utilities;
+using FiveSQD.StraightFour.Utilities;
 using UnityEngine;
 using OccaSoftware.SuperSimpleSkybox.Runtime;
 
-namespace FiveSQD.StraightFour.WorldEngine.Environment
+namespace FiveSQD.StraightFour.Environment
 {
     /// <summary>
     /// Manager for the environment.

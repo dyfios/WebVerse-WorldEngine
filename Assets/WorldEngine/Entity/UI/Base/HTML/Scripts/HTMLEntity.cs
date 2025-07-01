@@ -1,6 +1,6 @@
 // Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
-using FiveSQD.StraightFour.WorldEngine.Utilities;
+using FiveSQD.StraightFour.Utilities;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +11,7 @@ using UnityEngine.XR.Interaction.Toolkit.UI;
 using Vuplex.WebView;
 #endif
 
-namespace FiveSQD.StraightFour.WorldEngine.Entity
+namespace FiveSQD.StraightFour.Entity
 {
     /// <summary>
     /// Class for an HTML entity.

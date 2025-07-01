@@ -1,10 +1,10 @@
 // Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using UnityEngine;
-using FiveSQD.StraightFour.WorldEngine.Entity;
+using FiveSQD.StraightFour.Entity;
 using System.Collections.Generic;
 
-namespace FiveSQD.StraightFour.WorldEngine.Synchronization
+namespace FiveSQD.StraightFour.Synchronization
 {
     /// <summary>
     /// Base class for a Synchronizer. The World Engine interfaces with a Synchronizer following

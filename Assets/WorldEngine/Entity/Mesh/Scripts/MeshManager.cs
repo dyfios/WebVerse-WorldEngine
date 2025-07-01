@@ -2,10 +2,10 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using FiveSQD.StraightFour.WorldEngine.Tags;
-using FiveSQD.StraightFour.WorldEngine.Utilities;
+using FiveSQD.StraightFour.Tags;
+using FiveSQD.StraightFour.Utilities;
 
-namespace FiveSQD.StraightFour.WorldEngine.MeshManager
+namespace FiveSQD.StraightFour.MeshManager
 {
     /// <summary>
     /// WIP: Class that manages mesh objects.

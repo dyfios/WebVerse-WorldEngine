@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using UnityEngine;
-using FiveSQD.StraightFour.WorldEngine.Utilities;
+using FiveSQD.StraightFour.Utilities;
 
-namespace FiveSQD.StraightFour.WorldEngine.Materials
+namespace FiveSQD.StraightFour.Materials
 {
     /// <summary>
     /// Class for the material manager.

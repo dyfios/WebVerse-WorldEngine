@@ -3,7 +3,7 @@
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using FiveSQD.StraightFour.WorldEngine.Utilities;
+using FiveSQD.StraightFour.Utilities;
 
 public class LoggingTests
 {

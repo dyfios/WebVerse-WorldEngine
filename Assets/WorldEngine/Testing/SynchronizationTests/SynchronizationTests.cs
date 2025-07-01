@@ -4,8 +4,8 @@ using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using FiveSQD.StraightFour.WorldEngine;
-using FiveSQD.StraightFour.WorldEngine.Synchronization;
+using FiveSQD.StraightFour;
+using FiveSQD.StraightFour.Synchronization;
 using UnityEditor;
 
 public class SynchronizationTests
