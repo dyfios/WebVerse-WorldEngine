@@ -3,7 +3,7 @@ The StraightFour World Engine is a World Browser World Engine implemented in Uni
 
 ## Description
 
-This is the Unity3D World Engine for StraightFour.
+This is the Unity3D World Engine for WebVerse.
 
 * For the top-level WebVerse application (NodeJS/Electron project), see [WebVerse](https://github.com/Five-Squared-Interactive/WebVerse)
 * For the WebVerse Runtime (Unity3D project), see [WebVerse Runtime](https://github.com/Five-Squared-Interactive/WebVerse-Runtime)
