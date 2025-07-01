@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity.Terrain
+namespace FiveSQD.StraightFour.WorldEngine.Entity.Terrain
 {
     /// <summary>
     /// Struct for a terrain entity layer.

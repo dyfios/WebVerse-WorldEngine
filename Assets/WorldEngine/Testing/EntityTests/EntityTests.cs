@@ -4,12 +4,12 @@ using System.Collections;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
-using FiveSQD.WebVerse.WorldEngine.Entity;
+using FiveSQD.StraightFour.WorldEngine.Entity;
 using System;
-using FiveSQD.WebVerse.WorldEngine;
-using FiveSQD.WebVerse.WorldEngine.Synchronization;
+using FiveSQD.StraightFour.WorldEngine;
+using FiveSQD.StraightFour.WorldEngine.Synchronization;
 using UnityEditor;
-using FiveSQD.WebVerse.WorldEngine.Entity.Terrain;
+using FiveSQD.StraightFour.WorldEngine.Entity.Terrain;
 using System.Collections.Generic;
 
 public class EntityTests
@@ -2820,7 +2820,7 @@ public class EntityTests
         Assert.AreEqual(Vector3.zero, setMotion.Value.velocity);
 
         // Set Block Info.
-        FiveSQD.WebVerse.WorldEngine.Entity.Voxels.BlockInfo blockInfo = new FiveSQD.WebVerse.WorldEngine.Entity.Voxels.BlockInfo(0);
+        FiveSQD.StraightFour.WorldEngine.Entity.Voxels.BlockInfo blockInfo = new FiveSQD.StraightFour.WorldEngine.Entity.Voxels.BlockInfo(0);
         blockInfo.AddSubType(0, true, null, null, null, null, null, null);
         blockInfo.AddSubType(1, false, null, null, null, null, null, null);
         ve.SetBlockInfo(0, blockInfo);

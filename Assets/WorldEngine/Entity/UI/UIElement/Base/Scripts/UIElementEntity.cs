@@ -2,9 +2,9 @@
 
 using System;
 using UnityEngine;
-using FiveSQD.WebVerse.WorldEngine.Utilities;
+using FiveSQD.StraightFour.WorldEngine.Utilities;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity
+namespace FiveSQD.StraightFour.WorldEngine.Entity
 {
     /// <summary>
     /// Base class for a UI element entity.

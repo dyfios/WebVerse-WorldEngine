@@ -3,10 +3,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using FiveSQD.WebVerse.WorldEngine.Entity.Placement;
-using FiveSQD.WebVerse.WorldEngine.Synchronization;
+using FiveSQD.StraightFour.WorldEngine.Entity.Placement;
+using FiveSQD.StraightFour.WorldEngine.Synchronization;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity
+namespace FiveSQD.StraightFour.WorldEngine.Entity
 {
     /// <summary>
     /// Base class for an entity.

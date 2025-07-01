@@ -1,9 +1,9 @@
 // Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
 using System.Collections.Generic;
-using FiveSQD.WebVerse.WorldEngine.Utilities;
+using FiveSQD.StraightFour.WorldEngine.Utilities;
 
-namespace FiveSQD.WebVerse.WorldEngine.WorldStorage
+namespace FiveSQD.StraightFour.WorldEngine.WorldStorage
 {
     /// <summary>
     /// Class for the World Storage Manager.

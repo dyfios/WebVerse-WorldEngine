@@ -1,6 +1,6 @@
 // Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity.Voxels
+namespace FiveSQD.StraightFour.WorldEngine.Entity.Voxels
 {
     /// <summary>
     /// Class for voxel data.

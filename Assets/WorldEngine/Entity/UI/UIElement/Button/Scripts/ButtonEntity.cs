@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity
+namespace FiveSQD.StraightFour.WorldEngine.Entity
 {
     /// <summary>
     /// Class for a button entity.

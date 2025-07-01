@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace FiveSQD.WebVerse.WorldEngine.Utilities
+namespace FiveSQD.StraightFour.WorldEngine.Utilities
 {
     /// <summary>
     /// Base class for a manager.

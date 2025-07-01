@@ -1,6 +1,6 @@
 {
-    "name": "FiveSQD.WebVerse.WorldEngine",
-    "rootNamespace": "fivesqd.webverse.worldengine",
+    "name": "FiveSQD.StraightFour.WorldEngine",
+    "rootNamespace": "fivesqd.straightfour.worldengine",
     "references": [
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:b6af883ec2a5d8f4f9ff7b816453f7b7",

@@ -3,12 +3,12 @@
 using System;
 using UnityEngine;
 using TMPro;
-using FiveSQD.WebVerse.WorldEngine.Materials;
-using FiveSQD.WebVerse.WorldEngine.Tags;
-using FiveSQD.WebVerse.WorldEngine.Utilities;
+using FiveSQD.StraightFour.WorldEngine.Materials;
+using FiveSQD.StraightFour.WorldEngine.Tags;
+using FiveSQD.StraightFour.WorldEngine.Utilities;
 using System.Collections.Generic;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity
+namespace FiveSQD.StraightFour.WorldEngine.Entity
 {
     /// <summary>
     /// Class for a character entity.

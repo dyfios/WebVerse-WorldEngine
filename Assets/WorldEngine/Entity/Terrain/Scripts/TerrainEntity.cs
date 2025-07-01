@@ -2,12 +2,12 @@
 
 using System;
 using UnityEngine;
-using FiveSQD.WebVerse.WorldEngine.Materials;
-using FiveSQD.WebVerse.WorldEngine.Utilities;
-using FiveSQD.WebVerse.WorldEngine.Entity.Terrain;
+using FiveSQD.StraightFour.WorldEngine.Materials;
+using FiveSQD.StraightFour.WorldEngine.Utilities;
+using FiveSQD.StraightFour.WorldEngine.Entity.Terrain;
 using System.Collections.Generic;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity
+namespace FiveSQD.StraightFour.WorldEngine.Entity
 {
     /// <summary>
     /// Class for a terrain entity.

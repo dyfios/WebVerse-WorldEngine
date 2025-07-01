@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace FiveSQD.WebVerse.WorldEngine
+namespace FiveSQD.StraightFour.WorldEngine
 {
     /// <summary>
     /// Class for the World Engine.

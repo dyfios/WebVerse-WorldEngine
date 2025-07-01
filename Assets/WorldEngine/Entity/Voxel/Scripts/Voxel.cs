@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity.Voxels
+namespace FiveSQD.StraightFour.WorldEngine.Entity.Voxels
 {
     /// <summary>
     /// Class for a voxel.

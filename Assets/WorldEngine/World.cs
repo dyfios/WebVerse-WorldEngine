@@ -1,11 +1,11 @@
 // Copyright (c) 2019-2025 Five Squared Interactive. All rights reserved.
 
-using FiveSQD.WebVerse.WorldEngine.Camera;
-using FiveSQD.WebVerse.WorldEngine.Entity;
-using FiveSQD.WebVerse.WorldEngine.Materials;
-using FiveSQD.WebVerse.WorldEngine.WorldStorage;
-using FiveSQD.WebVerse.WorldEngine.Utilities;
-using FiveSQD.WebVerse.WorldEngine.Environment;
+using FiveSQD.StraightFour.WorldEngine.Camera;
+using FiveSQD.StraightFour.WorldEngine.Entity;
+using FiveSQD.StraightFour.WorldEngine.Materials;
+using FiveSQD.StraightFour.WorldEngine.WorldStorage;
+using FiveSQD.StraightFour.WorldEngine.Utilities;
+using FiveSQD.StraightFour.WorldEngine.Environment;
 using System.Collections.Generic;
 using UnityEngine;
 #if USE_DIGGER
@@ -13,7 +13,7 @@ using Digger.Modules.Core.Sources;
 using Digger.Modules.Runtime.Sources;
 #endif
 
-namespace FiveSQD.WebVerse.WorldEngine.World
+namespace FiveSQD.StraightFour.WorldEngine.World
 {
     /// <summary>
     /// Class for a World.

@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace FiveSQD.WebVerse.WorldEngine.Environment
+namespace FiveSQD.StraightFour.WorldEngine.Environment
 {
     /// <summary>
     /// Class for a sky sphere that follows a transform.

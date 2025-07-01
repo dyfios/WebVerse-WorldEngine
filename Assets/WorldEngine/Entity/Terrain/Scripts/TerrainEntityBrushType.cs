@@ -1,4 +1,4 @@
-namespace FiveSQD.WebVerse.WorldEngine.Entity.Terrain
+namespace FiveSQD.StraightFour.WorldEngine.Entity.Terrain
 {
     public enum TerrainEntityBrushType
     {

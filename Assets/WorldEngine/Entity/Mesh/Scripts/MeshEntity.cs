@@ -2,11 +2,11 @@
 
 using System.Collections.Generic;
 using UnityEngine;
-using FiveSQD.WebVerse.WorldEngine.Materials;
-using FiveSQD.WebVerse.WorldEngine.Tags;
-using FiveSQD.WebVerse.WorldEngine.Utilities;
+using FiveSQD.StraightFour.WorldEngine.Materials;
+using FiveSQD.StraightFour.WorldEngine.Tags;
+using FiveSQD.StraightFour.WorldEngine.Utilities;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity
+namespace FiveSQD.StraightFour.WorldEngine.Entity
 {
     /// <summary>
     /// Class for a mesh entity.

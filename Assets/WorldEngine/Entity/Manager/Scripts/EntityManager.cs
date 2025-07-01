@@ -3,10 +3,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using FiveSQD.WebVerse.WorldEngine.Utilities;
+using FiveSQD.StraightFour.WorldEngine.Utilities;
 using UnityEngine.Audio;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity
+namespace FiveSQD.StraightFour.WorldEngine.Entity
 {
     /// <summary>
     /// The Entity Manager class manages all of the entities in a world and

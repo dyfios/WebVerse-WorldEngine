@@ -2,11 +2,11 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
-using FiveSQD.WebVerse.WorldEngine.Utilities;
+using FiveSQD.StraightFour.WorldEngine.Utilities;
 using System.Collections.Generic;
-using FiveSQD.WebVerse.WorldEngine.Entity;
+using FiveSQD.StraightFour.WorldEngine.Entity;
 
-namespace FiveSQD.WebVerse.WorldEngine.Camera
+namespace FiveSQD.StraightFour.WorldEngine.Camera
 {
     /// <summary>
     /// Class that manages the world's camera.

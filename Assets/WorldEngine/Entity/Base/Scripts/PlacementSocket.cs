@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity.Placement
+namespace FiveSQD.StraightFour.WorldEngine.Entity.Placement
 {
     /// <summary>
     /// A Generic socket for supporting the placement of entities.

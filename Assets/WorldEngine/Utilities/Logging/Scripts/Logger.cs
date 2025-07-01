@@ -2,7 +2,7 @@
 
 using UnityEngine;
 
-namespace FiveSQD.WebVerse.WorldEngine.Utilities
+namespace FiveSQD.StraightFour.WorldEngine.Utilities
 {
     /// <summary>
     /// Log system for the World Engine.

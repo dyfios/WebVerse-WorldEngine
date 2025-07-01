@@ -3,7 +3,7 @@
 using UnityEngine;
 using TMPro;
 
-namespace FiveSQD.WebVerse.WorldEngine.Entity
+namespace FiveSQD.StraightFour.WorldEngine.Entity
 {
     /// <summary>
     /// Class for a text entity.
