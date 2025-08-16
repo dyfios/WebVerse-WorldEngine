@@ -135,6 +135,163 @@ namespace FiveSQD.StraightFour.Entity
         private Vector3 currentVelocity = Vector3.zero;
 
         /// <summary>
+        /// Get the character GameObject.
+        /// </summary>
+        /// <returns>The current character GameObject.</returns>
+        public GameObject GetCharacterGO()
+        {
+            return characterGO;
+        }
+
+        /// <summary>
+        /// Set the character GameObject at runtime.
+        /// </summary>
+        /// <param name="newCharacterGO">The new character GameObject to use.</param>
+        /// <param name="synchronize">Whether or not to synchronize the change.</param>
+        /// <returns>Whether or not the setting was successful.</returns>
+        public bool SetCharacterGO(GameObject newCharacterGO, bool synchronize = true)
+        {
+            if (newCharacterGO == null)
+            {
+                LogSystem.LogError("[CharacterEntity->SetCharacterGO] Character GameObject cannot be null.");
+                return false;
+            }
+
+            // Store old character GameObject
+            GameObject oldCharacterGO = characterGO;
+
+            // Set the new character GameObject
+            characterGO = newCharacterGO;
+            characterGO.SetActive(true);
+            characterGO.transform.SetParent(transform);
+            characterGO.transform.localPosition = characterObjectOffset;
+            characterGO.transform.localRotation = characterObjectRotation;
+
+            // Update meshes for the new character GameObject
+            List<Mesh> ms = new List<Mesh>();
+            foreach (MeshFilter filt in characterGO.GetComponentsInChildren<MeshFilter>())
+            {
+                ms.Add(filt.sharedMesh);
+            }
+            SetRenderers(ms.ToArray());
+
+            // Calculate new bounds
+            Bounds bounds = new Bounds(Vector3.zero, Vector3.zero);
+            foreach (Mesh m in meshes)
+            {
+                m.RecalculateBounds();
+                bounds.Encapsulate(m.bounds);
+            }
+            originalMeshSize = bounds.size;
+
+            // Clean up old character GameObject
+            if (oldCharacterGO != null)
+            {
+                DestroyImmediate(oldCharacterGO);
+            }
+
+            GameObject characterLabel = Instantiate(StraightFour.ActiveWorld.entityManager.characterControllerLabelPrefab);
+            characterLabel.transform.SetParent(characterGO.transform);
+
+            // Find the character label and update its text.
+            TextMeshProUGUI[] labels = characterGO.GetComponentsInChildren<TextMeshProUGUI>();
+            foreach (TextMeshProUGUI label in labels)
+            {
+                label.text = entityTag;
+                break; // Assume there's only one label per character
+            }
+
+            if (synchronize && synchronizer != null)
+            {
+                // Note: Synchronization logic would go here if needed
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Set the character object offset at runtime.
+        /// </summary>
+        /// <param name="newOffset">The new offset to apply.</param>
+        /// <param name="synchronize">Whether or not to synchronize the change.</param>
+        /// <returns>Whether or not the setting was successful.</returns>
+        public bool SetCharacterObjectOffset(Vector3 newOffset, bool synchronize = true)
+        {
+            if (characterGO == null)
+            {
+                LogSystem.LogError("[CharacterEntity->SetCharacterObjectOffset] No character GameObject.");
+                return false;
+            }
+
+            characterObjectOffset = newOffset;
+            characterGO.transform.localPosition = characterObjectOffset;
+
+            if (synchronize && synchronizer != null)
+            {
+                // Note: Synchronization logic would go here if needed
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Set the character object rotation at runtime.
+        /// </summary>
+        /// <param name="newRotation">The new rotation to apply.</param>
+        /// <param name="synchronize">Whether or not to synchronize the change.</param>
+        /// <returns>Whether or not the setting was successful.</returns>
+        public bool SetCharacterObjectRotation(Quaternion newRotation, bool synchronize = true)
+        {
+            if (characterGO == null)
+            {
+                LogSystem.LogError("[CharacterEntity->SetCharacterObjectRotation] No character GameObject.");
+                return false;
+            }
+
+            characterObjectRotation = newRotation;
+            characterGO.transform.localRotation = characterObjectRotation;
+
+            if (synchronize && synchronizer != null)
+            {
+                // Note: Synchronization logic would go here if needed
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Set the character label offset at runtime.
+        /// </summary>
+        /// <param name="newOffset">The new offset to apply.</param>
+        /// <param name="synchronize">Whether or not to synchronize the change.</param>
+        /// <returns>Whether or not the setting was successful.</returns>
+        public bool SetCharacterLabelOffset(Vector3 newOffset, bool synchronize = true)
+        {
+            if (characterGO == null)
+            {
+                LogSystem.LogError("[CharacterEntity->SetCharacterLabelOffset] No character GameObject.");
+                return false;
+            }
+
+            characterLabelOffset = newOffset;
+
+            // Find the character label and update its position
+            TextMeshProUGUI[] labels = characterGO.GetComponentsInChildren<TextMeshProUGUI>();
+            foreach (TextMeshProUGUI label in labels)
+            {
+                label.transform.parent.localPosition = characterLabelOffset;
+                break; // Assume there's only one label per character
+            }
+
+            if (synchronize && synchronizer != null)
+            {
+                // Note: Synchronization logic would go here if needed
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Apply motion to the character entity with the given vector.
         /// </summary>
         /// <param name="amount">Amount to move the character entity.</param>
