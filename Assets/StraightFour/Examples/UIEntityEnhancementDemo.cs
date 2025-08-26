@@ -22,12 +22,22 @@ namespace FiveSQD.StraightFour.Examples
             CanvasEntity canvas = canvasGO.AddComponent<CanvasEntity>();
             canvas.Initialize(System.Guid.NewGuid());
 
-            // Demo 1: UIElementEntity with stretch to parent
-            GameObject uiElementGO = new GameObject("StretchedElement");
+            // Demo 1: UIElementEntity with stretch to parent (enabled and disabled)
+            GameObject uiElementGO = new GameObject("StretchableElement");
             UIElementEntity uiElement = uiElementGO.AddComponent<UIElementEntity>();
             uiElement.Initialize(System.Guid.NewGuid(), canvas);
+            
+            // Enable stretch to parent
+            uiElement.StretchToParent(true);
+            Debug.Log($"Created UI element that stretches to parent: {uiElement.IsStretchedToParent()}");
+            
+            // Disable stretch to parent
+            uiElement.StretchToParent(false);
+            Debug.Log($"Disabled stretch to parent: {uiElement.IsStretchedToParent()}");
+            
+            // Re-enable using default parameter (backward compatibility)
             uiElement.StretchToParent();
-            Debug.Log("Created UI element that stretches to parent");
+            Debug.Log($"Re-enabled stretch using default parameter: {uiElement.IsStretchedToParent()}");
 
             // Demo 2: UIElementEntity with center alignment
             GameObject centeredElementGO = new GameObject("CenteredElement");

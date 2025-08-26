@@ -24,15 +24,31 @@ public class UIEntityEnhancementTests
 
         yield return null;
 
-        // Test stretch to parent
-        bool result = uiElement.StretchToParent();
-        Assert.IsTrue(result, "StretchToParent should return true");
+        // Test stretch to parent (enabled)
+        bool result = uiElement.StretchToParent(true);
+        Assert.IsTrue(result, "StretchToParent(true) should return true");
 
         RectTransform rt = uiElement.GetComponent<RectTransform>();
         Assert.IsNotNull(rt, "RectTransform should exist");
-        Assert.AreEqual(Vector2.zero, rt.anchorMin, "AnchorMin should be (0,0)");
-        Assert.AreEqual(Vector2.one, rt.anchorMax, "AnchorMax should be (1,1)");
-        Assert.AreEqual(Vector2.zero, rt.sizeDelta, "SizeDelta should be (0,0)");
+        Assert.AreEqual(Vector2.zero, rt.anchorMin, "AnchorMin should be (0,0) when stretched");
+        Assert.AreEqual(Vector2.one, rt.anchorMax, "AnchorMax should be (1,1) when stretched");
+        Assert.AreEqual(Vector2.zero, rt.sizeDelta, "SizeDelta should be (0,0) when stretched");
+        Assert.IsTrue(uiElement.IsStretchedToParent(), "IsStretchedToParent should return true");
+
+        // Test stretch to parent (disabled)
+        result = uiElement.StretchToParent(false);
+        Assert.IsTrue(result, "StretchToParent(false) should return true");
+        Assert.AreEqual(new Vector2(0.5f, 0.5f), rt.anchorMin, "AnchorMin should be (0.5,0.5) when not stretched");
+        Assert.AreEqual(new Vector2(0.5f, 0.5f), rt.anchorMax, "AnchorMax should be (0.5,0.5) when not stretched");
+        Assert.AreEqual(new Vector2(100f, 30f), rt.sizeDelta, "SizeDelta should be (100,30) when not stretched");
+        Assert.IsFalse(uiElement.IsStretchedToParent(), "IsStretchedToParent should return false");
+
+        // Test backward compatibility (no parameter = stretch enabled)
+        result = uiElement.StretchToParent();
+        Assert.IsTrue(result, "StretchToParent() should return true");
+        Assert.AreEqual(Vector2.zero, rt.anchorMin, "AnchorMin should be (0,0) with default parameter");
+        Assert.AreEqual(Vector2.one, rt.anchorMax, "AnchorMax should be (1,1) with default parameter");
+        Assert.IsTrue(uiElement.IsStretchedToParent(), "IsStretchedToParent should return true with default parameter");
 
         // Cleanup
         Object.DestroyImmediate(canvasGO);
