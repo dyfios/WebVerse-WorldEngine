@@ -21,17 +21,17 @@ namespace FiveSQD.StraightFour.Entity
         /// <summary>
         /// The camera to face. If null, will automatically find the main camera.
         /// </summary>
-        private Camera targetCamera;
+        private UnityEngine.Camera targetCamera;
 
         void Start()
         {
             // Find the target camera
             if (targetCamera == null)
             {
-                targetCamera = Camera.main;
+                targetCamera = UnityEngine.Camera.main;
                 if (targetCamera == null)
                 {
-                    targetCamera = FindObjectOfType<Camera>();
+                    targetCamera = FindObjectOfType<UnityEngine.Camera>();
                 }
             }
         }
@@ -41,10 +41,10 @@ namespace FiveSQD.StraightFour.Entity
             // Ensure we have a valid camera to face
             if (targetCamera == null)
             {
-                targetCamera = Camera.main;
+                targetCamera = UnityEngine.Camera.main;
                 if (targetCamera == null)
                 {
-                    targetCamera = FindObjectOfType<Camera>();
+                    targetCamera = FindObjectOfType<UnityEngine.Camera>();
                 }
                 
                 if (targetCamera == null)
@@ -67,7 +67,7 @@ namespace FiveSQD.StraightFour.Entity
             if (direction.magnitude > 0.001f)
             {
                 // Calculate the rotation to face the camera
-                Quaternion targetRotation = Quaternion.LookRotation(direction);
+                Quaternion targetRotation = Quaternion.LookRotation(Quaternion.Euler(0, 180, 0) * direction);
                 
                 // Apply the rotation
                 transform.rotation = targetRotation;
@@ -78,7 +78,7 @@ namespace FiveSQD.StraightFour.Entity
         /// Manually set the target camera for this billboard.
         /// </summary>
         /// <param name="camera">The camera to face.</param>
-        public void SetTargetCamera(Camera camera)
+        public void SetTargetCamera(UnityEngine.Camera camera)
         {
             targetCamera = camera;
         }

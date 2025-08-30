@@ -18,7 +18,8 @@ namespace FiveSQD.StraightFour.Entity
         /// <summary>
         /// Tag for the entity.
         /// </summary>
-        public override string entityTag {
+        public override string entityTag
+        {
             get => base.entityTag;
             set
             {
@@ -45,7 +46,7 @@ namespace FiveSQD.StraightFour.Entity
         /// <summary>
         /// Height of the character model.
         /// </summary>
-        [Range (0, float.MaxValue)]
+        [Range(0, float.MaxValue)]
         public float height;
 
         /// <summary>
@@ -192,6 +193,7 @@ namespace FiveSQD.StraightFour.Entity
 
             GameObject characterLabel = Instantiate(StraightFour.ActiveWorld.entityManager.characterControllerLabelPrefab);
             characterLabel.transform.SetParent(characterGO.transform);
+            Billboard billboard = characterLabel.transform.parent.gameObject.AddComponent<Billboard>();
 
             // Find the character label and update its text.
             TextMeshProUGUI[] labels = characterGO.GetComponentsInChildren<TextMeshProUGUI>();
@@ -342,7 +344,7 @@ namespace FiveSQD.StraightFour.Entity
                 LogSystem.LogError("[CharacterEntity->Jump] No rigidbody for character entity.");
                 return false;
             }
-            
+
             if (IsOnSurface() || !discardIfFalling)
             {
                 currentVelocity.y += amount;
@@ -697,7 +699,7 @@ namespace FiveSQD.StraightFour.Entity
             if (characterObjectPrefab == null)
             {
                 characterGO = Instantiate(StraightFour.ActiveWorld.entityManager.characterControllerPrefab);
-                
+
                 // Check if the default prefab has a label, if not create one
                 TextMeshProUGUI existingLabel = characterGO.GetComponentInChildren<TextMeshProUGUI>();
                 if (existingLabel == null && StraightFour.ActiveWorld.entityManager.characterControllerLabelPrefab != null)
@@ -705,16 +707,16 @@ namespace FiveSQD.StraightFour.Entity
                     GameObject characterLabel = Instantiate(StraightFour.ActiveWorld.entityManager.characterControllerLabelPrefab);
                     characterLabel.transform.SetParent(characterGO.transform);
                     characterLabel.transform.localPosition = avatarLabelOffset;
-                    
+
                     // Add Billboard component to make the label always face the camera
                     Billboard billboard = characterLabel.GetComponent<Billboard>();
                     if (billboard == null)
                     {
-                        billboard = characterLabel.AddComponent<Billboard>();
+                        billboard = characterLabel.transform.parent.gameObject.AddComponent<Billboard>();
                     }
                     // Lock X axis for character labels to prevent tilting
                     billboard.lockXAxis = true;
-                    
+
                     characterLabel.SetActive(true);
                 }
                 else if (existingLabel != null)
@@ -738,7 +740,7 @@ namespace FiveSQD.StraightFour.Entity
                 characterLabel.transform.localPosition = avatarLabelOffset;
                 //characterLabel.transform.localRotation = Quaternion.identity;
                 //characterLabel.transform.localScale = Vector3.one;
-                
+
                 // Add Billboard component to make the label always face the camera
                 Billboard billboard = characterLabel.GetComponent<Billboard>();
                 if (billboard == null)
@@ -747,7 +749,7 @@ namespace FiveSQD.StraightFour.Entity
                 }
                 // Lock X axis for character labels to prevent tilting
                 billboard.lockXAxis = true;
-                
+
                 characterLabel.SetActive(true);
             }
             characterGO.transform.SetParent(transform);
@@ -793,7 +795,7 @@ namespace FiveSQD.StraightFour.Entity
             {
                 capsuleCollider = gameObject.AddComponent<CapsuleCollider>();
             }
-            
+
             SetColliders(capsuleCollider);
 
             CharacterController characterController = gameObject.GetComponent<CharacterController>();
@@ -897,9 +899,9 @@ namespace FiveSQD.StraightFour.Entity
                 default:
                     break;
             }
-            
+
             rigidBody.isKinematic = true;
-            
+
             capsuleCollider.enabled = false;
             gameObject.SetActive(false);
             interactionState = InteractionState.Hidden;
@@ -1025,9 +1027,8 @@ namespace FiveSQD.StraightFour.Entity
         private float timeWaitedForUpdate = 0;
         private int stepToRaise = 1;
         private int maxStepToRaise = 1024;
-        protected override void Update()
+        void FixedUpdate()
         {
-            base.Update();
             timeWaitedForUpdate += Time.deltaTime;
             if (timeWaitedForUpdate >= timeToWaitForUpdate)
             {
@@ -1060,7 +1061,7 @@ namespace FiveSQD.StraightFour.Entity
             {
                 if (!IsAboveGround())
                 {
-                    characterController.transform.position = new Vector3(characterController.transform.position.x, 
+                    characterController.transform.position = new Vector3(characterController.transform.position.x,
                         characterController.transform.position.y + (stepToRaise *= 2), characterController.transform.position.z);
                     if (stepToRaise > maxStepToRaise)
                     {

@@ -105,6 +105,17 @@ namespace FiveSQD.StraightFour.Synchronization
         }
 
         /// <summary>
+        /// Method to set the position of a synchronized entity.
+        /// </summary>
+        /// <param name="entityToSet">The entity to set the position of.</param>
+        /// <param name="position">Position value.</param>
+        /// <returns><see cref="StatusCode"/>StatusCode</returns>
+        public virtual StatusCode SetPositionPercent(BaseEntity entityToSet, Vector2 position)
+        {
+            return StatusCode.UNSUPPORTED;
+        }
+
+        /// <summary>
         /// Method to set the rotation of a synchronized entity.
         /// </summary>
         /// <param name="entityToSet">The entity to set the rotation of.</param>
@@ -133,6 +144,17 @@ namespace FiveSQD.StraightFour.Synchronization
         /// <param name="size">Size value.</param>
         /// <returns><see cref="StatusCode"/>StatusCode</returns>
         public virtual StatusCode SetSize(BaseEntity entityToSet, Vector3 size)
+        {
+            return StatusCode.UNSUPPORTED;
+        }
+
+        /// <summary>
+        /// Method to set the size of a synchronized entity.
+        /// </summary>
+        /// <param name="entityToSet">The entity to set the size of.</param>
+        /// <param name="size">Size value.</param>
+        /// <returns><see cref="StatusCode"/>StatusCode</returns>
+        public virtual StatusCode SetSizePercent(BaseEntity entityToSet, Vector2 size)
         {
             return StatusCode.UNSUPPORTED;
         }

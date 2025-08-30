@@ -2874,7 +2874,7 @@ public class EntityTests
         yield return null;
 
         // Get the character entity
-        CharacterEntity character = StraightFour.ActiveWorld.entityManager.GetEntity(characterID) as CharacterEntity;
+        CharacterEntity character = StraightFour.ActiveWorld.entityManager.FindEntity(characterID) as CharacterEntity;
         Assert.IsNotNull(character);
 
         // Find the character label with Billboard component

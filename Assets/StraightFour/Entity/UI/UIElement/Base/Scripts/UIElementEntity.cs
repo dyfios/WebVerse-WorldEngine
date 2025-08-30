@@ -226,8 +226,8 @@ namespace FiveSQD.StraightFour.Entity
                 LogSystem.LogError("[UIElementEntity->CorrectSizeAndPosition] No parent canvas entity.");
                 return false;
             }
-			
-			UIEntity parentUIEntity = GetParentUIEntity();
+
+            UIEntity parentUIEntity = GetParentUIEntity();
             if (parentUIEntity == null)
             {
                 LogSystem.LogError("[UIElementEntity->CorrectSizeAndPosition] No parent UI entity.");
@@ -240,11 +240,11 @@ namespace FiveSQD.StraightFour.Entity
                 LogSystem.LogError("[UIElementEntity->CorrectSizeAndPosition] No parent UI entity rect transform.");
                 return false;
             }
-            
+
             Vector2 worldSize = new Vector2(parentRT.sizeDelta.x * targetSize.x, parentRT.sizeDelta.y * targetSize.y);
             Vector3 worldPos = new Vector3(parentRT.sizeDelta.x * targetPosition.x + rt.sizeDelta.x / 2,
                 -1 * parentRT.sizeDelta.y * targetPosition.y - rt.sizeDelta.y / 2);
-            
+
             rt.sizeDelta = worldSize;
             rt.anchorMin = rt.anchorMax = new Vector2(0, 1);
             rt.pivot = new Vector2(0.5f, 0.5f);
@@ -282,18 +282,147 @@ namespace FiveSQD.StraightFour.Entity
         {
             return GetComponentInParent<CanvasEntity>(true);
         }
-		
-		/// <summary>
+
+        /// <summary>
         /// Get the parent UI entity of this entity.
         /// </summary>
         /// <returns>The parent UI entity.</returns>
-		protected UIEntity GetParentUIEntity()
+        protected UIEntity GetParentUIEntity()
+        {
+            if (transform.parent == null)
+            {
+                return null;
+            }
+            return transform.parent.GetComponentInParent<UIEntity>(true);
+        }
+        
+        /// <summary>
+		/// Set whether the UI element should stretch to fill its parent.
+		/// </summary>
+		/// <param name="stretch">Whether to stretch to parent. If false, restores normal sizing.</param>
+		/// <param name="synchronize">Whether or not to synchronize the setting.</param>
+		/// <returns>Whether or not the operation was successful.</returns>
+		public virtual bool StretchToParent(bool stretch = true, bool synchronize = true)
 		{
-			if (transform.parent == null)
+			RectTransform rt = uiElementRectTransform;
+			if (rt == null)
 			{
-				return null;
+				LogSystem.LogWarning("[UIElementEntity->StretchToParent] No rect transform.");
+				return false;
 			}
-			return transform.parent.GetComponentInParent<UIEntity>(true);
+
+			if (stretch)
+			{
+				// Set anchors to stretch to parent
+				rt.anchorMin = Vector2.zero;
+				rt.anchorMax = Vector2.one;
+				rt.anchoredPosition = Vector2.zero;
+				rt.sizeDelta = Vector2.zero;
+
+				if (synchronize && synchronizer != null)
+				{
+					// Synchronize with the network if needed
+					synchronizer.SetPositionPercent(this, Vector2.zero);
+					synchronizer.SetSizePercent(this, Vector2.one);
+				}
+			}
+			else
+			{
+				// Restore to normal (centered) positioning with default size
+				rt.anchorMin = new Vector2(0.5f, 0.5f);
+				rt.anchorMax = new Vector2(0.5f, 0.5f);
+				rt.pivot = new Vector2(0.5f, 0.5f);
+				rt.anchoredPosition = Vector2.zero;
+				
+				// Set a reasonable default size (100x30 pixels)
+				rt.sizeDelta = new Vector2(100f, 30f);
+
+				if (synchronize && synchronizer != null)
+				{
+					// Synchronize with the network if needed
+					synchronizer.SetPositionPercent(this, new Vector2(0.5f, 0.5f));
+					synchronizer.SetSizePercent(this, new Vector2(0.1f, 0.1f)); // 10% of parent size as default
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Set the alignment of the UI element within its parent.
+		/// </summary>
+		/// <param name="alignment">Alignment to set.</param>
+		/// <param name="synchronize">Whether or not to synchronize the setting.</param>
+		/// <returns>Whether or not the operation was successful.</returns>
+		public virtual bool SetAlignment(UIElementAlignment alignment, bool synchronize = true)
+		{
+			RectTransform rt = uiElementRectTransform;
+			if (rt == null)
+			{
+				LogSystem.LogWarning("[UIElementEntity->SetAlignment] No rect transform.");
+				return false;
+			}
+
+			Vector2 anchorMin, anchorMax, pivot;
+
+			switch (alignment)
+			{
+				case UIElementAlignment.Center:
+					anchorMin = anchorMax = new Vector2(0.5f, 0.5f);
+					pivot = new Vector2(0.5f, 0.5f);
+					break;
+				case UIElementAlignment.Left:
+					anchorMin = anchorMax = new Vector2(0f, 0.5f);
+					pivot = new Vector2(0f, 0.5f);
+					break;
+				case UIElementAlignment.Right:
+					anchorMin = anchorMax = new Vector2(1f, 0.5f);
+					pivot = new Vector2(1f, 0.5f);
+					break;
+				case UIElementAlignment.Top:
+					anchorMin = anchorMax = new Vector2(0.5f, 1f);
+					pivot = new Vector2(0.5f, 1f);
+					break;
+				case UIElementAlignment.Bottom:
+					anchorMin = anchorMax = new Vector2(0.5f, 0f);
+					pivot = new Vector2(0.5f, 0f);
+					break;
+				default:
+					LogSystem.LogWarning("[UIElementEntity->SetAlignment] Unknown alignment.");
+					return false;
+			}
+
+			rt.anchorMin = anchorMin;
+			rt.anchorMax = anchorMax;
+			rt.pivot = pivot;
+			rt.anchoredPosition = Vector2.zero;
+
+			if (synchronize && synchronizer != null)
+			{
+				// Calculate position percentage based on alignment for synchronization
+				Vector2 positionPercent = Vector2.zero;
+				switch (alignment)
+				{
+					case UIElementAlignment.Center:
+						positionPercent = new Vector2(0.5f, 0.5f);
+						break;
+					case UIElementAlignment.Left:
+						positionPercent = new Vector2(0f, 0.5f);
+						break;
+					case UIElementAlignment.Right:
+						positionPercent = new Vector2(1f, 0.5f);
+						break;
+					case UIElementAlignment.Top:
+						positionPercent = new Vector2(0.5f, 1f);
+						break;
+					case UIElementAlignment.Bottom:
+						positionPercent = new Vector2(0.5f, 0f);
+						break;
+				}
+				synchronizer.SetPositionPercent(this, positionPercent);
+			}
+
+			return true;
 		}
     }
 }
