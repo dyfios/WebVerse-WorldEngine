@@ -919,7 +919,7 @@ namespace FiveSQD.StraightFour.Entity
             // Match the right edge of this terrain with the left edge of the other terrain
             for (int j = 0; j < Mathf.Min(myHeight, otherHeight); j++)
             {
-                int otherJ = j * (otherHeight - 1) / (myHeight - 1);
+                int otherJ = myHeight > 1 ? j * (otherHeight - 1) / (myHeight - 1) : 0;
                 float averageHeight = (heights[myWidth - 1, j] + otherHeights[0, otherJ]) * 0.5f;
                 heights[myWidth - 1, j] = averageHeight;
             }
@@ -937,7 +937,7 @@ namespace FiveSQD.StraightFour.Entity
             // Match the left edge of this terrain with the right edge of the other terrain
             for (int j = 0; j < Mathf.Min(myHeight, otherHeight); j++)
             {
-                int otherJ = j * (otherHeight - 1) / (myHeight - 1);
+                int otherJ = myHeight > 1 ? j * (otherHeight - 1) / (myHeight - 1) : 0;
                 float averageHeight = (heights[0, j] + otherHeights[otherWidth - 1, otherJ]) * 0.5f;
                 heights[0, j] = averageHeight;
             }
@@ -955,7 +955,7 @@ namespace FiveSQD.StraightFour.Entity
             // Match the front edge of this terrain with the back edge of the other terrain
             for (int i = 0; i < Mathf.Min(myWidth, otherWidth); i++)
             {
-                int otherI = i * (otherWidth - 1) / (myWidth - 1);
+                int otherI = myWidth > 1 ? i * (otherWidth - 1) / (myWidth - 1) : 0;
                 float averageHeight = (heights[i, myHeight - 1] + otherHeights[otherI, 0]) * 0.5f;
                 heights[i, myHeight - 1] = averageHeight;
             }
@@ -973,7 +973,7 @@ namespace FiveSQD.StraightFour.Entity
             // Match the back edge of this terrain with the front edge of the other terrain
             for (int i = 0; i < Mathf.Min(myWidth, otherWidth); i++)
             {
-                int otherI = i * (otherWidth - 1) / (myWidth - 1);
+                int otherI = myWidth > 1 ? i * (otherWidth - 1) / (myWidth - 1) : 0;
                 float averageHeight = (heights[i, 0] + otherHeights[otherI, otherHeight - 1]) * 0.5f;
                 heights[i, 0] = averageHeight;
             }
