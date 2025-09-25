@@ -352,7 +352,7 @@ public bool SetScale(Vector3 scale, bool synchronize = true)
 ```csharp
 public bool SetMesh(Mesh mesh, bool synchronize = true)
 public bool SetMaterials(Material[] materials, bool synchronize = true)
-public bool SetCollider(ColliderType colliderType, bool synchronize = true)
+// Note: Colliders are automatically created based on mesh geometry
 ```
 
 #### TerrainEntity
@@ -610,15 +610,7 @@ public enum RenderMode
     WorldSpace
 }
 
-public enum ColliderType
-{
-    None,
-    Box,
-    Sphere,
-    Capsule,
-    Mesh,
-    Convex
-}
+
 ```
 
 ### Structures
