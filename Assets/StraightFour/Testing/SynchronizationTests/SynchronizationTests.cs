@@ -74,5 +74,27 @@ public class SynchronizationTests
 
         // Make Screen Canvas.
         Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.MakeScreenCanvas(null));
+
+        // Set Position Percent.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SetPositionPercent(null, Vector2.zero));
+
+        // Set Size Percent.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SetSizePercent(null, Vector2.zero));
+
+        // Modify Terrain Entity.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.ModifyTerrainEntity(null, 0, 0, 0, null));
+
+        // Set Interaction State.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SetInteractionState(null, BaseEntity.InteractionState.Static));
+
+        // Add Synchronized Entity.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.AddSynchronizedEntity(null, false));
+
+        // Remove Synchronized Entity.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.RemoveSynchronizedEntity(null));
+
+        // Send Message.
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SendMessage(null, null));
+        Assert.AreEqual(BaseSynchronizer.StatusCode.UNSUPPORTED, bs.SendMessage("topic", "message"));
     }
 }
