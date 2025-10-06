@@ -2416,6 +2416,70 @@ public class EntityTests
         Assert.True(te == null);
     }
 
+    [UnityTest]
+    public IEnumerator EntityTests_TerrainEntity_Stitching()
+    {
+        // Initialize World Engine and Load World.
+        GameObject WEGO = new GameObject();
+        StraightFour we = WEGO.AddComponent<StraightFour>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        yield return null;
+        StraightFour.LoadWorld("test");
+
+        // Set up terrain layers and masks
+        TerrainEntityLayer[] layers = new TerrainEntityLayer[1]
+        {
+            new TerrainEntityLayer() 
+            { 
+                diffuse = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/StraightFour/Testing/TestResources/1.png"),
+                metallic = 0.0f,
+                smoothness = 0.5f
+            }
+        };
+        
+        float[,] layerMask = { { 1.0f, 1.0f }, { 1.0f, 1.0f } };
+        Dictionary<int, float[,]> layerMasks = new Dictionary<int, float[,]>();
+        layerMasks.Add(0, layerMask);
+
+        // Create first terrain
+        float[,] heights1 = { { 0.0f, 0.5f }, { 0.5f, 1.0f } };
+        Guid terrain1ID = Guid.NewGuid();
+        TerrainEntity terrain1 = TerrainEntity.Create(2, 2, 2, heights1, layers, layerMasks, terrain1ID, true);
+        terrain1.SetPosition(new Vector3(0, 0, 0), false, false);
+
+        // Create second terrain adjacent to the first
+        float[,] heights2 = { { 1.5f, 2.0f }, { 2.0f, 2.5f } };
+        Guid terrain2ID = Guid.NewGuid();
+        TerrainEntity terrain2 = TerrainEntity.Create(2, 2, 2, heights2, layers, layerMasks, terrain2ID, true);
+        terrain2.SetPosition(new Vector3(2, 0, 0), false, false);
+
+        yield return null;
+
+        // Test stitching functionality
+        Assert.IsTrue(terrain1.GetStitching(), "Terrain1 should have stitching enabled");
+        Assert.IsTrue(terrain2.GetStitching(), "Terrain2 should have stitching enabled");
+
+        // Test finding adjacent terrains
+        List<TerrainEntity> adjacentToTerrain1 = terrain1.FindAdjacentTerrains();
+        Assert.IsTrue(adjacentToTerrain1.Count > 0, "Terrain1 should find adjacent terrains");
+
+        // Test stitching process
+        terrain1.StitchWithAdjacentTerrains();
+        terrain2.StitchWithAdjacentTerrains();
+        yield return null;
+
+        // Test disabling stitching
+        terrain1.SetStitching(false);
+        Assert.IsFalse(terrain1.GetStitching(), "Terrain1 stitching should be disabled");
+
+        // Clean up
+        terrain1.Delete();
+        terrain2.Delete();
+        yield return null;
+        Assert.True(terrain1 == null);
+        Assert.True(terrain2 == null);
+    }
+
 #if TEST_HYBRID_TERRAIN
     [UnityTest]
     public IEnumerator EntityTests_HybridTerrainEntity()
@@ -2657,6 +2721,67 @@ public class EntityTests
         te.Delete();
         yield return null;
         Assert.True(te == null);
+    }
+#endif
+
+#if TEST_HYBRID_TERRAIN
+    [UnityTest]
+    public IEnumerator EntityTests_HybridTerrainEntity_Stitching()
+    {
+        // Initialize World Engine and Load World.
+        GameObject WEGO = new GameObject();
+        StraightFour we = WEGO.AddComponent<StraightFour>();
+        we.skyMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/StraightFour/Environment/Materials/skybox.mat");
+        yield return null;
+        StraightFour.LoadWorld("test");
+
+        // Set up terrain layers and masks
+        TerrainEntityLayer[] layers = new TerrainEntityLayer[1]
+        {
+            new TerrainEntityLayer { diffuseTexture = null, normalTexture = null, maskTexture = null, tileSize = Vector2.one, tileOffset = Vector2.zero, specular = Color.white, metallic = 0.0f, smoothness = 0.5f }
+        };
+        
+        float[,] layerMask = { { 1.0f, 1.0f }, { 1.0f, 1.0f } };
+        Dictionary<int, float[,]> layerMasks = new Dictionary<int, float[,]>();
+        layerMasks.Add(0, layerMask);
+
+        // Create first terrain
+        float[,] heights1 = { { 0.0f, 0.5f }, { 0.5f, 1.0f } };
+        Guid terrain1ID = Guid.NewGuid();
+        HybridTerrainEntity terrain1 = HybridTerrainEntity.Create(2, 2, 2, heights1, layers, layerMasks, terrain1ID, true);
+        terrain1.SetPosition(new Vector3(0, 0, 0), false, false);
+
+        // Create second terrain adjacent to the first
+        float[,] heights2 = { { 1.5f, 2.0f }, { 2.0f, 2.5f } };
+        Guid terrain2ID = Guid.NewGuid();
+        HybridTerrainEntity terrain2 = HybridTerrainEntity.Create(2, 2, 2, heights2, layers, layerMasks, terrain2ID, true);
+        terrain2.SetPosition(new Vector3(2, 0, 0), false, false);
+
+        yield return null;
+
+        // Test stitching functionality
+        Assert.IsTrue(terrain1.GetStitching(), "Terrain1 should have stitching enabled");
+        Assert.IsTrue(terrain2.GetStitching(), "Terrain2 should have stitching enabled");
+
+        // Test finding adjacent terrains
+        List<HybridTerrainEntity> adjacentToTerrain1 = terrain1.FindAdjacentTerrains();
+        Assert.IsTrue(adjacentToTerrain1.Count > 0, "Terrain1 should find adjacent terrains");
+
+        // Test stitching process
+        terrain1.StitchWithAdjacentTerrains();
+        terrain2.StitchWithAdjacentTerrains();
+        yield return null;
+
+        // Test disabling stitching
+        terrain1.SetStitching(false);
+        Assert.IsFalse(terrain1.GetStitching(), "Terrain1 stitching should be disabled");
+
+        // Clean up
+        terrain1.Delete();
+        terrain2.Delete();
+        yield return null;
+        Assert.True(terrain1 == null);
+        Assert.True(terrain2 == null);
     }
 #endif
 
