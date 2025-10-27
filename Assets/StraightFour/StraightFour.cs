@@ -127,6 +127,12 @@ namespace FiveSQD.StraightFour
         public GameObject crosshair;
 
         /// <summary>
+        /// Logging configuration for the StraightFour instance.
+        /// </summary>
+        [Tooltip("Logging configuration for the StraightFour instance.")]
+        public Utilities.LoggingConfig loggingConfig;
+
+        /// <summary>
         /// The active world loaded by the world engine.
         /// </summary>
         public static World.World ActiveWorld
@@ -166,9 +172,15 @@ namespace FiveSQD.StraightFour
         /// Load a world.
         /// </summary>
         /// <param name="worldName">Name for the world.</param>
+        /// <param name="queryParams">Query parameters for the world.</param>
+        /// <param name="loggingConfig">Logging configuration to use. If null, uses the instance's default configuration.</param>
         /// <returns>Whether or not the operation was successful.</returns>
-        public static bool LoadWorld(string worldName, string queryParams = null)
+        public static bool LoadWorld(string worldName, string queryParams = null, Utilities.LoggingConfig loggingConfig = null)
         {
+            // Set the logging configuration if provided, otherwise use the instance's default
+            Utilities.LoggingConfig configToUse = loggingConfig ?? instance.loggingConfig;
+            Utilities.LogSystem.SetLoggingConfig(configToUse);
+
             if (instance.currentWorld != null)
             {
                 Utilities.LogSystem.LogError("[StraightFour->LoadWorld] Cannot load world. A world is loaded.");
